@@ -6,9 +6,9 @@ namespace Talented
 {
     public class TalentedTabUI : ITab
     {
-        protected Gene_TalentBase TalentGene => (Gene_TalentBase)SelPawn.genes.GetGene(GeneDef);
-        protected GeneDef GeneDef { get; }
-        public override bool IsVisible => SelPawn?.genes?.GetGene(GeneDef) != null;
+        protected Gene_TalentBase TalentGene => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>();
+        protected TalentedGeneDef GeneDef => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>().TalentedGeneDef;
+        public override bool IsVisible => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>() != null;
 
         protected const float PADDING = 5f;
         protected const float BUTTON_WIDTH = 90f;
@@ -19,13 +19,7 @@ namespace Talented
 
         public TalentedTabUI()
         {
-            labelKey = "Parasite";
-            size = tabSize;
-        }
-        public TalentedTabUI(GeneDef geneDef, string labelKey = "Talents")
-        {
-            this.GeneDef = geneDef;
-            this.labelKey = labelKey;
+            labelKey = "Talents";
             size = tabSize;
         }
 

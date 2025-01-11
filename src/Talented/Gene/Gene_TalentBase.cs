@@ -24,7 +24,7 @@ namespace Talented
         protected virtual float ExperiencePerLevel => 1.5f;
         protected const int MaxLevel = 300;
 
-        protected TalentedGeneDef TalentedGeneDef => (TalentedGeneDef)def;
+        public TalentedGeneDef TalentedGeneDef => (TalentedGeneDef)def;
 
         private ExperienceHandler experienceHandler;
 
@@ -72,11 +72,16 @@ namespace Talented
             experienceHandler?.Cleanup();
         }
 
+        public abstract void OnExperienceGained(float amount, string source);
+        public abstract void OnLevelGained(int levels);
+
         public virtual void GainExperience(float amount)
         {
             if (currentLevel >= MaxLevel) return;
             currentExperience += amount;
             float maxExp = MaxExperienceForLevel(currentLevel);
+
+            Messages.Message($"{this.pawn.Label} gained {amount} experience.", MessageTypeDefOf.PositiveEvent);
 
             int levelsToGain = 0;
             float remainingExp = currentExperience;
@@ -154,17 +159,6 @@ namespace Talented
                 talentPoints -= amount;
             }
         }
-
-        public override void ExposeData()
-        {
-            base.ExposeData();
-            Scribe_Deep.Look(ref passiveTree, "passiveTree");
-            Scribe_Deep.Look(ref activeTree, "activeTree");
-            Scribe_Values.Look(ref talentPoints, "talentPoints", 0);
-            Scribe_Values.Look(ref currentLevel, "currentLevel", 1);
-            Scribe_Values.Look(ref currentExperience, "currentExperience", 0f);
-        }
-
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var gizmo in base.GetGizmos())
@@ -189,9 +183,16 @@ namespace Talented
                 };
             }
         }
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Deep.Look(ref passiveTree, "passiveTree");
+            Scribe_Deep.Look(ref activeTree, "activeTree");
+            Scribe_Values.Look(ref talentPoints, "talentPoints", 0);
+            Scribe_Values.Look(ref currentLevel, "currentLevel", 1);
+            Scribe_Values.Look(ref currentExperience, "currentExperience", 0f);
+        }
 
-        public abstract void OnExperienceGained(float amount, string source);
-        public abstract void OnLevelGained(int levels);
     }
 
 
