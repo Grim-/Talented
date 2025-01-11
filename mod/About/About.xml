@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Talented - Talent Tree Framework</name>
+  <author>Emo</author>
+  <supportedVersions>
+    <li>1.5</li>
+  </supportedVersions>
+	<packageId>com.emo.talented</packageId>
+        <description>Allows mod developers to use this light weight, extendable framework in order to create classes and other specializations.</description>
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>Ludeon.RimWorld.Biotech</li>
+	</loadAfter>
+	<modDependencies>
+	</modDependencies>
+</ModMetaData>

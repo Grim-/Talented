@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <!-- Path Selection Messages -->
+  <Talented.Path.Selected>Selected {0} upgrade path.</Talented.Path.Selected>
+  <Talented.Path.CannotSelect>Cannot select this path - conflicts with existing selection</Talented.Path.CannotSelect>
+  
+  <!-- Node Tooltips -->
+  <Talented.Node.UnknownUpgrade>Unknown upgrade</Talented.Node.UnknownUpgrade>
+  <Talented.Node.AllUpgradesUnlocked>All upgrades unlocked</Talented.Node.AllUpgradesUnlocked>
+  <Talented.Node.Progress>Progress: {0}/{1}</Talented.Node.Progress>
+  <Talented.Node.UnlockedUpgrades>Unlocked Upgrades:</Talented.Node.UnlockedUpgrades>
+  <Talented.Node.NextUpgrade>Next Upgrade: {0}</Talented.Node.NextUpgrade>
+  
+  <!-- Debug Information -->
+  <Talented.Debug.Info>Debug Info</Talented.Debug.Info>
+  <Talented.Debug.Node>Node: {0}</Talented.Debug.Node>
+  <Talented.Debug.Type>Type: {0}</TalentedDebug.Type>
+  <Talented.Debug.FullyUnlocked>Fully Unlocked: {0}</Talented.Debug.FullyUnlocked>
+  <Talented.Debug.CanUnlockNext>Can Unlock Next: {0}</Talented.Debug.CanUnlockNext>
+  <Talented.Debug.Path>Path: {0}</Talented.Debug.Path>
+  <Talented.Debug.PathSelected>Path Selected: {0}</Talented.Debug.PathSelected>
+  <Talented.Debug.UnlockError>Unlock Error: {0}</Talented.Debug.UnlockError>
+  
+  <!-- Error Messages -->
+  <Talented.Error.DisplayStrategy>Display Strategy Def was null</Talented.Error.DisplayStrategy>
+</LanguageData>

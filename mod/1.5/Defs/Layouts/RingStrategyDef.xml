@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <Talented.TreeDisplayStrategyDef>
+      <defName>RingStrategy</defName>
+      <strategyClass>Talented.ConcentricRingStrategy</strategyClass>
+    </Talented.TreeDisplayStrategyDef>
+</Defs>

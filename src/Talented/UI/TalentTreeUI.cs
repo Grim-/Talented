@@ -17,6 +17,11 @@ namespace Talented
         protected Vector2 tabSize = new Vector2(500, 400);
         protected float toolbarHeight => 40f;
 
+        public TalentedTabUI()
+        {
+            labelKey = "Parasite";
+            size = tabSize;
+        }
         public TalentedTabUI(GeneDef geneDef, string labelKey = "Talents")
         {
             this.GeneDef = geneDef;

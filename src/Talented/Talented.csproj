@@ -108,8 +108,8 @@
     <Compile Include="Tree\UpgradeTreeDef.cs" />
     <Compile Include="Tree\UpgradeTreeNodeDef.cs" />
     <Compile Include="Tree\UpgradeTreeSkinDef.cs" />
-    <Compile Include="UI\Gene_TalentBase.cs" />
-    <Compile Include="UI\IExperienceHolder.cs" />
+    <Compile Include="Gene\Gene_TalentBase.cs" />
+    <Compile Include="Gene\IExperienceHolder.cs" />
     <Compile Include="UI\TalentTreeDisplayWindow.cs" />
     <Compile Include="UI\TalentTreeUI.cs" />
     <Compile Include="Tree\UIAnimationState.cs" />

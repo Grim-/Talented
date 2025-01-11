@@ -25,16 +25,34 @@ namespace Talented
 
         public TalentTreeDisplayWindow(Gene_TalentBase parasite, UpgradeTreeDef tree, BaseTreeHandler handler, TreeDisplayStrategyDef displayStrategyDef)
         {
+            if (parasite == null)
+            {
+                Log.Error("TalentTreeDisplayWindow: parasite gene was null");
+                return;
+            }
+
+            if (tree == null)
+            {
+                Log.Error("TalentTreeDisplayWindow: tree def was null");
+                return;
+            }
+
+            if (handler == null)
+            {
+                Log.Error("TalentTreeDisplayWindow: tree handler was null");
+                return;
+            }
+
             if (displayStrategyDef == null)
             {
-                Log.Error($"Display Strategy Def was null");
+                Log.Error("TalentTreeDisplayWindow: display strategy def was null");
                 return;
             }
 
             parasiteGene = parasite;
             treeDef = tree;
             treeHandler = handler;
-            allNodes = treeDef.GetAllNodes();
+            allNodes = treeDef.GetAllNodes() ?? new List<UpgradeTreeNodeDef>();
             skin = tree.Skin;
 
             displayStrategy = (ITreeDisplayStrategy)Activator.CreateInstance(displayStrategyDef.strategyClass);
@@ -320,6 +338,11 @@ namespace Talented
         }
         private void DrawTexturedConnection(UpgradeTreeNodeDef from, UpgradeTreeNodeDef to)
         {
+            if (from == null || to == null || skin == null || skin.ConnectionTexture == null)
+            {
+                return;
+            }
+
             Vector2 start = nodePositions[from].center;
             Vector2 end = nodePositions[to].center;
             Color lineColor = GetPathStatusColor(from, to);
@@ -332,7 +355,8 @@ namespace Talented
             float spacing = distance / numberOfLinks;
 
             Matrix4x4 matrixBackup = GUI.matrix;
- 
+            GUI.color = lineColor;
+
             for (int i = 0; i < numberOfLinks; i++)
             {
                 float progress = i / (float)(numberOfLinks - 1);
@@ -361,23 +385,29 @@ namespace Talented
 
         private Color GetPathStatusColor(UpgradeTreeNodeDef from, UpgradeTreeNodeDef to)
         {
-            Color lineColor;
-            switch (treeHandler.GetPathStatusBetweenNodes(from, to))
+            if (treeHandler == null)
+            {
+                return skin?.inactiveConnectionColor ?? Color.gray;
+            }
+
+            PathStatus status = treeHandler.GetPathStatusBetweenNodes(from, to);
+
+            if (skin == null)
+            {
+                return Color.gray;
+            }
+
+            switch (status)
             {
                 case PathStatus.Unlocked:
-                    lineColor = skin.unlockedConnectionColor;
-                    break;
+                    return skin.unlockedConnectionColor;
                 case PathStatus.Active:
-                    lineColor = skin.activeConnectionColor;
-                    break;
+                    return skin.activeConnectionColor;
                 case PathStatus.Locked:
-                    lineColor = skin.inactiveConnectionColor;
-                    break;
+                    return skin.inactiveConnectionColor;
                 default:
-                    lineColor = Color.gray;
-                    break;
+                    return Color.gray;
             }
-            return lineColor;
         }
 
         private void DrawConnectionArrow(Vector2 start, Vector2 end, Color color)

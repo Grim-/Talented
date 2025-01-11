@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+<Talented.UpgradeTreeSkinDef>
+  <defName>DefaultTreeSkin</defName>
+  <label>Default Tree Skin</label>
+  <description>Default visual style for upgrade trees</description>
+
+  <!-- Background configuration -->
+  <backgroundTexturePath>UI/Tree/defaultbackground</backgroundTexturePath>
+  <backgroundColor>(1, 1, 1)</backgroundColor>
+
+  <!-- Node appearance -->
+  <nodeTexturePath>UI/Tree/defaultNode</nodeTexturePath>
+  <nodeSize>60</nodeSize>
+  <nodeSpacing>15</nodeSpacing>
+
+  <!-- Connection appearance -->
+  <defaultConnectionTexturePath>UI/Tree/defaultconnection</defaultConnectionTexturePath>
+  <connectionThickness>1.5</connectionThickness>
+  <showConnectionArrows>true</showConnectionArrows>
+  <arrowSize>10</arrowSize>
+
+  <!-- Color scheme -->
+  <unlockedNodeColor>(0.2, 0.8, 0.2)</unlockedNodeColor>
+  <availableNodeColor>(0.5, 0.5, 0.5)</availableNodeColor>
+  <lockedNodeColor>(0.8, 0.2, 0.2)</lockedNodeColor>
+  <pathSelectedColor>(1, 1, 0)</pathSelectedColor>
+  <pathExcludedColor>(1, 0, 0)</pathExcludedColor>
+  <pathAvailableColor>(1, 1, 1)</pathAvailableColor>
+
+  <!-- Connection colors -->
+  <unlockedConnectionColor>(0.2, 0.8, 0.2, 0.8)</unlockedConnectionColor>
+  <activeConnectionColor>(0.8, 0.8, 0.2, 0.6)</activeConnectionColor>
+  <inactiveConnectionColor>(0.5, 0.5, 0.5, 0.3)</inactiveConnectionColor>
+
+  <!-- Text configuration -->
+  <labelOffset>5</labelOffset>
+  <pathLabelOffset>25</pathLabelOffset>
+  <labelFont>Small</labelFont>
+  <labelColor>(1, 1, 1)</labelColor>
+
+    <!-- Toolbar configuration -->
+    <toolbarHeight>35</toolbarHeight>
+</Talented.UpgradeTreeSkinDef>
+
+</Defs>

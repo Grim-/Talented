@@ -35,8 +35,35 @@ namespace Talented
         public override void PostMake()
         {
             base.PostMake();
-            experienceHandler = new ExperienceHandler(this);
+
+            if (def == null || !(def is TalentedGeneDef talentedDef))
+            {
+                Log.Error($"Gene_TalentBase: GeneDef is not a TalentedGeneDef for pawn {pawn?.Label}");
+                return;
+            }
+
+            if (talentedDef.MainTreeDef == null || talentedDef.SecondaryTreeDef == null)
+            {
+                Log.Error($"Gene_TalentBase: Missing tree definitions for gene {def.defName}");
+                return;
+            }
+
             InitializeTrees();
+
+            if (activeTree == null || passiveTree == null)
+            {
+                Log.Error($"Gene_TalentBase: Failed to initialize trees for gene {def.defName}");
+                return;
+            }
+
+            if (talentedDef.experienceGainSettings != null)
+            {
+                experienceHandler = new ExperienceHandler(this);
+            }
+            else
+            {
+                Log.Warning($"Gene_TalentBase: No experience settings defined for gene {def.defName}");
+            }
         }
 
         public override void PostRemove()
