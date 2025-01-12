@@ -59,23 +59,46 @@ namespace Talented
         {
             if (activeEffects == null || unlockedUpgrades == null) return;
 
-            var upgradesList = unlockedUpgrades.ToList();
+            var oldUpgrades = unlockedUpgrades.ToList();
             activeEffects.Clear();
+            unlockedUpgrades.Clear();
 
-            foreach (var upgrade in upgradesList)
+            var nodeUpgrades = treeDef.GetAllNodes()
+                .Where(n => n.upgrades != null)
+                .ToDictionary(
+                    n => n,
+                    n => n.upgrades.Where(oldUpgrades.Contains).ToList()
+                );
+
+            foreach (var nodePair in nodeUpgrades)
             {
-                if (upgrade == null) continue;
+                var node = nodePair.Key;
+                var upgrades = nodePair.Value;
 
-                activeEffects[upgrade] = new List<UpgradeEffect>();
-                var effects = upgrade.CreateEffects();
-                foreach (var effect in effects)
+                if (node.sequential && upgrades.Any())
                 {
-                    effect.TryApply(pawn);
-                    activeEffects[upgrade].Add(effect);
+                    var lastUpgrade = upgrades.Last();
+                    UnlockUpgrade(lastUpgrade);
+                }
+                else
+                {
+                    foreach (var upgrade in upgrades)
+                    {
+                        UnlockUpgrade(upgrade);
+                    }
                 }
             }
         }
-
+        private void ApplyUpgradeEffects(UpgradeDef upgrade)
+        {
+            activeEffects[upgrade] = new List<UpgradeEffect>();
+            var effects = upgrade.CreateEffects();
+            foreach (var effect in effects)
+            {
+                effect.TryApply(pawn);
+                activeEffects[upgrade].Add(effect);
+            }
+        }
         #region Nodes
         public virtual UnlockResult TryUnlockNode(UpgradeTreeNodeDef node)
         {
@@ -209,21 +232,63 @@ namespace Talented
                 TryUnlockNextUpgrade(node, true);
             }
         }
-
         public virtual void UnlockUpgrade(UpgradeDef upgrade)
         {
+            var node = treeDef.GetAllNodes().FirstOrDefault(n => n.upgrades != null && n.upgrades.Contains(upgrade));
+            bool isSequential = node?.sequential ?? false;
+            Log.Message($"Unlocking upgrade {upgrade.defName}, Sequential: {isSequential}");
+
             if (!activeEffects.ContainsKey(upgrade))
             {
+                if (isSequential && node != null)
+                {
+                    RemovePreviousNodeUpgrades(node, upgrade);
+                }
+
                 activeEffects[upgrade] = new List<UpgradeEffect>();
                 var effects = upgrade.CreateEffects();
                 foreach (var effect in effects)
                 {
-                    effect.TryApply(pawn);
+                    effect.TryApply(pawn, isSequential);
                     activeEffects[upgrade].Add(effect);
                 }
             }
             unlockedUpgrades.Add(upgrade);
         }
+
+        protected void RemovePreviousNodeUpgrades(UpgradeTreeNodeDef node, UpgradeDef untilUpgrade)
+        {
+            var previousUpgrades = node.upgrades
+                .TakeWhile(u => u != untilUpgrade)
+                .Where(u => activeEffects.ContainsKey(u))
+                .ToList();
+
+            Log.Message($"Removing previous upgrades: {string.Join(", ", previousUpgrades.Select(u => u.defName))}");
+
+            foreach (var prevUpgrade in previousUpgrades)
+            {
+                foreach (var effect in activeEffects[prevUpgrade])
+                {
+                    effect.TryRemove(pawn);
+                }
+                activeEffects.Remove(prevUpgrade);
+                unlockedUpgrades.Remove(prevUpgrade);
+            }
+        }
+        //public virtual void UnlockUpgrade(UpgradeDef upgrade)
+        //{
+        //    if (!activeEffects.ContainsKey(upgrade))
+        //    {
+        //        activeEffects[upgrade] = new List<UpgradeEffect>();
+        //        var effects = upgrade.CreateEffects();
+        //        foreach (var effect in effects)
+        //        {
+        //            effect.TryApply(pawn);
+        //            activeEffects[upgrade].Add(effect);
+        //        }
+        //    }
+        //    unlockedUpgrades.Add(upgrade);
+        //}
         public virtual UnlockResult ValidateUnlock(UpgradeTreeNodeDef node)
         {
             if (node?.upgrades == null || !node.upgrades.Any())

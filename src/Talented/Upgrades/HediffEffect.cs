@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using System.Linq;
+using Verse;
 
 namespace Talented
 {
@@ -21,6 +22,16 @@ namespace Talented
             return pawn.health.hediffSet.HasHediff(hediffDef);
         }
 
+        protected override void RemoveExistingEffects(Pawn pawn)
+        {
+            var existingHediffs = pawn.health.hediffSet.hediffs
+                .Where(h => h.def == hediffDef)
+                .ToList();
+            foreach (var hediff in existingHediffs)
+            {
+                pawn.health.RemoveHediff(hediff);
+            }
+        }
         protected override void Apply(Pawn pawn)
         {
             appliedHediff = HediffMaker.MakeHediff(hediffDef, pawn);

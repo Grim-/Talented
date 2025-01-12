@@ -22,12 +22,25 @@ namespace Talented
 
         protected override void Apply(Pawn pawn)
         {
-            Hediff addedPart = null;
-
-            addedPart = pawn.health.AddHediff(addedOrganHediff);
-            addedParts.Add(addedPart);
+            BodyPartDef partToUse = targetOrgan != null ? targetOrgan : BodyPartDefOf.Torso;
+            BodyPartRecord targetPart = pawn.RaceProps.body.GetPartsWithDef(partToUse).FirstOrDefault();
+            if (targetPart != null)
+            {
+                Hediff addedPart = pawn.health.AddHediff(addedOrganHediff, targetPart);
+                addedParts.Add(addedPart);
+            }
         }
-
+        protected override void RemoveExistingEffects(Pawn pawn)
+        {
+            // Remove any existing organs of this type
+            var existingOrgans = pawn.health.hediffSet.hediffs
+                .Where(h => h.def == addedOrganHediff)
+                .ToList();
+            foreach (var organ in existingOrgans)
+            {
+                pawn.health.RemoveHediff(organ);
+            }
+        }
         protected override void Remove(Pawn pawn)
         {
             foreach (var part in addedParts)

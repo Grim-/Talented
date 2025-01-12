@@ -37,21 +37,19 @@ namespace Talented
         protected virtual void DrawToolbar(Rect rect)
         {
             float curX = PADDING;
-            // Level display
             var levelLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
             Widgets.DrawHighlight(levelLabelRect);
             Text.Anchor = TextAnchor.MiddleCenter;
             Widgets.Label(levelLabelRect, $"Level: {TalentGene.CurrentLevel}");
             curX += LEVEL_WIDTH + PADDING;
 
-            //// Talent Points display
+
             //var pointsLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
             //Widgets.DrawHighlight(pointsLabelRect);
             //Widgets.Label(pointsLabelRect, $"Points: {TalentGene.TalentPointsAvailable}");
             //curX += LEVEL_WIDTH + PADDING;
             //Text.Anchor = TextAnchor.UpperLeft;
 
-            // Experience Progress
             if (TalentGene is IExperienceHolder expHolder)
             {
                 var progressRect = new Rect(curX, rect.y + (rect.height - 18f) / 2f, PROGRESS_WIDTH, 18f);
@@ -59,7 +57,7 @@ namespace Talented
                 curX += PROGRESS_WIDTH + PADDING;
             }
 
-            // Tree Buttons
+
             DrawTreeButtons(rect);
         }
 

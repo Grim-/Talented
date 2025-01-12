@@ -13,7 +13,7 @@ namespace Talented
         public UpgradePathDef path;
         public List<BranchPathData> branchPaths;
 
-
+        public bool sequential = false;
         public bool hide = false;
         public List<UpgradeDef> prerequisitesToShow;
 
@@ -69,6 +69,7 @@ namespace Talented
             {
                 return null;
             }
+
             return upgrades[upgradeIndex];
         }
         public int UpgradeCount => upgrades != null ? upgrades.Count : 0;

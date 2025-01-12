@@ -35,7 +35,21 @@ namespace Talented
                 }
             }
         }
-
+        protected override void RemoveExistingEffects(Pawn pawn)
+        {
+            // Remove any existing abilities of these types
+            if (pawn.abilities != null)
+            {
+                foreach (var abilityDef in abilities)
+                {
+                    var existingAbility = pawn.abilities.GetAbility(abilityDef);
+                    if (existingAbility != null)
+                    {
+                        pawn.abilities.RemoveAbility(abilityDef);
+                    }
+                }
+            }
+        }
         protected override void Remove(Pawn pawn)
         {
             if (pawn.abilities != null)

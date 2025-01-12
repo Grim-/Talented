@@ -174,22 +174,19 @@ namespace Talented
                 yield return gizmo;
             }
 
-            if (Prefs.DevMode)
+            yield return new Command_Action
             {
-                yield return new Command_Action
-                {
-                    defaultLabel = "DEV: Gain Level",
-                    defaultDesc = "Gain 1 Level (Debug)",
-                    action = () => GainLevel(1),
-                };
+                defaultLabel = "DEV: Gain Level",
+                defaultDesc = "Gain 1 Level (Debug)",
+                action = () => GainLevel(1),
+            };
 
-                yield return new Command_Action
-                {
-                    defaultLabel = "DEV: Max Experience",
-                    defaultDesc = "Fill Experience Bar (Debug)",
-                    action = () => GainExperience(MaxExperienceForLevel(currentLevel) - currentExperience - 0.1f),
-                };
-            }
+            yield return new Command_Action
+            {
+                defaultLabel = "DEV: Max Experience",
+                defaultDesc = "Fill Experience Bar (Debug)",
+                action = () => GainExperience(MaxExperienceForLevel(currentLevel) - currentExperience - 0.1f),
+            };
         }
         public override void ExposeData()
         {

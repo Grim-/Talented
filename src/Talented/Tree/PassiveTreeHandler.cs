@@ -83,21 +83,21 @@ namespace Talented
             }
         }
 
-        public override void OnLevelUp(int newLevel)
-        {
-            base.OnLevelUp(newLevel);
-            if (!HasChosenPath)
-            {
-                unspentLevels++;
-                Log.Message($"{treeDef.defName} Storing {unspentLevels} unspent levels");
-            }
-            else
-            {
-                availablePoints++;
-                Log.Message($"{treeDef.defName} Adding {1} points, now have {availablePoints}");
-                AutoUnlockAvailableNodes();
-            }
-        }
+        //public override void OnLevelUp(int newLevel)
+        //{
+        //    base.OnLevelUp(newLevel);
+        //    if (!HasChosenPath)
+        //    {
+        //        unspentLevels++;
+        //        Log.Message($"{treeDef.defName} Storing {unspentLevels} unspent levels");
+        //    }
+        //    else
+        //    {
+        //        availablePoints++;
+        //        Log.Message($"{treeDef.defName} Adding {1} points, now have {availablePoints}");
+        //        AutoUnlockAvailableNodes();
+        //    }
+        //}
 
         private void AutoUnlockAvailableNodes()
         {
@@ -146,9 +146,8 @@ namespace Talented
             base.DrawToolBar(rect);
             rect = rect.ContractedBy(2);
             float currentX = rect.x;
-            string label = $"Talent Points Available {availablePoints} unspent points {unspentLevels}";
+            string label = $"{this.treeDef.treeName} Talent Points Available {availablePoints}";
             Vector2 labelSize = Text.CalcSize(label);
-            currentX += labelSize.x;
 
             Rect labelRect = new Rect(currentX, rect.y, labelSize.x, labelSize.y);
             Widgets.Label(labelRect, label);

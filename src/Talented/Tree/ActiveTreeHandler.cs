@@ -38,12 +38,6 @@ namespace Talented
             return UnlockResult.Succeeded();
         }
 
-        public override void OnLevelUp(int newLevel)
-        {
-            base.OnLevelUp(newLevel);
-            this.availablePoints++;
-        }
-
         public int GetAvailablePoints()
         {
             return availablePoints;
@@ -106,17 +100,13 @@ namespace Talented
         public override void DrawToolBar(Rect rect)
         {
             base.DrawToolBar(rect);
-
             rect = rect.ContractedBy(2);
-
             float currentX = rect.x;
-            float labelWidth = 60f;
-            string label = $"Talent Points Available {availablePoints}";
+            string label = $"{this.treeDef.treeName} Talent Points Available {availablePoints}";
             Vector2 labelSize = Text.CalcSize(label);
-            currentX += labelSize.x;
+
             Rect labelRect = new Rect(currentX, rect.y, labelSize.x, labelSize.y);
             Widgets.Label(labelRect, label);
-            currentX += labelWidth;
         }
 
         protected override void OnTalentPointsGained(int points)

@@ -97,6 +97,7 @@
     <Compile Include="Experience\ExperienceFormulaDef.cs" />
     <Compile Include="Experience\ExperienceFormulaWorker.cs" />
     <Compile Include="Experience\ExperienceHandler.cs" />
+    <Compile Include="Gene\GeneGizmo_BasicResource.cs" />
     <Compile Include="Gene\Gene_BasicResource.cs" />
     <Compile Include="Experience\LinearExperienceFormula.cs" />
     <Compile Include="Gene\TalentedGeneDef.cs" />
