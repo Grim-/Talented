@@ -1,13 +1,14 @@
 {
+  "homepage": "/Talented/tools/docs/my-app",
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16"
   },
   "dependencies": {
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^3.0.1"
   },
-    "scripts": {
+  "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
