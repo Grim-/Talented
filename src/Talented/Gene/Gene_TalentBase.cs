@@ -150,6 +150,18 @@ namespace Talented
             }
         }
 
+        public virtual IEnumerable<(UpgradeTreeDef treeDef, BaseTreeHandler handler, string label)> AvailableTrees()
+        {
+            if (TalentedGeneDef?.MainTreeDef != null && activeTree != null)
+            {
+                yield return (TalentedGeneDef.MainTreeDef, activeTree, "Main Tree");
+            }
+            if (TalentedGeneDef?.SecondaryTreeDef != null && passiveTree != null)
+            {
+                yield return (TalentedGeneDef.SecondaryTreeDef, passiveTree, "Secondary Tree");
+            }
+        }
+
         public bool CanAffordUpgrade(UpgradeDef upgrade)
         {
             return HasTalentPointsAvailable(upgrade.pointCost);

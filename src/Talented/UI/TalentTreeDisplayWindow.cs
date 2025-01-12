@@ -249,22 +249,33 @@ namespace Talented
         {
             bool isFullyUnlocked = treeHandler.IsNodeFullyUnlocked(node);
             UnlockResult canUnlockResult = treeHandler.ValidateUnlock(node);
-
             string tooltip = "";
 
+            // Show current upgrade description if any upgrades are unlocked
+            if (currentProgress > 0)
+            {
+                var currentUpgrade = node.upgrades[currentProgress - 1];
+                tooltip = $"Current Upgrade: {currentUpgrade.label}\n{currentUpgrade.FormattedDescriptionString}";
+            }
+
+            // Show next upgrade description if not fully unlocked
             if (currentProgress < node.upgrades.Count)
             {
                 var nextUpgrade = node.upgrades[currentProgress];
-                tooltip = nextUpgrade?.DescriptionString ?? "Unknown upgrade";
-                tooltip += $"\n\nNext Upgrade: {nextUpgrade?.label ?? "Unknown"}";
+                if (!string.IsNullOrEmpty(tooltip))
+                {
+                    tooltip += "\n\n";
+                }
+                tooltip += $"Next Upgrade: {nextUpgrade?.label ?? "Unknown"}\n{nextUpgrade?.FormattedDescriptionString ?? "Unknown upgrade"}";
             }
             else
             {
-                tooltip = "All upgrades unlocked";
+                tooltip += "\n\nAll upgrades unlocked";
             }
 
             tooltip += $"\n\nProgress: {currentProgress}/{node.upgrades.Count}";
 
+            // Show list of unlocked upgrades
             if (currentProgress > 0)
             {
                 tooltip += "\n\nUnlocked Upgrades:";
@@ -274,16 +285,20 @@ namespace Talented
                 }
             }
 
-            tooltip += "\n[== Debug Info ==]";
-            tooltip += $"\nNode: {node.defName}";
-            tooltip += $"\nType: {node.type}";
-            tooltip += $"\nFully Unlocked: {isFullyUnlocked}";
-            tooltip += $"\nCan Unlock Next: {canUnlockResult.Success}";
-
-            if (node.BelongsToUpgradePath)
+            if (Prefs.DevMode)
             {
-                tooltip += $"\nPath: {node.path.defName}";
-                tooltip += $"\nPath Selected: {treeHandler.IsPathSelected(node.path)}";
+                // Debug information
+                tooltip += "\n[== Debug Info ==]";
+                tooltip += $"\nNode: {node.defName}";
+                tooltip += $"\nType: {node.type}";
+                tooltip += $"\nFully Unlocked: {isFullyUnlocked}";
+                tooltip += $"\nCan Unlock Next: {canUnlockResult.Success}";
+
+                if (node.BelongsToUpgradePath)
+                {
+                    tooltip += $"\nPath: {node.path.defName}";
+                    tooltip += $"\nPath Selected: {treeHandler.IsPathSelected(node.path)}";
+                }
             }
 
             if (!isFullyUnlocked && !canUnlockResult.Success)

@@ -16,7 +16,61 @@ namespace Talented
         public List<AbilityEffectProperties> abilityEffects;
         public List<OrganEffectProperties> organEffects;
 
-        public virtual string DescriptionString { get; } = "";
+        public string DescriptionString;
+
+        public virtual string FormattedDescriptionString
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(DescriptionString))
+                    return DescriptionString;
+
+                return GenerateDefaultDescription();
+            }
+        }
+
+        private string GenerateDefaultDescription()
+        {
+            var description = new List<string>();
+
+            if (hediffEffects?.Count > 0)
+            {
+                foreach (var effect in hediffEffects)
+                {
+                    description.Add($"Adds {effect.hediffDef?.label ?? "unknown hediff"}");
+                }
+            }
+
+            if (abilityEffects?.Count > 0)
+            {
+                foreach (var effect in abilityEffects)
+                {
+                    if (effect.abilities?.Count > 0)
+                    {
+                        foreach (var ability in effect.abilities)
+                        {
+                            description.Add($"Grants {ability?.label ?? "unknown ability"}");
+                        }
+                    }
+                }
+            }
+
+            if (organEffects?.Count > 0)
+            {
+                foreach (var effect in organEffects)
+                {
+                    string actionType = effect.isAddition ? "Adds" : "Modifies";
+                    string organName = effect.targetOrgan?.label ?? "unknown organ";
+                    string hediffEffect = effect.addedOrganHediff?.label ?? "unknown effect";
+                    description.Add($"{actionType} {hediffEffect} to {organName}");
+                }
+            }
+
+            if (description.Count == 0)
+                description.Add("No effects");
+
+            return string.Join("\n", description);
+        }
 
         public List<UpgradeEffect> CreateEffects()
         {
