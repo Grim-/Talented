@@ -1,5 +1,5 @@
 {
-  "homepage": "/Talented/tools/docs/my-app/build",
+  "homepage": "/Talented/tools/docs/my-app/app",
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
