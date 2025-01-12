@@ -15,8 +15,7 @@ namespace Talented
         protected Dictionary<UpgradeDef, List<UpgradeEffect>> activeEffects;
         protected HashSet<UpgradePathDef> selectedPaths;
         protected Dictionary<UpgradeTreeNodeDef, int> nodeProgress;
-
-
+        protected TalentPointFormulaWorker talentPointWorker;
         public bool HasUnlockUpgrade(UpgradeDef upgradeDef)
         {
             return unlockedUpgrades.Contains(upgradeDef);
@@ -36,12 +35,26 @@ namespace Talented
             this.activeEffects = new Dictionary<UpgradeDef, List<UpgradeEffect>>();
             this.selectedPaths = new HashSet<UpgradePathDef>();
             this.nodeProgress = new Dictionary<UpgradeTreeNodeDef, int>();
+            if (treeDef.talentPointFormula != null)
+            {
+                talentPointWorker = treeDef.talentPointFormula.CreateWorker();
+            }
         }
 
-        public virtual void OnLevelUp(int newLevel)
+        public virtual void OnLevelUp(int levels)
         {
-       
+            if (talentPointWorker != null)
+            {
+                int points = talentPointWorker.GetTalentPointsForLevel(levels);
+                OnTalentPointsGained(points);
+            }
+            else
+            {
+                OnTalentPointsGained(levels);
+            }
         }
+
+        protected abstract void OnTalentPointsGained(int points);
         protected virtual void ReapplyUnlockedUpgrades()
         {
             if (activeEffects == null || unlockedUpgrades == null) return;

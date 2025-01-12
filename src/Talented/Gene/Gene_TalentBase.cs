@@ -5,7 +5,7 @@ using Verse;
 
 namespace Talented
 {
-    public abstract class Gene_TalentBase : Gene_BasicResource
+    public abstract class Gene_TalentBase : Gene_BasicResource, IExperienceHolder
     {
         protected PassiveTreeHandler passiveTree;
         protected ActiveTreeHandler activeTree;
@@ -27,10 +27,8 @@ namespace Talented
         public TalentedGeneDef TalentedGeneDef => (TalentedGeneDef)def;
 
         private ExperienceHandler experienceHandler;
+        private ExperienceFormulaWorker formulaWorker;
 
-        protected virtual float MaxExperienceForLevel(int level) => (level + 1) * BaseExperience;
-
-        protected abstract void InitializeTrees();
 
         public override void PostMake()
         {
@@ -46,6 +44,13 @@ namespace Talented
             {
                 Log.Error($"Gene_TalentBase: Missing tree definitions for gene {def.defName}");
                 return;
+            }
+
+
+            if (TalentedGeneDef?.experienceFormula != null)
+            {
+                formulaWorker = TalentedGeneDef.experienceFormula.CreateFormulaWorker();
+                formulaWorker.Def = TalentedGeneDef.experienceFormula;
             }
 
             InitializeTrees();
@@ -71,7 +76,16 @@ namespace Talented
             base.PostRemove();
             experienceHandler?.Cleanup();
         }
+        protected virtual float MaxExperienceForLevel(int level)
+        {
+            if (formulaWorker != null)
+            {
+                return formulaWorker.GetExperienceForLevel(level);
+            }
+            return (level + 1) * BaseExperience;
+        }
 
+        protected abstract void InitializeTrees();
         public abstract void OnExperienceGained(float amount, string source);
         public abstract void OnLevelGained(int levels);
 
@@ -105,17 +119,11 @@ namespace Talented
         public virtual void GainLevel(int levels)
         {
             int oldLevel = currentLevel;
-            int gainedLevels = levels;
-
-            int newLevel = oldLevel + gainedLevels;
-            currentLevel = Math.Min(newLevel, MaxLevel);
-
-            // Give talent points on level up
-            talentPoints += levels;
+            int newLevel = Math.Min(oldLevel + levels, MaxLevel);
+            currentLevel = newLevel;
 
             passiveTree?.OnLevelUp(currentLevel);
             activeTree?.OnLevelUp(levels);
-
             OnLevelGained(levels);
 
             Messages.Message($"{pawn.Label} gained {levels} level{(levels > 1 ? "s" : "")} (level = {currentLevel})",
@@ -193,16 +201,5 @@ namespace Talented
             Scribe_Values.Look(ref currentExperience, "currentExperience", 0f);
         }
 
-    }
-
-
-    public class TalentedGeneDef : BasicResourceGeneDef
-    {
-        public UpgradeTreeDef MainTreeDef;
-        public UpgradeTreeDef SecondaryTreeDef;
-        public InspectTabBase CustomTab;
-        public string TabLabel = "Talents";
-
-        public ExperienceGainSettings experienceGainSettings;
     }
 }

@@ -1,0 +1,11 @@
+﻿using RimWorld;
+
+namespace Talented
+{
+    [DefOf]
+    public class TalentedDefOf
+    {
+        public static ExperienceFormulaDef Basic_LinearXP;
+        public static UpgradeTreeSkinDef DefaultTreeSkin;
+    }
+}

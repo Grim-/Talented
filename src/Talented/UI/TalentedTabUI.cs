@@ -1,4 +1,6 @@
 ﻿using RimWorld;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -35,7 +37,6 @@ namespace Talented
         protected virtual void DrawToolbar(Rect rect)
         {
             float curX = PADDING;
-
             // Level display
             var levelLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
             Widgets.DrawHighlight(levelLabelRect);
@@ -43,13 +44,12 @@ namespace Talented
             Widgets.Label(levelLabelRect, $"Level: {TalentGene.CurrentLevel}");
             curX += LEVEL_WIDTH + PADDING;
 
-            // Talent Points display
-            var pointsLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
-            Widgets.DrawHighlight(pointsLabelRect);
-            Widgets.Label(pointsLabelRect, $"Points: {TalentGene.TalentPointsAvailable}");
-            curX += LEVEL_WIDTH + PADDING;
-
-            Text.Anchor = TextAnchor.UpperLeft;
+            //// Talent Points display
+            //var pointsLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
+            //Widgets.DrawHighlight(pointsLabelRect);
+            //Widgets.Label(pointsLabelRect, $"Points: {TalentGene.TalentPointsAvailable}");
+            //curX += LEVEL_WIDTH + PADDING;
+            //Text.Anchor = TextAnchor.UpperLeft;
 
             // Experience Progress
             if (TalentGene is IExperienceHolder expHolder)
@@ -65,24 +65,38 @@ namespace Talented
 
         protected virtual void DrawTreeButtons(Rect rect)
         {
-            var mainTreeRect = new Rect(rect.width - (BUTTON_WIDTH * 2 + PADDING * 2),
-                rect.y + PADDING, BUTTON_WIDTH, rect.height - PADDING * 2);
-            if (Widgets.ButtonText(mainTreeRect, "Main Tree"))
-            {
-                TalentGene.OpenActiveTree();
-            }
+            var dropdownRect = new Rect(rect.width - (BUTTON_WIDTH * 2 + PADDING * 2),
+                rect.y + PADDING, BUTTON_WIDTH * 2 + PADDING, rect.height - PADDING * 2);
 
-            var secondaryTreeRect = new Rect(rect.width - (BUTTON_WIDTH + PADDING),
-                rect.y + PADDING, BUTTON_WIDTH, rect.height - PADDING * 2);
-            if (Widgets.ButtonText(secondaryTreeRect, "Secondary Tree"))
+            if (Widgets.ButtonText(dropdownRect, "View Trees ▼"))
             {
-                TalentGene.OpenPassiveTree();
+                var options = new List<FloatMenuOption>();
+
+                foreach (var gene in SelPawn.genes.GenesListForReading.Where(g => g is Gene_TalentBase).Cast<Gene_TalentBase>())
+                {
+                    string geneLabel = gene.def.label;
+
+                    options.Add(new FloatMenuOption(
+                        $"{geneLabel} - Main Tree",
+                        () => gene.OpenActiveTree()
+                    ));
+
+                    options.Add(new FloatMenuOption(
+                        $"{geneLabel} - Secondary Tree",
+                        () => gene.OpenPassiveTree()
+                    ));
+                }
+
+                if (options.Any())
+                {
+                    Find.WindowStack.Add(new FloatMenu(options));
+                }
             }
         }
 
         protected virtual void DrawContent(Rect rect)
         {
-            // Override this to add custom content below the toolbar
+          
         }
     }
 }

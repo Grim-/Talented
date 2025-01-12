@@ -7,6 +7,7 @@ namespace Talented
 {
     public class UpgradeTreeDef : Def
     {
+        public string treeName = "A Talent Tree";
         public List<UpgradeTreeNodeDef> nodes;
         public IntVec2 dimensions;
         public Type handlerClass;
@@ -14,7 +15,20 @@ namespace Talented
         public List<UpgradePathDef> availablePaths;
         public TreeDisplayStrategyDef displayStrategy;
 
+        public TalentPointFormulaDef talentPointFormula;
+        private TalentPointFormulaWorker talentPointWorker;
 
+        public TalentPointFormulaWorker TalentPointWorker
+        {
+            get
+            {
+                if (talentPointWorker == null && talentPointFormula != null)
+                {
+                    talentPointWorker = talentPointFormula.CreateWorker();
+                }
+                return talentPointWorker;
+            }
+        }
 
         public UpgradeTreeNodeDef RootNode
         {
@@ -37,7 +51,7 @@ namespace Talented
             {
                 if (skin == null)
                 {
-                    skin = DefDatabase<UpgradeTreeSkinDef>.GetNamed("DefaultTreeSkin");
+                    skin = TalentedDefOf.DefaultTreeSkin == null ? DefDatabase<UpgradeTreeSkinDef>.GetNamed("DefaultTreeSkin") : TalentedDefOf.DefaultTreeSkin;
                 }
 
                 return skin;

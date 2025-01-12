@@ -98,7 +98,7 @@ namespace Talented
             if (pawn == gene.pawn)
             {
                 var expType = settings.experienceTypes.OfType<VerbExperienceTypeDef>()
-                    .FirstOrDefault(x => x.VerbClassName == verb.GetType().Name);
+                    .FirstOrDefault(x => x.VerbClassName == verb.GetType().ToString());
                 if (expType != null)
                 {
                     float xp = expType.GetExperience(gene.pawn);

@@ -62,7 +62,7 @@ namespace Talented
                 {
                     return customTexture;
                 }
-                Log.Error($"Failed to load custom {textureType} texture at path: {customPath}. Falling back to default.");
+                Log.Message($"Failed to load custom {textureType} texture at path: {customPath}. Falling back to default.");
             }
 
             // Load default texture

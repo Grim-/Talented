@@ -118,5 +118,10 @@ namespace Talented
             Widgets.Label(labelRect, label);
             currentX += labelWidth;
         }
+
+        protected override void OnTalentPointsGained(int points)
+        {
+            availablePoints += points;
+        }
     }
 }

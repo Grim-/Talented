@@ -139,47 +139,8 @@ namespace Talented
             Scribe_Values.Look(ref currentLevel, "currentLevel", 0);
             Scribe_Values.Look(ref unspentLevels, "unspentLevels", 0);
             Scribe_Values.Look(ref availablePoints, "availablePoints", 0);
-
-            //if (Scribe.mode == LoadSaveMode.PostLoadInit)
-            //{
-            //    if (!IsNodeFullyUnlocked(treeDef.nodes[0]))
-            //    {
-            //        TryUnlockNextUpgrade(treeDef.nodes[0], true);
-            //    }
-
-            //    if (selectedPaths != null && selectedPaths.Any())
-            //    {
-            //        foreach (var path in selectedPaths.ToList())
-            //        {
-            //            OnPathSelected(path);
-            //        }
-            //    }
-
-            //    if (HasSelectedAPath())
-            //    {
-            //        int spentPoints = 0;
-            //        foreach (var node in treeDef.GetAllNodes())
-            //        {
-            //            if (node.type != NodeType.Start)
-            //            {
-            //                int progress = GetNodeProgress(node);
-            //                for (int i = 0; i < progress && i < node.upgrades.Count; i++)
-            //                {
-            //                    spentPoints += node.upgrades[i].pointCost;
-            //                }
-            //            }
-            //        }
-            //        availablePoints = currentLevel - spentPoints;
-
-            //        AutoUnlockAvailableNodes();
-            //    }
-            //    else if (currentLevel > 0)
-            //    {
-            //        unspentLevels = currentLevel;
-            //        availablePoints = 0;
-            //    }
-            //}
         }
+
         public override void DrawToolBar(Rect rect)
         {
             base.DrawToolBar(rect);
@@ -191,6 +152,21 @@ namespace Talented
 
             Rect labelRect = new Rect(currentX, rect.y, labelSize.x, labelSize.y);
             Widgets.Label(labelRect, label);
+        }
+
+        protected override void OnTalentPointsGained(int points)
+        {
+            if (!HasChosenPath)
+            {
+                unspentLevels += points;
+                Log.Message($"{treeDef.defName} Storing {points} unspent levels");
+            }
+            else
+            {
+                availablePoints += points;
+                Log.Message($"{treeDef.defName} Adding {points} points, now have {availablePoints}");
+                AutoUnlockAvailableNodes();
+            }
         }
     }
 }
