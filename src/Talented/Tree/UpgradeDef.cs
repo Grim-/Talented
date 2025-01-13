@@ -15,6 +15,7 @@ namespace Talented
         public List<HediffEffectProperties> hediffEffects;
         public List<AbilityEffectProperties> abilityEffects;
         public List<OrganEffectProperties> organEffects;
+        public List<StatEffectProperties> statEffects;
 
         public string DescriptionString;
 
@@ -93,10 +94,66 @@ namespace Talented
                         isAddition = props.isAddition
                     });
 
+            if (statEffects != null)
+                foreach (var props in statEffects)
+                {
+                    var effect = new StatEffect
+                    {
+                        statDef = props.statDef,
+                        value = props.value,
+                        operation = props.operation,
+                        parentUpgrade = this
+                    };
+                    effects.Add(effect);
+                }
+
             return effects;
         }
     }
+    public class StatEffectProperties
+    {
+        public StatDef statDef;
+        public float value;
+        public StatModifierOperation operation = StatModifierOperation.Add;
+    }
 
+    public enum StatModifierOperation
+    {
+        Add,
+        Multiply,
+        Override
+    }
+
+    public class StatEffect : UpgradeEffect
+    {
+        public UpgradeDef parentUpgrade;
+        public StatDef statDef;
+        public float value;
+        public StatModifierOperation operation;
+
+        protected override bool IsEffectPresent(Pawn pawn)
+        {
+            return isActive;
+        }
+
+        protected override void Apply(Pawn pawn)
+        {
+            isActive = true;
+        }
+
+        protected override void Remove(Pawn pawn)
+        {
+            isActive = false;
+        }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Defs.Look(ref statDef, "statDef");
+            Scribe_Values.Look(ref value, "value");
+            Scribe_Values.Look(ref operation, "operation");
+        }
+    }
     public class OrganEffectProperties
     {
         public BodyPartDef targetOrgan;

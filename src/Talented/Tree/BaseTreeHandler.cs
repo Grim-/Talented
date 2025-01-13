@@ -10,11 +10,30 @@ namespace Talented
         protected Pawn pawn;
         protected Gene_TalentBase gene;
         protected UpgradeTreeDef treeDef;
+
+        public UpgradeTreeDef TreeDef
+        {
+            get
+            {
+                return treeDef;
+            }
+        }
+
         protected HashSet<UpgradeDef> unlockedUpgrades;
         protected HashSet<UpgradeTreeNodeDef> unlockedNodes;
-        protected Dictionary<UpgradeDef, List<UpgradeEffect>> activeEffects;
+        public Dictionary<UpgradeDef, List<UpgradeEffect>> activeEffects;
+
         protected HashSet<UpgradePathDef> selectedPaths;
         protected Dictionary<UpgradeTreeNodeDef, int> nodeProgress;
+
+        public Dictionary<UpgradeTreeNodeDef, int> NodeProgress
+        {
+            get
+            {
+                return nodeProgress;
+            }
+        }
+
         protected TalentPointFormulaWorker talentPointWorker;
         public bool HasUnlockUpgrade(UpgradeDef upgradeDef)
         {

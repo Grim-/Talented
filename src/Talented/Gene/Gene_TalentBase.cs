@@ -5,10 +5,13 @@ using Verse;
 
 namespace Talented
 {
-    public abstract class Gene_TalentBase : Gene_BasicResource, IExperienceHolder
+    public class Gene_TalentBase : Gene_BasicResource, IExperienceHolder
     {
         protected PassiveTreeHandler passiveTree;
         protected ActiveTreeHandler activeTree;
+
+        public BaseTreeHandler PassiveTree => passiveTree;
+        public BaseTreeHandler ActiveTree => activeTree;
 
         protected int talentPoints = 0;
         public int TalentPointsAvailable => talentPoints;
@@ -29,6 +32,10 @@ namespace Talented
         private ExperienceHandler experienceHandler;
         private ExperienceFormulaWorker formulaWorker;
 
+        public Gene_TalentBase()
+        {
+
+        }
 
         public override void PostMake()
         {
@@ -85,9 +92,19 @@ namespace Talented
             return (level + 1) * BaseExperience;
         }
 
-        protected abstract void InitializeTrees();
-        public abstract void OnExperienceGained(float amount, string source);
-        public abstract void OnLevelGained(int levels);
+        protected virtual void InitializeTrees()
+        {
+            activeTree = new ActiveTreeHandler(pawn, this, TalentedGeneDef.MainTreeDef);
+            passiveTree = new PassiveTreeHandler(pawn, this, TalentedGeneDef.SecondaryTreeDef);
+        }
+        public virtual void OnExperienceGained(float amount, string source)
+        {
+
+        }
+        public virtual void OnLevelGained(int levels)
+        {
+
+        }
 
         public virtual void GainExperience(float amount)
         {

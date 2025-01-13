@@ -8,6 +8,8 @@ namespace Talented
     {
         protected bool isActive = false;
 
+        public bool IsActive => isActive;
+
         public void TryApply(Pawn pawn, bool sequential = false)
         {
             if (sequential)
@@ -23,10 +25,8 @@ namespace Talented
             isActive = true;
         }
 
-        // Override this to handle removing any existing effects of the same type
         protected virtual void RemoveExistingEffects(Pawn pawn)
         {
-            // Base implementation just does normal remove
             TryRemove(pawn);
         }
 

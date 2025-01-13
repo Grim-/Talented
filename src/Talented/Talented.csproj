@@ -101,6 +101,7 @@
     <Compile Include="Gene\GeneGizmo_BasicResource.cs" />
     <Compile Include="Gene\Gene_BasicResource.cs" />
     <Compile Include="Experience\LinearExperienceFormula.cs" />
+    <Compile Include="Gene\StatPart_TalentUpgrades.cs" />
     <Compile Include="Gene\TalentedGeneDef.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\ActiveTreeHandler.cs" />

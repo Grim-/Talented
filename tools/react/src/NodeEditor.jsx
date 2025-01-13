@@ -165,67 +165,74 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
   };
 
   const exportToXml = () => {
-    let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
+      let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
 
-    // Existing paths
-    paths.forEach(path => {
-      xml += `  <Talented.UpgradePathDef>\n`;
-      xml += `    <defName>${path.name}</defName>\n`;
-      xml += `    <pathDescription>${path.description}</pathDescription>\n`;
-      xml += `  </Talented.UpgradePathDef>\n\n`;
-    });
+      // Existing paths
+      paths.forEach(path => {
+        xml += `  <Talented.UpgradePathDef>\n`;
+        xml += `    <defName>${path.name}</defName>\n`;
+        xml += `    <pathDescription>${path.description}</pathDescription>\n`;
+        xml += `  </Talented.UpgradePathDef>\n\n`;
+      });
 
-    // Existing nodes + any other node-like defs
-    nodes.forEach(node => {
-      // Determine the correct def type based on node properties
-      const defType = node.upgrade ? 'Talented.UpgradeTreeNodeDef' :
-                     node.dimensions ? 'Talented.UpgradeTreeDef' :
-                     node.pointCost ? 'Talented.UpgradeDef' :
-                     'Talented.UpgradeTreeNodeDef';
+      // Existing nodes + any other node-like defs
+      nodes.forEach(node => {
+        // Determine the correct def type based on node properties
+        const defType = node.upgrade ? 'Talented.UpgradeTreeNodeDef' :
+                       node.dimensions ? 'Talented.UpgradeTreeDef' :
+                       node.pointCost ? 'Talented.UpgradeDef' :
+                       'Talented.UpgradeTreeNodeDef';
 
-      xml += `  <${defType}>\n`;
-      xml += `    <defName>${node.id}</defName>\n`;
+        xml += `  <${defType}>\n`;
+        xml += `    <defName>${node.id}</defName>\n`;
 
-      // Add all non-empty properties based on their type
-      if (node.position || node.x !== undefined) {
-        xml += `    <position>(${Math.round((node.x || 0)/50)},${Math.round((node.y || 0)/50)})</position>\n`;
-      }
-      if (node.type) xml += `    <type>${node.type}</type>\n`;
-      if (node.upgrade) xml += `    <upgrade>${node.upgrade}</upgrade>\n`;
-      if (node.path) xml += `    <path>${node.path}</path>\n`;
-      if (node.parasiteLevelRequired) xml += `    <parasiteLevelRequired>${node.parasiteLevelRequired}</parasiteLevelRequired>\n`;
-      if (node.pointCost) xml += `    <pointCost>${node.pointCost}</pointCost>\n`;
-      if (node.uiIcon) xml += `    <uiIcon>${node.uiIcon}</uiIcon>\n`;
-      if (node.dimensions) xml += `    <dimensions>(${node.dimensions.x},${node.dimensions.y})</dimensions>\n`;
+        // Add all non-empty properties based on their type
+        if (node.position || node.x !== undefined) {
+          xml += `    <position>(${Math.round((node.x || 0)/50)},${Math.round((node.y || 0)/50)})</position>\n`;
+        }
+        if (node.type) xml += `    <type>${node.type}</type>\n`;
 
-      if (node.connections?.length > 0) {
-        xml += `    <connections>\n`;
-        node.connections.forEach(conn => {
-          xml += `      <li>${conn}</li>\n`;
-        });
-        xml += `    </connections>\n`;
-      }
-      if (node.branchPaths?.length > 0) {
-        xml += `    <branchPaths>\n`;
-        node.branchPaths.forEach(branch => {
-          xml += `      <li>\n`;
-          xml += `        <path>${branch.path}</path>\n`;
-          xml += `        <nodes>\n`;
-          branch.nodes.forEach(nodeId => {
-            xml += `          <li>${nodeId}</li>\n`;
+        // Convert single upgrade to upgrades list
+        if (node.upgrade) {
+          xml += `    <upgrades>\n`;
+          xml += `      <li>${node.upgrade}</li>\n`;
+          xml += `    </upgrades>\n`;
+        }
+
+        if (node.path) xml += `    <path>${node.path}</path>\n`;
+        if (node.parasiteLevelRequired) xml += `    <parasiteLevelRequired>${node.parasiteLevelRequired}</parasiteLevelRequired>\n`;
+        if (node.pointCost) xml += `    <pointCost>${node.pointCost}</pointCost>\n`;
+        if (node.uiIcon) xml += `    <uiIcon>${node.uiIcon}</uiIcon>\n`;
+        if (node.dimensions) xml += `    <dimensions>(${node.dimensions.x},${node.dimensions.y})</dimensions>\n`;
+
+        if (node.connections?.length > 0) {
+          xml += `    <connections>\n`;
+          node.connections.forEach(conn => {
+            xml += `      <li>${conn}</li>\n`;
           });
-          xml += `        </nodes>\n`;
-          xml += `      </li>\n`;
-        });
-        xml += `    </branchPaths>\n`;
-      }
-      xml += `  </${defType}>\n\n`;
-    });
+          xml += `    </connections>\n`;
+        }
+        if (node.branchPaths?.length > 0) {
+          xml += `    <branchPaths>\n`;
+          node.branchPaths.forEach(branch => {
+            xml += `      <li>\n`;
+            xml += `        <path>${branch.path}</path>\n`;
+            xml += `        <nodes>\n`;
+            branch.nodes.forEach(nodeId => {
+              xml += `          <li>${nodeId}</li>\n`;
+            });
+            xml += `        </nodes>\n`;
+            xml += `      </li>\n`;
+          });
+          xml += `    </branchPaths>\n`;
+        }
+        xml += `  </${defType}>\n\n`;
+      });
 
-    xml += '</Defs>';
-    setExportedXml(xml);
-    setShowExport(true);
-  };
+      xml += '</Defs>';
+      setExportedXml(xml);
+      setShowExport(true);
+    };
 
   // Node event handlers
   const handleMouseDown = (e, nodeId) => {
