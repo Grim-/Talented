@@ -39,6 +39,7 @@ namespace Talented
         {
             return unlockedUpgrades.Contains(upgradeDef);
         }
+        protected int availablePoints = 0;
 
         protected BaseTreeHandler()
         {
@@ -294,20 +295,7 @@ namespace Talented
                 unlockedUpgrades.Remove(prevUpgrade);
             }
         }
-        //public virtual void UnlockUpgrade(UpgradeDef upgrade)
-        //{
-        //    if (!activeEffects.ContainsKey(upgrade))
-        //    {
-        //        activeEffects[upgrade] = new List<UpgradeEffect>();
-        //        var effects = upgrade.CreateEffects();
-        //        foreach (var effect in effects)
-        //        {
-        //            effect.TryApply(pawn);
-        //            activeEffects[upgrade].Add(effect);
-        //        }
-        //    }
-        //    unlockedUpgrades.Add(upgrade);
-        //}
+
         public virtual UnlockResult ValidateUnlock(UpgradeTreeNodeDef node)
         {
             if (node?.upgrades == null || !node.upgrades.Any())
@@ -433,6 +421,58 @@ namespace Talented
  
         }
 
+        public virtual void ResetTree()
+        {
+            if (activeEffects != null)
+            {
+                foreach (var effectPair in activeEffects)
+                {
+                    foreach (var effect in effectPair.Value)
+                    {
+                        effect.TryRemove(pawn);
+                    }
+                }
+                activeEffects.Clear();
+            }
+
+
+            int pointsToRefund = 0;
+            if (nodeProgress != null)
+            {
+                foreach (var nodePair in nodeProgress)
+                {
+                    var node = nodePair.Key;
+                    var progress = nodePair.Value;
+
+
+                    if (node.upgrades != null)
+                    {
+                        for (int i = 0; i < progress && i < node.upgrades.Count; i++)
+                        {
+                            if (node.upgrades[i].pointCost > 0)
+                            {
+                                pointsToRefund += node.upgrades[i].pointCost;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            unlockedUpgrades?.Clear();
+            unlockedNodes?.Clear();
+            selectedPaths?.Clear();
+            nodeProgress?.Clear();
+            activeEffects?.Clear();
+
+
+            OnTalentPointsGained(pointsToRefund);
+
+
+            UnlockStartingNodes();
+        }
+
+        public abstract int GetAvailablePoints();
 
         public virtual void ExposeData()
         {
@@ -440,6 +480,8 @@ namespace Talented
             Scribe_References.Look(ref gene, "gene");
             Scribe_Defs.Look(ref treeDef, "treeDef");
 
+
+            Scribe_Values.Look(ref availablePoints, "availablePoints", 0);
             Scribe_Collections.Look(ref unlockedUpgrades, "unlockedUpgrades", LookMode.Def);
             Scribe_Collections.Look(ref unlockedNodes, "unlockedNodes", LookMode.Def);
             Scribe_Collections.Look(ref selectedPaths, "selectedPaths", LookMode.Def);

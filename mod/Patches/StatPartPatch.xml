@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+    <Operation Class="PatchOperationSequence">
+        <operations>
+            <!-- For stats with no parts, create the parts tag first -->
+            <li Class="PatchOperationConditional">
+                <xpath>/Defs/StatDef[not(parts)]</xpath>
+                <match Class="PatchOperationAdd">
+                    <xpath>/Defs/StatDef[not(parts)]</xpath>
+                    <value>
+                        <parts />
+                    </value>
+                </match>
+            </li>
+
+            <!-- Now add our part to all stats -->
+            <li Class="PatchOperationAdd">
+                <xpath>/Defs/StatDef/parts</xpath>
+                <value>
+                    <li Class="Talented.StatPart_TalentUpgrades" />
+                </value>
+            </li>
+        </operations>
+    </Operation>
+</Patch>

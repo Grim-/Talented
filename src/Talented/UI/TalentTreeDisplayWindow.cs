@@ -113,7 +113,7 @@ namespace Talented
                 }
 
                 DrawNodeIconBG(node, nodeRect);
-                DrawNodeIcon(node, nodeRect);
+                DrawNodeIcon(node,  treeHandler, nodeRect);
                 DrawNodeBadge(node, nodeRect);
 
                 HandleNodeClick(nodeRect, node, canUnlockResult);
@@ -223,16 +223,28 @@ namespace Talented
             }
         }
 
-        private void DrawNodeIcon(UpgradeTreeNodeDef node, Rect nodeRect)
+        private void DrawNodeIcon(UpgradeTreeNodeDef node, BaseTreeHandler tree, Rect nodeRect)
         {
             Rect iconRect = nodeRect.ContractedBy(8f);
-            if (!node.upgrades.NullOrEmpty() && !string.IsNullOrEmpty(node.upgrades[0].uiIconPath))
+            Texture2D iconToUse = null;
+            if (!node.upgrades.NullOrEmpty())
             {
-                var icon = ContentFinder<Texture2D>.Get(node.upgrades[0].uiIconPath);
-                if (icon != null)
+                int progress = tree.GetNodeProgress(node);
+                int upgradeIndex = progress > 0 ? progress - 1 : 0;
+                UpgradeDef upgrade = node.GetUpgrade(upgradeIndex);
+
+                if (upgrade != null && !string.IsNullOrEmpty(upgrade.uiIconPath))
                 {
-                    Widgets.DrawTextureFitted(iconRect, icon, 1f);
+                    iconToUse = ContentFinder<Texture2D>.Get(upgrade.uiIconPath);
                 }
+            }
+            if (iconToUse == null)
+            {
+                iconToUse = tree.TreeDef.Skin.DefaultUpgradeIcon;
+            }
+            if (iconToUse != null)
+            {
+                Widgets.DrawTextureFitted(iconRect, iconToUse, 1f);
             }
         }
         private void DrawNodeIconBG(UpgradeTreeNodeDef node, Rect nodeRect)

@@ -108,7 +108,9 @@ namespace Talented
 
         public virtual void GainExperience(float amount)
         {
-            if (currentLevel >= MaxLevel) return;
+            if (currentLevel >= MaxLevel) 
+                return;
+
             currentExperience += amount;
             float maxExp = MaxExperienceForLevel(currentLevel);
 
@@ -167,15 +169,30 @@ namespace Talented
             }
         }
 
-        public virtual IEnumerable<(UpgradeTreeDef treeDef, BaseTreeHandler handler, string label)> AvailableTrees()
+
+        public struct TreeInstanceData
+        {
+            public UpgradeTreeDef treeDef;
+            public BaseTreeHandler handler;
+            public string label;
+
+            public TreeInstanceData(UpgradeTreeDef treeDef, BaseTreeHandler handler, string label)
+            {
+                this.treeDef = treeDef;
+                this.handler = handler;
+                this.label = label;
+            }
+        }
+
+        public virtual IEnumerable<TreeInstanceData> AvailableTrees()
         {
             if (TalentedGeneDef?.MainTreeDef != null && activeTree != null)
             {
-                yield return (TalentedGeneDef.MainTreeDef, activeTree, "Main Tree");
+                yield return new TreeInstanceData(TalentedGeneDef.MainTreeDef, activeTree, TalentedGeneDef.MainTreeDef.label);
             }
             if (TalentedGeneDef?.SecondaryTreeDef != null && passiveTree != null)
             {
-                yield return (TalentedGeneDef.SecondaryTreeDef, passiveTree, "Secondary Tree");
+                yield return new TreeInstanceData(TalentedGeneDef.SecondaryTreeDef, passiveTree, TalentedGeneDef.SecondaryTreeDef.label);
             }
         }
 

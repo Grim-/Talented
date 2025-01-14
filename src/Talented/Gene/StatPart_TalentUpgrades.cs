@@ -24,12 +24,12 @@ namespace Talented
 
             foreach (var gene in talentGenes)
             {
-                foreach (var (_, handler, _) in gene.AvailableTrees())
+                foreach (var TreeInstanceData in gene.AvailableTrees())
                 {
-                    if (handler == null || handler.activeEffects == null)
+                    if (TreeInstanceData.handler == null || TreeInstanceData.handler.activeEffects == null)
                         continue;
 
-                    foreach (var effectList in handler.activeEffects.Values)
+                    foreach (var effectList in TreeInstanceData.handler.activeEffects.Values)
                     {
                         foreach (var effect in effectList)
                         {
@@ -92,12 +92,12 @@ namespace Talented
 
             foreach (var gene in talentGenes)
             {
-                foreach (var (_, handler, _) in gene.AvailableTrees())
+                foreach (var TreeInstanceData in gene.AvailableTrees())
                 {
-                    if (handler == null || handler.activeEffects == null)
+                    if (TreeInstanceData.handler == null || TreeInstanceData.handler.activeEffects == null)
                         continue;
 
-                    foreach (var effectList in handler.activeEffects.Values)
+                    foreach (var effectList in TreeInstanceData.handler.activeEffects.Values)
                     {
                         foreach (var effect in effectList)
                         {
@@ -105,7 +105,7 @@ namespace Talented
                                 statEffect.statDef == parentStat &&
                                 statEffect.IsActive)
                             {
-                                effectDetails.Add((statEffect, handler));
+                                effectDetails.Add((statEffect, TreeInstanceData.handler));
                             }
                         }
                     }

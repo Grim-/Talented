@@ -10,9 +10,21 @@ namespace Talented
         private string defaultbackgroundTexturePath = "UI/Tree/defaultbackground";
         public Color? backgroundColor;
 
+
+        //Tree list appearance
+        public string treeListbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
+        private string defaulttreeListbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
+
+
+        public string genelistbackgroundTexturePath = "UI/Tree/genelistbackground";
+        private string defaultgenelistbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
+
         // Node appearance
         public string nodeTexturePath = "UI/Tree/defaultnode";
         private string defaultNodeTexturePath = "UI/Tree/defaultnode";
+
+        private string defaultUpgradeNodeTexturePath = "UI/Tree/defaultupgradeicon";
+
         public float nodeSize = 60f;
         public float nodeSpacing = 10f;
 
@@ -48,9 +60,13 @@ namespace Talented
         // Toolbar configuration
         public float toolbarHeight = 80f;
 
+        private Texture2D cachedtreeListBackgroundTexture;
         private Texture2D cachedBackgroundTexture;
         private Texture2D cachedNodeTexture;
         private Texture2D cachedConnectionTexture;
+        private Texture2D cachedgeneListBackgroundTexture;
+
+        private Texture2D cachedDefaultUpgradeIcon;
 
         private Texture2D LoadTexture(string customPath, string defaultPath, string textureType)
         {
@@ -73,7 +89,17 @@ namespace Talented
             }
             return defaultTexture;
         }
-
+        public Texture2D TreeListBackgroundTexture
+        {
+            get
+            {
+                if (cachedtreeListBackgroundTexture == null)
+                {
+                    cachedtreeListBackgroundTexture = LoadTexture(treeListbackgroundTexturePath, defaulttreeListbackgroundTexturePath, "background");
+                }
+                return cachedtreeListBackgroundTexture;
+            }
+        }
         public Texture2D BackgroundTexture
         {
             get
@@ -85,7 +111,17 @@ namespace Talented
                 return cachedBackgroundTexture;
             }
         }
-
+        public Texture2D GeneListBackgroundTexture
+        {
+            get
+            {
+                if (cachedgeneListBackgroundTexture == null)
+                {
+                    cachedgeneListBackgroundTexture = LoadTexture(genelistbackgroundTexturePath, defaultgenelistbackgroundTexturePath, "background");
+                }
+                return cachedgeneListBackgroundTexture;
+            }
+        }
         public Texture2D NodeTexture
         {
             get
@@ -97,7 +133,17 @@ namespace Talented
                 return cachedNodeTexture;
             }
         }
-
+        public Texture2D DefaultUpgradeIcon
+        {
+            get
+            {
+                if (cachedDefaultUpgradeIcon == null)
+                {
+                    cachedDefaultUpgradeIcon = LoadTexture(defaultUpgradeNodeTexturePath, defaultUpgradeNodeTexturePath, "node");
+                }
+                return cachedDefaultUpgradeIcon;
+            }
+        }
         public Texture2D ConnectionTexture
         {
             get

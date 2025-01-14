@@ -16,6 +16,10 @@ namespace Talented
         public bool sequential = false;
         public bool hide = false;
         public List<UpgradeDef> prerequisitesToShow;
+        public int UpgradeCount => upgrades != null ? upgrades.Count : 0;
+        public int ConnectionCount => connections != null ? connections.Count : 0;
+        public bool BelongsToUpgradePath => path != null;
+        public bool IsBranchNode => type == NodeType.Branch;
 
         public bool MeetsVisibilityRequirements(BaseTreeHandler treeHandler)
         {
@@ -72,9 +76,6 @@ namespace Talented
 
             return upgrades[upgradeIndex];
         }
-        public int UpgradeCount => upgrades != null ? upgrades.Count : 0;
-        public int ConnectionCount => connections != null ? connections.Count : 0;
-        public bool BelongsToUpgradePath => path != null;
-        public bool IsBranchNode => type == NodeType.Branch;
+
     }
 }

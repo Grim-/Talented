@@ -14,7 +14,6 @@ namespace Talented
         {
             if (sequential)
             {
-                // For sequential upgrades, always remove existing effects first
                 RemoveExistingEffects(pawn);
             }
 

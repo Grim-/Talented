@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <!-- Rogue-Mage Psychic Stealth Enhancement -->
+  <Talented.UpgradeDef>
+      <defName>PsychicStealthUpgrade</defName>
+      <label>Psychic Stealth</label>
+      <description>Uses psychic energy to enhance stealth capabilities.</description>
+      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <hediffEffects>
+          <li>
+              <hediffDef>PsychicStealth</hediffDef>
+          </li>
+      </hediffEffects>
+  </Talented.UpgradeDef>
+
+  <HediffDef ParentName="ImplantHediffBase">
+      <defName>PsychicStealth</defName>
+      <label>psychic stealth</label>
+      <description>Parasitic modifications allow psychic energy to be used for enhanced stealth.</description>
+      <defaultLabelColor>(0.6, 0.5, 0.8)</defaultLabelColor>
+      <stages>
+          <li>
+              <statOffsets>
+                  <PsychicSensitivity>0.10</PsychicSensitivity>
+              </statOffsets>
+          </li>
+      </stages>
+  </HediffDef>
+</Defs>

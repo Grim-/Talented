@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Rogue Base Stat Upgrade -->
+  <Talented.UpgradeDef>
+      <defName>SwiftMovementUpgrade</defName>
+      <label>Swift Movement</label>
+      <description>Enhances movement capabilities through parasitic muscle enhancement.</description>
+      <parasiteLevelRequired>3</parasiteLevelRequired>
+      <statEffects>
+          <li>
+              <statDef>MoveSpeed</statDef>
+              <value>0.15</value>
+              <operation>Add</operation>
+          </li>
+          <li>
+              <statDef>DodgeChance</statDef>
+              <value>0.10</value>
+              <operation>Add</operation>
+          </li>
+      </statEffects>
+  </Talented.UpgradeDef>
+
+  <!-- Rogue Shadow Strike Ability -->
+  <Talented.UpgradeDef>
+      <defName>ShadowStrikeUpgrade</defName>
+      <label>Shadow Strike</label>
+      <description>Grants the ability to briefly become invisible and perform a powerful strike.</description>
+      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <abilityEffects>
+          <li>
+              <abilities>
+                  <li>
+                      <abilityDef>ShadowStrikeAbility</abilityDef>
+                  </li>
+              </abilities>
+          </li>
+      </abilityEffects>
+  </Talented.UpgradeDef>
+
+  <AbilityDef>
+      <defName>ShadowStrikeAbility</defName>
+      <label>shadow strike</label>
+      <description>Briefly become invisible and gain bonus damage on your next attack.</description>
+      <iconPath>Abilities/ShadowStrike</iconPath>
+      <targetRequired>False</targetRequired>
+      <verbProperties>
+          <verbClass>Verb_CastAbility</verbClass>
+      </verbProperties>
+  </AbilityDef>
+
+  <HediffDef>
+      <defName>ShadowStrikeBoost</defName>
+      <label>shadow strike boost</label>
+      <description>Enhanced stealth and damage capabilities.</description>
+      <stages>
+          <li>
+              <statOffsets>
+                  <MeleeDamageFactor>0.5</MeleeDamageFactor>
+                  <NegotiationAbility>0.8</NegotiationAbility>
+              </statOffsets>
+          </li>
+      </stages>
+  </HediffDef>
+
+  <!-- Rogue Enhanced Reflexes -->
+  <Talented.UpgradeDef>
+      <defName>EnhancedReflexesUpgrade</defName>
+      <label>Enhanced Reflexes</label>
+      <description>Develops improved neural pathways for better reflexes and coordination.</description>
+      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <hediffEffects>
+          <li>
+              <hediffDef>EnhancedReflexes</hediffDef>
+          </li>
+      </hediffEffects>
+  </Talented.UpgradeDef>
+
+  <HediffDef ParentName="ImplantHediffBase">
+      <defName>EnhancedReflexes</defName>
+      <label>enhanced reflexes</label>
+      <description>Parasitic modifications have enhanced neural response time.</description>
+      <defaultLabelColor>(0.8, 0.5, 0.5)</defaultLabelColor>
+      <stages>
+          <li>
+              <statOffsets>
+                  <ShootingAccuracyPawn>0.15</ShootingAccuracyPawn>
+                  <MeleeHitChance>0.10</MeleeHitChance>
+                  <WorkSpeedGlobal>0.10</WorkSpeedGlobal>
+              </statOffsets>
+          </li>
+      </stages>
+  </HediffDef>
+</Defs>

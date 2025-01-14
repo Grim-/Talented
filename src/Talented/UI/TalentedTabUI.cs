@@ -9,33 +9,43 @@ namespace Talented
     public class TalentedTabUI : ITab
     {
         protected Gene_TalentBase TalentGene => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>();
-        protected TalentedGeneDef GeneDef => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>().TalentedGeneDef;
-        public override bool IsVisible => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>() != null;
-
+        protected TalentedGeneDef GeneDef => TalentGene.TalentedGeneDef;
+        public override bool IsVisible => TalentGene != null;
         protected const float PADDING = 5f;
-        protected const float BUTTON_WIDTH = 90f;
-        protected const float LEVEL_WIDTH = 80f;
+        protected const float TREE_BUTTON_SPACING = 5f;
+        protected const float LEVEL_WIDTH = 60f;
         protected const float PROGRESS_WIDTH = 100f;
-        protected const float TREE_BANNER_HEIGHT = 160f;
-        protected const float TREE_BANNER_SPACING = 10f;
-
+        protected const float TREE_BANNER_HEIGHT = 80f;
+        protected const float TREE_ROW_HEIGHT = 40f;
+        protected const float TREE_BANNER_SPACING = 15f;
+        protected const float TOOLBAR_MARGIN = 20f;
+        private float TreeButtonExpBarWidth = 80f;
         protected Vector2 tabSize = new Vector2(500, 400);
         protected float toolbarHeight => 40f;
         protected Vector2 scrollPosition;
 
         public TalentedTabUI()
         {
-            labelKey = "Talents";
+            labelKey = "Talented.Tab.Label";
             size = tabSize;
         }
 
         protected override void FillTab()
         {
             var rect = new Rect(0, 0, tabSize.x, tabSize.y);
-            var toolbarRect = rect.TopPartPixels(toolbarHeight);
-            GUI.DrawTexture(toolbarRect, SolidColorMaterials.NewSolidColorTexture(Color.grey));
-            DrawToolbar(toolbarRect);
-            DrawContent(rect.BottomPartPixels(rect.height - toolbarHeight));
+
+            if (Prefs.DevMode)
+            {
+                var toolbarRect = rect.TopPartPixels(toolbarHeight);
+                GUI.DrawTexture(toolbarRect, SolidColorMaterials.NewSolidColorTexture(Color.grey));
+                DrawToolbar(toolbarRect);
+            }
+
+            var contentRect = rect.BottomPartPixels(rect.height - (Prefs.DevMode ? toolbarHeight : 0));
+            contentRect.y += TOOLBAR_MARGIN;
+            contentRect.height -= Prefs.DevMode ? TOOLBAR_MARGIN : 0;
+
+            DrawContent(contentRect);
         }
 
         protected virtual void DrawToolbar(Rect rect)
@@ -43,143 +53,169 @@ namespace Talented
             float curX = PADDING;
             var levelLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
             Widgets.DrawHighlight(levelLabelRect);
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(levelLabelRect, $"Level: {TalentGene.CurrentLevel}");
-            curX += LEVEL_WIDTH + PADDING;
-
             Text.Anchor = TextAnchor.UpperLeft;
-            if (TalentGene is IExperienceHolder expHolder)
-            {
-                var progressRect = new Rect(curX, rect.y + (rect.height - 18f) / 2f, PROGRESS_WIDTH, 18f);
-                Widgets.FillableBar(progressRect, expHolder.ExperienceProgress);
-                curX += PROGRESS_WIDTH + PADDING;
-            }
         }
 
         protected virtual void DrawContent(Rect rect)
         {
-            var availableTrees = SelPawn.genes.GenesListForReading
-                .Where(g => g is Gene_TalentBase)
-                .Cast<Gene_TalentBase>()
-                .ToList();
+            List<Gene_TalentBase> genes = GetTalentGenes();
+            if (genes.Count == 0) return;
 
-            float totalHeight = (TREE_BANNER_HEIGHT + TREE_BANNER_SPACING) * availableTrees.Count;
+            float totalHeight = CalcTotalContentHeight(genes);
             Rect viewRect = new Rect(0, 0, rect.width - 16f, totalHeight);
 
             Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
-
-            float currentY = 0f;
-            foreach (var gene in availableTrees)
-            {
-                DrawTreeBanner(new Rect(PADDING, currentY, viewRect.width - PADDING * 2, TREE_BANNER_HEIGHT), gene);
-                currentY += TREE_BANNER_HEIGHT + TREE_BANNER_SPACING;
-            }
-
+            DrawGeneList(genes, viewRect);
             Widgets.EndScrollView();
         }
 
-        protected virtual void DrawTreeBanner(Rect rect, Gene_TalentBase gene)
+        private List<Gene_TalentBase> GetTalentGenes()
         {
-            const float BUTTON_SIZE = 64f; 
-            const float BUTTON_SPACING = 10f;
-            const float LABEL_HEIGHT = 16f; 
-            const float INNER_PADDING = 3f;
-            const float TITLE_HEIGHT = 18f;
+            return SelPawn.genes.GenesListForReading
+                .Where(g => g is Gene_TalentBase)
+                .Cast<Gene_TalentBase>()
+                .ToList();
+        }
 
-            Color FOOTER_COLOR = new Color(0.2f, 0.2f, 0.2f);
+        private float CalcTotalContentHeight(List<Gene_TalentBase> genes)
+        {
+            float height = 0f;
+            foreach (var gene in genes)
+            {
+                height += TREE_BANNER_HEIGHT + gene.AvailableTrees().Count() * (TREE_ROW_HEIGHT + TREE_BUTTON_SPACING);
+                height += TREE_BANNER_SPACING;
+            }
+            return height;
+        }
 
+        private void DrawGeneList(List<Gene_TalentBase> genes, Rect viewRect)
+        {
+            float currentY = 0f;
+            foreach (var gene in genes)
+            {
+                float bannerHeight = CalcBannerHeight(gene);
+                DrawGeneBanner(new Rect(PADDING, currentY, viewRect.width - PADDING * 2, bannerHeight), gene);
+                currentY += bannerHeight + TREE_BANNER_SPACING;
+            }
+        }
+
+        private float CalcBannerHeight(Gene_TalentBase gene)
+        {
+            return TREE_BANNER_HEIGHT + gene.AvailableTrees().Count() * (TREE_ROW_HEIGHT + TREE_BUTTON_SPACING);
+        }
+
+        protected virtual void DrawGeneBanner(Rect rect, Gene_TalentBase gene)
+        {
+            DrawBannerBackground(rect);
+            Rect contentRect = rect.ContractedBy(10f);
+
+            DrawBannerHeader(contentRect, gene);
+            DrawBannerTrees(contentRect, gene);
+        }
+
+        private void DrawBannerBackground(Rect rect)
+        {
             GUI.DrawTexture(rect, SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f)));
-            Widgets.DrawBox(rect);
+        }
 
-            float contentPadding = 10f;
-            Rect contentRect = rect.ContractedBy(contentPadding);
+        private void DrawBannerHeader(Rect rect, Gene_TalentBase gene)
+        {
+            Rect headerRect = rect.TopPartPixels(26f);
 
-            Rect titleRect = contentRect.TopPartPixels(TITLE_HEIGHT);
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(titleRect, gene.def.label);
+            Widgets.Label(headerRect.LeftPartPixels(rect.width * 0.7f), gene.def.label);
 
-            Rect buttonAreaRect = new Rect(
-                contentRect.x,
-                titleRect.yMax + contentPadding,
-                contentRect.width,
-                contentRect.height - TITLE_HEIGHT - contentPadding
-            );
-
-            var trees = gene.AvailableTrees().ToList();
-            if (trees.Count == 0) return;
-
-
-            float availableWidth = buttonAreaRect.width;
-            float totalSpacing = BUTTON_SPACING * (trees.Count - 1);
-            float buttonWidth = (availableWidth - totalSpacing) / trees.Count;
-            buttonWidth = Mathf.Min(buttonWidth, BUTTON_SIZE);
-
-            float startX = buttonAreaRect.x;
-
-            foreach (var (treeDef, handler, label) in trees)
-            {
-                Rect buttonRect = new Rect(startX, buttonAreaRect.y, buttonWidth, BUTTON_SIZE);
-
-
-                Widgets.DrawBox(buttonRect, 1, SolidColorMaterials.NewSolidColorTexture(Color.white));
-
-
-                Rect innerRect = buttonRect.ContractedBy(INNER_PADDING);
-
-                // Icon area
-                Rect iconRect = new Rect(
-                    innerRect.x,
-                    innerRect.y,
-                    innerRect.width,
-                    innerRect.height - LABEL_HEIGHT
-                );
-                GUI.DrawTexture(iconRect, treeDef.Skin?.BackgroundTexture ?? SolidColorMaterials.NewSolidColorTexture(FOOTER_COLOR));
-
-
-                Rect footerRect = new Rect(
-                    buttonRect.x,
-                    buttonRect.y + buttonRect.height - LABEL_HEIGHT,
-                    buttonRect.width,
-                    LABEL_HEIGHT
-                );
-
-                GUI.DrawTexture(footerRect, SolidColorMaterials.NewSolidColorTexture(FOOTER_COLOR));
-
-                Text.Font = GameFont.Tiny;
-                Text.Anchor = TextAnchor.MiddleCenter;
-                Widgets.Label(footerRect, label);
-
-                if (Mouse.IsOver(buttonRect))
-                {
-                    Widgets.DrawHighlight(buttonRect);
-                    TooltipHandler.TipRegion(buttonRect, $"Open {label}");
-                    if (Widgets.ButtonInvisible(buttonRect))
-                    {
-                        Find.WindowStack.Add(new TalentTreeDisplayWindow(gene, treeDef, handler, treeDef.displayStrategy));
-                    }
-                }
-
-                startX += buttonWidth + BUTTON_SPACING;
-            }
-
-            // Reset text settings
             Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.MiddleRight;
+            Widgets.Label(headerRect.RightPartPixels(100f), "Talented.Tab.Level".Translate(gene.CurrentLevel));
+        }
+
+        private void DrawBannerTrees(Rect rect, Gene_TalentBase gene)
+        {
+            float currentY = rect.y + 36f;
+            foreach (var tree in gene.AvailableTrees())
+            {
+                DrawTreeButton(new Rect(rect.x, currentY, rect.width, TREE_ROW_HEIGHT), tree.handler, gene);
+                currentY += TREE_ROW_HEIGHT + TREE_BUTTON_SPACING;
+            }
+        }
+
+        protected virtual void DrawTreeButton(Rect rect, BaseTreeHandler tree, Gene_TalentBase gene)
+        {
+            DrawTreeBackground(rect, tree);
+            Rect iconRect = DrawTreeIcon(rect, tree);
+            DrawTreeInfo(rect, iconRect, tree, gene);
+            HandleTreeInteraction(rect, tree, gene);
+        }
+
+        private void DrawTreeBackground(Rect rect, BaseTreeHandler tree)
+        {
+            GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
+                SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f)));
+        }
+
+        private Rect DrawTreeIcon(Rect rect, BaseTreeHandler tree)
+        {
+            float iconSize = rect.height - 4f;
+            Rect iconRect = new Rect(rect.x + 2f, rect.y + 2f, iconSize, iconSize);
+            GUI.DrawTexture(iconRect, tree.TreeDef.Skin?.BackgroundTexture ??
+                SolidColorMaterials.NewSolidColorTexture(Color.gray));
+            return iconRect;
+        }
+
+        private void DrawTreeInfo(Rect rect, Rect iconRect, BaseTreeHandler tree, Gene_TalentBase gene)
+        {
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.MiddleLeft;
+
+            Rect labelRect = new Rect(iconRect.xMax + PADDING, rect.y, rect.width * 0.3f, rect.height);
+            Widgets.LabelFit(labelRect, "Talented.Tab.TreePoints".Translate(tree.TreeDef.treeName, tree.GetAvailablePoints()));
+
+            if (gene is IExperienceHolder expHolder)
+            {
+                Rect expRect = new Rect(
+                    rect.xMax - 5f - TreeButtonExpBarWidth - PADDING,
+                    rect.y + (rect.height - 18f) / 2f,
+                    TreeButtonExpBarWidth,
+                    18f
+                );
+                Widgets.FillableBar(expRect, expHolder.ExperienceProgress);
+            }
+        }
+
+        private void HandleTreeInteraction(Rect rect, BaseTreeHandler tree, Gene_TalentBase gene)
+        {
+            if (Mouse.IsOver(rect))
+            {
+                Widgets.DrawHighlight(rect);
+                TooltipHandler.TipRegion(rect, "Talented.Tab.OpenTree".Translate(tree.TreeDef.treeName));
+                if (Widgets.ButtonInvisible(rect))
+                {
+                    Find.WindowStack.Add(new TalentTreeDisplayWindow(gene, tree.TreeDef, tree, tree.TreeDef.displayStrategy));
+                }
+            }
             Text.Anchor = TextAnchor.UpperLeft;
         }
     }
     //public class TalentedTabUI : ITab
     //{
     //    protected Gene_TalentBase TalentGene => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>();
-    //    protected TalentedGeneDef GeneDef => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>().TalentedGeneDef;
-    //    public override bool IsVisible => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>() != null;
-
+    //    protected TalentedGeneDef GeneDef => TalentGene.TalentedGeneDef;
+    //    public override bool IsVisible => TalentGene != null;
     //    protected const float PADDING = 5f;
-    //    protected const float BUTTON_WIDTH = 90f;
-    //    protected const float LEVEL_WIDTH = 80f;
+    //    protected const float TREE_BUTTON_SPACING = 5f;
+    //    protected const float LEVEL_WIDTH = 60f;
     //    protected const float PROGRESS_WIDTH = 100f;
+    //    protected const float TREE_BANNER_HEIGHT = 80f;
+    //    protected const float TREE_ROW_HEIGHT = 40f;
+    //    protected const float TREE_BANNER_SPACING = 15f;
+    //    protected const float TOOLBAR_MARGIN = 20f;
+    //    private float TreeButtonExpBarWidth = 80f;
     //    protected Vector2 tabSize = new Vector2(500, 400);
     //    protected float toolbarHeight => 40f;
+    //    protected Vector2 scrollPosition;
+
 
     //    public TalentedTabUI()
     //    {
@@ -190,10 +226,19 @@ namespace Talented
     //    protected override void FillTab()
     //    {
     //        var rect = new Rect(0, 0, tabSize.x, tabSize.y);
-    //        var toolbarRect = rect.TopPartPixels(toolbarHeight);
-    //        GUI.DrawTexture(toolbarRect, SolidColorMaterials.NewSolidColorTexture(Color.grey));
-    //        DrawToolbar(toolbarRect);
-    //        DrawContent(rect.BottomPartPixels(rect.height - toolbarHeight));
+
+    //        if (Prefs.DevMode)
+    //        {
+    //            var toolbarRect = rect.TopPartPixels(toolbarHeight);
+    //            GUI.DrawTexture(toolbarRect, SolidColorMaterials.NewSolidColorTexture(Color.grey));
+    //            DrawToolbar(toolbarRect);
+    //        }
+
+    //        var contentRect = rect.BottomPartPixels(rect.height - (Prefs.DevMode ? toolbarHeight : 0));
+    //        contentRect.y += TOOLBAR_MARGIN;
+    //        contentRect.height -= Prefs.DevMode ? TOOLBAR_MARGIN : 0;
+
+    //        DrawContent(contentRect);
     //    }
 
     //    protected virtual void DrawToolbar(Rect rect)
@@ -201,56 +246,157 @@ namespace Talented
     //        float curX = PADDING;
     //        var levelLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
     //        Widgets.DrawHighlight(levelLabelRect);
-    //        Text.Anchor = TextAnchor.MiddleCenter;
-    //        Widgets.Label(levelLabelRect, $"Level: {TalentGene.CurrentLevel}");
-    //        curX += LEVEL_WIDTH + PADDING;
+
     //        Text.Anchor = TextAnchor.UpperLeft;
-
-    //        if (TalentGene is IExperienceHolder expHolder)
-    //        {
-    //            var progressRect = new Rect(curX, rect.y + (rect.height - 18f) / 2f, PROGRESS_WIDTH, 18f);
-    //            Widgets.FillableBar(progressRect, expHolder.ExperienceProgress);
-    //            curX += PROGRESS_WIDTH + PADDING;
-    //        }
-
-
-    //        DrawTreeButtons(rect);
-    //    }
-
-    //    protected virtual void DrawTreeButtons(Rect rect)
-    //    {
-    //        var dropdownRect = new Rect(rect.width - (BUTTON_WIDTH * 2 + PADDING * 2),
-    //            rect.y + PADDING, BUTTON_WIDTH * 2 + PADDING, rect.height - PADDING * 2);
-
-    //        if (Widgets.ButtonText(dropdownRect, "View Trees ▼"))
-    //        {
-    //            var options = new List<FloatMenuOption>();
-
-    //            foreach (var gene in SelPawn.genes.GenesListForReading.Where(g => g is Gene_TalentBase).Cast<Gene_TalentBase>())
-    //            {
-    //                string geneLabel = gene.def.label;
-
-    //                options.Add(new FloatMenuOption(
-    //                    $"{geneLabel} - Main Tree",
-    //                    () => gene.OpenActiveTree()
-    //                ));
-
-    //                options.Add(new FloatMenuOption(
-    //                    $"{geneLabel} - Secondary Tree",
-    //                    () => gene.OpenPassiveTree()
-    //                ));
-    //            }
-
-    //            if (options.Any())
-    //            {
-    //                Find.WindowStack.Add(new FloatMenu(options));
-    //            }
-    //        }
     //    }
 
     //    protected virtual void DrawContent(Rect rect)
     //    {
+    //        List<Gene_TalentBase> genes = GetTalentGenes();
+    //        if (genes.Count == 0) return;
 
+    //        float totalHeight = CalcTotalContentHeight(genes);
+    //        Rect viewRect = new Rect(0, 0, rect.width - 16f, totalHeight);
+
+    //        Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
+    //        DrawGeneList(genes, viewRect);
+    //        Widgets.EndScrollView();
+    //    }
+
+    //    private List<Gene_TalentBase> GetTalentGenes()
+    //    {
+    //        return SelPawn.genes.GenesListForReading
+    //            .Where(g => g is Gene_TalentBase)
+    //            .Cast<Gene_TalentBase>()
+    //            .ToList();
+    //    }
+
+    //    private float CalcTotalContentHeight(List<Gene_TalentBase> genes)
+    //    {
+    //        float height = 0f;
+    //        foreach (var gene in genes)
+    //        {
+    //            height += TREE_BANNER_HEIGHT + gene.AvailableTrees().Count() * (TREE_ROW_HEIGHT + TREE_BUTTON_SPACING);
+    //            height += TREE_BANNER_SPACING;
+    //        }
+    //        return height;
+    //    }
+
+    //    private void DrawGeneList(List<Gene_TalentBase> genes, Rect viewRect)
+    //    {
+    //        float currentY = 0f;
+    //        foreach (var gene in genes)
+    //        {
+    //            float bannerHeight = CalcBannerHeight(gene);
+    //            DrawGeneBanner(new Rect(PADDING, currentY, viewRect.width - PADDING * 2, bannerHeight), gene);
+    //            currentY += bannerHeight + TREE_BANNER_SPACING;
+    //        }
+    //    }
+
+    //    private float CalcBannerHeight(Gene_TalentBase gene)
+    //    {
+    //        return TREE_BANNER_HEIGHT + gene.AvailableTrees().Count() * (TREE_ROW_HEIGHT + TREE_BUTTON_SPACING);
+    //    }
+
+    //    protected virtual void DrawGeneBanner(Rect rect, Gene_TalentBase gene)
+    //    {
+    //        DrawBannerBackground(rect);
+    //        Rect contentRect = rect.ContractedBy(10f);
+
+    //        DrawBannerHeader(contentRect, gene);
+    //        DrawBannerTrees(contentRect, gene);
+    //    }
+
+    //    private void DrawBannerBackground(Rect rect)
+    //    {
+    //        GUI.DrawTexture(rect, SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f)));
+    //        //Widgets.DrawBox(rect);
+    //    }
+
+    //    private void DrawBannerHeader(Rect rect, Gene_TalentBase gene)
+    //    {
+    //        Rect headerRect = rect.TopPartPixels(26f);
+
+    //        // Label
+    //        Text.Font = GameFont.Medium;
+    //        Text.Anchor = TextAnchor.MiddleLeft;
+    //        Widgets.Label(headerRect.LeftPartPixels(rect.width * 0.7f), gene.def.label);
+
+    //        // Level
+    //        Text.Font = GameFont.Small;
+    //        Text.Anchor = TextAnchor.MiddleRight;
+    //        Widgets.Label(headerRect.RightPartPixels(100f), $"Level: {gene.CurrentLevel}");
+    //    }
+
+    //    private void DrawBannerTrees(Rect rect, Gene_TalentBase gene)
+    //    {
+    //        float currentY = rect.y + 36f; // Header height + padding
+    //        foreach (var tree in gene.AvailableTrees())
+    //        {
+    //            DrawTreeButton(new Rect(rect.x, currentY, rect.width, TREE_ROW_HEIGHT), tree.handler, gene);
+    //            currentY += TREE_ROW_HEIGHT + TREE_BUTTON_SPACING;
+    //        }
+    //    }
+
+    //    protected virtual void DrawTreeButton(Rect rect, BaseTreeHandler tree, Gene_TalentBase gene)
+    //    {
+    //        DrawTreeBackground(rect, tree);
+    //        Rect iconRect = DrawTreeIcon(rect, tree);
+    //        DrawTreeInfo(rect, iconRect, tree, gene);
+    //        HandleTreeInteraction(rect, tree, gene);
+    //    }
+
+    //    private void DrawTreeBackground(Rect rect, BaseTreeHandler tree)
+    //    {
+    //        GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
+    //            SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f)));
+    //        //Widgets.DrawBox(rect);
+    //    }
+
+    //    private Rect DrawTreeIcon(Rect rect, BaseTreeHandler tree)
+    //    {
+    //        float iconSize = rect.height - 4f;
+    //        Rect iconRect = new Rect(rect.x + 2f, rect.y + 2f, iconSize, iconSize);
+    //        GUI.DrawTexture(iconRect, tree.TreeDef.Skin?.BackgroundTexture ??
+    //            SolidColorMaterials.NewSolidColorTexture(Color.gray));
+    //        return iconRect;
+    //    }
+
+    //    private void DrawTreeInfo(Rect rect, Rect iconRect, BaseTreeHandler tree, Gene_TalentBase gene)
+    //    {
+    //        Text.Font = GameFont.Small;
+    //        Text.Anchor = TextAnchor.MiddleLeft;
+
+    //        // Tree name and points
+    //        Rect labelRect = new Rect(iconRect.xMax + PADDING, rect.y, rect.width * 0.3f, rect.height);
+    //        Widgets.LabelFit(labelRect, $"{tree.TreeDef.treeName} ({tree.GetAvailablePoints()})");
+
+    //        // Experience bar if applicable
+    //        if (gene is IExperienceHolder expHolder)
+    //        {
+    //            Rect expRect = new Rect(
+    //                rect.xMax - 5f - TreeButtonExpBarWidth - PADDING,
+    //                rect.y + (rect.height - 18f) / 2f,
+    //                TreeButtonExpBarWidth,
+    //                18f
+    //            );
+    //            Widgets.FillableBar(expRect, expHolder.ExperienceProgress);
+    //        }
+    //    }
+
+    //    private void HandleTreeInteraction(Rect rect, BaseTreeHandler tree, Gene_TalentBase gene)
+    //    {
+    //        if (Mouse.IsOver(rect))
+    //        {
+    //            Widgets.DrawHighlight(rect);
+    //            TooltipHandler.TipRegion(rect, $"Open {tree.TreeDef.treeName}");
+    //            if (Widgets.ButtonInvisible(rect))
+    //            {
+    //                Find.WindowStack.Add(new TalentTreeDisplayWindow(gene, tree.TreeDef, tree, tree.TreeDef.displayStrategy));
+    //            }
+    //        }
+    //        Text.Anchor = TextAnchor.UpperLeft;
     //    }
     //}
+
 }
