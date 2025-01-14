@@ -116,6 +116,7 @@
     <Compile Include="TalentedDefOf.cs" />
     <Compile Include="Experience\TalentPointFormulaDef.cs" />
     <Compile Include="Experience\TalentPointFormulaWorker.cs" />
+    <Compile Include="Tree\StatEffect.cs" />
     <Compile Include="Tree\UpgradeDef.cs" />
     <Compile Include="Tree\UpgradePathDef.cs" />
     <Compile Include="Tree\UpgradeTreeDef.cs" />

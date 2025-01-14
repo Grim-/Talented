@@ -21,7 +21,9 @@ namespace Talented
 
         protected override float Margin => skin != null ? skin.windowMargin : 0;
 
-        public override Vector2 InitialSize => new Vector2(450f, 800f);
+
+        private Vector2 WindowSize = new Vector2(450f, 800f);
+        public override Vector2 InitialSize => WindowSize;
 
         public TalentTreeDisplayWindow(Gene_TalentBase parasite, UpgradeTreeDef tree, BaseTreeHandler handler, TreeDisplayStrategyDef displayStrategyDef)
         {
@@ -49,8 +51,10 @@ namespace Talented
                 return;
             }
 
+
             parasiteGene = parasite;
             treeDef = tree;
+            this.WindowSize = new Vector2(this.treeDef.dimensions.x > 0 ? this.treeDef.dimensions.x : this.InitialSize.x, this.treeDef.dimensions.z > 0 ? this.treeDef.dimensions.z : this.InitialSize.y);
             treeHandler = handler;
             allNodes = treeDef.GetAllNodes() ?? new List<UpgradeTreeNodeDef>();
             skin = tree.Skin;
