@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace Talented
@@ -31,6 +32,24 @@ namespace Talented
 
         private ExperienceHandler experienceHandler;
         private ExperienceFormulaWorker formulaWorker;
+
+        public string genelistbackgroundTexturePath = "UI/Tree/genelistbackground";
+        private string defaultgenelistbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
+
+        private Texture2D cachedBackgroundTexture;
+        public Texture2D BackgroundTexture
+        {
+            get
+            {
+                if (cachedBackgroundTexture == null)
+                {
+                    cachedBackgroundTexture = UpgradeTreeSkinDef.LoadTexture(genelistbackgroundTexturePath, defaultgenelistbackgroundTexturePath, "background");
+                }
+                return cachedBackgroundTexture;
+            }
+        }
+
+        public float XPForNextLevel => MaxExperienceForLevel(currentLevel);
 
         public Gene_TalentBase()
         {
@@ -220,20 +239,24 @@ namespace Talented
                 yield return gizmo;
             }
 
-            yield return new Command_Action
+            if (Prefs.DevMode)
             {
-                defaultLabel = "DEV: Gain Level",
-                defaultDesc = "Gain 1 Level (Debug)",
-                action = () => GainLevel(1),
-            };
+                yield return new Command_Action
+                {
+                    defaultLabel = $"DEV: {this.Label}  Gain Level",
+                    defaultDesc = "Gain 1 Level (Debug)",
+                    action = () => GainLevel(1),
+                };
 
-            yield return new Command_Action
-            {
-                defaultLabel = "DEV: Max Experience",
-                defaultDesc = "Fill Experience Bar (Debug)",
-                action = () => GainExperience(MaxExperienceForLevel(currentLevel) - currentExperience - 0.1f),
-            };
+                yield return new Command_Action
+                {
+                    defaultLabel = $"DEV:  {this.Label} Max Experience",
+                    defaultDesc = "Fill Experience Bar (Debug)",
+                    action = () => GainExperience(MaxExperienceForLevel(currentLevel) - currentExperience - 0.1f),
+                };
+            }
         }
+
         public override void ExposeData()
         {
             base.ExposeData();

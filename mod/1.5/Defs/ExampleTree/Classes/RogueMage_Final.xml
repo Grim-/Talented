@@ -13,7 +13,7 @@
       </hediffEffects>
   </Talented.UpgradeDef>
 
-  <HediffDef ParentName="ImplantHediffBase">
+  <HediffDef>
       <defName>PsychicStealth</defName>
       <label>psychic stealth</label>
       <description>Parasitic modifications allow psychic energy to be used for enhanced stealth.</description>

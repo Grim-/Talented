@@ -70,7 +70,7 @@ namespace Talented
         public override void DoWindowContents(Rect inRect)
         {
             DrawBackground(inRect);
-            // Toolbar and rest of contents
+
             Rect toolbarRect = new Rect(0f, 0f, inRect.width, skin.toolbarHeight);
             DrawToolbar(toolbarRect);
 
@@ -82,7 +82,7 @@ namespace Talented
         private void DrawBackground(Rect inRect)
         {
             GUI.color = Color.white;
-            GUI.DrawTexture(inRect, skin.BackgroundTexture, ScaleMode.StretchToFill);
+            GUI.DrawTexture(inRect, skin.BackgroundTexture, ScaleMode.ScaleAndCrop);
         }
 
         private void DrawNodes()

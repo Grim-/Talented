@@ -1,8 +1,27 @@
-// utils/xmlSerializer.js - New file for XML handling
-import { EditableDefTypes, DefStructures } from '../DefTypes';
+// utils/xmlSerializer.js
+// Configuration object for def types
+export const DefTypeConfig = {
+  NODE: 'UpgradeTreeNodeDef',
+  TREE: 'UpgradeTreeDef',
+  PATH: 'UpgradePathDef',
+  UPGRADE: 'UpgradeDef',
+  GENE: 'TalentedGeneDef'
+};
 
-export const serializeDefToXml = (def) => {
-  let xml = `  <${def.type}>\n`;
+// Namespace configuration
+export const NamespaceConfig = {
+  prefix: 'Talented',
+  separator: '.'
+};
+
+// Helper to generate full def type name
+const getFullDefName = (defType) => {
+  return `${NamespaceConfig.prefix}${NamespaceConfig.separator}${defType}`;
+};
+
+export const serializeDefToXml = (def, config = DefTypeConfig) => {
+  const fullDefType = getFullDefName(def.type);
+  let xml = `  <${fullDefType}>\n`;
   xml += `    <defName>${def.defName}</defName>\n`;
 
   Object.entries(def).forEach(([key, value]) => {
@@ -11,10 +30,11 @@ export const serializeDefToXml = (def) => {
     }
   });
 
-  xml += `  </${def.type}>\n\n`;
+  xml += `  </${fullDefType}>\n\n`;
   return xml;
 };
-export const handleXmlImport = async (event, savedDefs, setSavedDefs) => {
+
+export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = DefTypeConfig) => {
   const files = event.target.files;
   let newDefs = { ...savedDefs };
 
@@ -23,8 +43,9 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs) => {
       const text = await file.text();
       const xmlDoc = new DOMParser().parseFromString(text, "text/xml");
 
-      Object.values(EditableDefTypes).forEach(defType => {
-        Array.from(xmlDoc.getElementsByTagName(defType)).forEach(defNode => {
+      Object.values(config).forEach(defType => {
+        const fullDefType = getFullDefName(defType);
+        Array.from(xmlDoc.getElementsByTagName(fullDefType)).forEach(defNode => {
           const defName = defNode.getElementsByTagName("defName")[0]?.textContent;
           if (!defName) return;
 
@@ -66,21 +87,25 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs) => {
   setSavedDefs(newDefs);
   event.target.value = '';
 };
-export const exportToXml = (nodes, paths) => {
+
+export const exportToXml = (nodes, paths, config = DefTypeConfig) => {
   let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
 
+  // Export paths
   paths?.forEach(path => {
-    xml += `  <Talented.UpgradePathDef>\n`;
+    const pathDefType = getFullDefName(config.PATH);
+    xml += `  <${pathDefType}>\n`;
     xml += `    <defName>${path.name}</defName>\n`;
     xml += `    <pathDescription>${path.description}</pathDescription>\n`;
-    xml += `  </Talented.UpgradePathDef>\n\n`;
+    xml += `  </${pathDefType}>\n\n`;
   });
 
+  // Export nodes
   nodes.forEach(node => {
-    const defType = node.upgrade ? 'Talented.UpgradeTreeNodeDef' :
-                   node.dimensions ? 'Talented.UpgradeTreeDef' :
-                   node.pointCost ? 'Talented.UpgradeDef' :
-                   'Talented.UpgradeTreeNodeDef';
+    const defType = node.upgrade ? getFullDefName(config.NODE) :
+                   node.dimensions ? getFullDefName(config.TREE) :
+                   node.pointCost ? getFullDefName(config.UPGRADE) :
+                   getFullDefName(config.NODE);
 
     xml += `  <${defType}>\n`;
     xml += `    <defName>${node.id}</defName>\n`;
@@ -111,7 +136,7 @@ export const exportToXml = (nodes, paths) => {
         });
         xml += `        </nodes>\n`;
         xml += `      </li>\n`;
-        });
+      });
       xml += `    </branchPaths>\n`;
     }
     xml += `  </${defType}>\n\n`;
@@ -121,15 +146,17 @@ export const exportToXml = (nodes, paths) => {
   return xml;
 };
 
-export const importFromXml = (xmlContents) => {
+export const importFromXml = (xmlContents, config = DefTypeConfig) => {
   const parser = new DOMParser();
   const nodes = [];
   const paths = [];
 
   xmlContents.forEach(content => {
     const xmlDoc = parser.parseFromString(content, "text/xml");
+    const pathDefType = getFullDefName(config.PATH);
+    const nodeDefType = getFullDefName(config.NODE);
 
-    Array.from(xmlDoc.getElementsByTagName("Talented.UpgradePathDef")).forEach(pathDef => {
+    Array.from(xmlDoc.getElementsByTagName(pathDefType)).forEach(pathDef => {
       paths.push({
         id: pathDef.getElementsByTagName("defName")[0].textContent,
         name: pathDef.getElementsByTagName("defName")[0].textContent,
@@ -137,7 +164,7 @@ export const importFromXml = (xmlContents) => {
       });
     });
 
-    Array.from(xmlDoc.getElementsByTagName("Talented.UpgradeTreeNodeDef")).forEach(nodeDef => {
+    Array.from(xmlDoc.getElementsByTagName(nodeDefType)).forEach(nodeDef => {
       const position = nodeDef.getElementsByTagName("position")[0]?.textContent || "(0,0)";
       const [x, y] = position.replace(/[()]/g, '').split(',').map(n => parseInt(n) * 50);
 
@@ -168,6 +195,7 @@ export const importFromXml = (xmlContents) => {
   return { nodes, paths };
 };
 
+// Helper function remains unchanged
 export const serializeProperty = (key, value, indent) => {
   const spaces = ' '.repeat(indent * 2);
 

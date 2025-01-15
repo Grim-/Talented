@@ -76,11 +76,12 @@
       </hediffEffects>
   </Talented.UpgradeDef>
 
-  <HediffDef ParentName="ImplantHediffBase">
+  <HediffDef>
       <defName>ArmoredHide</defName>
       <label>armored hide</label>
       <description>Parasitic modifications have created natural armor plating under the skin.</description>
       <defaultLabelColor>(0.7, 0.7, 0.7)</defaultLabelColor>
+      <hediffClass>HediffWithComps</hediffClass>
       <stages>
           <li>
               <statOffsets>

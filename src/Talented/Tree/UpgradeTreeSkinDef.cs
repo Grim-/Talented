@@ -13,11 +13,8 @@ namespace Talented
 
         //Tree list appearance
         public string treeListbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
+        public ScaleMode treeListbackgroundScaleMode = ScaleMode.StretchToFill;
         private string defaulttreeListbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
-
-
-        public string genelistbackgroundTexturePath = "UI/Tree/genelistbackground";
-        private string defaultgenelistbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
 
         // Node appearance
         public string nodeTexturePath = "UI/Tree/defaultnode";
@@ -68,7 +65,7 @@ namespace Talented
 
         private Texture2D cachedDefaultUpgradeIcon;
 
-        private Texture2D LoadTexture(string customPath, string defaultPath, string textureType)
+        public static Texture2D LoadTexture(string customPath, string defaultPath, string textureType)
         {
             // Try loading custom texture if specified
             if (!customPath.NullOrEmpty())
@@ -111,17 +108,7 @@ namespace Talented
                 return cachedBackgroundTexture;
             }
         }
-        public Texture2D GeneListBackgroundTexture
-        {
-            get
-            {
-                if (cachedgeneListBackgroundTexture == null)
-                {
-                    cachedgeneListBackgroundTexture = LoadTexture(genelistbackgroundTexturePath, defaultgenelistbackgroundTexturePath, "background");
-                }
-                return cachedgeneListBackgroundTexture;
-            }
-        }
+
         public Texture2D NodeTexture
         {
             get

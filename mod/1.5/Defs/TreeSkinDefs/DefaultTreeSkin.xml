@@ -9,10 +9,18 @@
   <backgroundTexturePath>UI/Tree/defaultbackground</backgroundTexturePath>
   <backgroundColor>(1, 1, 1)</backgroundColor>
 
+  <windowMargin>0</windowMargin>
+  <treeListbackgroundScaleMode>StretchToFill</treeListbackgroundScaleMode>
+
+  <!-- Scale modes
+      StretchToFill,
+      ScaleAndCrop,
+      ScaleToFit
+    -->
   <!-- Node appearance -->
   <nodeTexturePath>UI/Tree/defaultNode</nodeTexturePath>
   <nodeSize>60</nodeSize>
-  <nodeSpacing>15</nodeSpacing>
+  <nodeSpacing>10</nodeSpacing>
 
   <!-- Connection appearance -->
   <defaultConnectionTexturePath>UI/Tree/defaultconnection</defaultConnectionTexturePath>

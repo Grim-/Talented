@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
-  <!-- Keep existing keys -->
+
   <Talented.Path.Selected>Selected {0} upgrade path.</Talented.Path.Selected>
   <Talented.Path.CannotSelect>Cannot select this path - conflicts with existing selection</Talented.Path.CannotSelect>
   <Talented.Node.UnknownUpgrade>Unknown upgrade</Talented.Node.UnknownUpgrade>
@@ -8,6 +8,8 @@
   <Talented.Node.Progress>Progress: {0}/{1}</Talented.Node.Progress>
   <Talented.Node.UnlockedUpgrades>Unlocked Upgrades:</Talented.Node.UnlockedUpgrades>
   <Talented.Node.NextUpgrade>Next Upgrade: {0}</Talented.Node.NextUpgrade>
+
+
   <Talented.Debug.Info>Debug Info</Talented.Debug.Info>
   <Talented.Debug.Node>Node: {0}</Talented.Debug.Node>
   <Talented.Debug.Type>Type: {0}</Talented.Debug.Type>
@@ -18,12 +20,12 @@
   <Talented.Debug.UnlockError>Unlock Error: {0}</Talented.Debug.UnlockError>
   <Talented.Error.DisplayStrategy>Display Strategy Def was null</Talented.Error.DisplayStrategy>
 
-  <!-- Updated keys with simpler structure -->
   <!-- Errors -->
   <Talented.Tree.Error.AlreadyUnlockedAll>{0}: Already unlocked all upgrades in this node</Talented.Tree.Error.AlreadyUnlockedAll>
   <Talented.Tree.Error.RequiresPoints>{0}: Requires {1} points</Talented.Tree.Error.RequiresPoints>
   <Talented.Tree.Error.NodeFullyUnlocked>{0}: Node is already fully unlocked</Talented.Tree.Error.NodeFullyUnlocked>
   <Talented.Tree.Error.MustSelectPath>Must select a path first</Talented.Tree.Error.MustSelectPath>
+
   <!-- Log Messages -->
   <Talented.Tree.Log.InsufficientPoints>{0}: Insufficient points for node {1}. Available: {2}, Required: {3}</Talented.Tree.Log.InsufficientPoints>
   <Talented.Tree.Log.PathSelected>{0}: Path selected: {1}, Unspent levels: {2}</Talented.Tree.Log.PathSelected>
@@ -33,11 +35,12 @@
   <Talented.Tree.Log.StoringPoints>{0}: Storing {1} unspent points</Talented.Tree.Log.StoringPoints>
   <Talented.Tree.Log.AddingPoints>{0}: Adding {1} points, now have {2}</Talented.Tree.Log.AddingPoints>
 
-  
+  <!-- Tab -->
   <Talented.Tab.Label>Talents</Talented.Tab.Label>
-  <Talented.Tab.Level>Level: {0}</Talented.Tab.Level>
+  <Talented.Tab.Level>{0} level: {1}</Talented.Tab.Level>
   <Talented.Tab.TreePoints>{0} ({1})</Talented.Tab.TreePoints>
   <Talented.Tab.OpenTree>Open {0}</Talented.Tab.OpenTree>
+
   <!-- UI -->
   <Talented.Tree.UI.AvailablePoints>{0} Talent Points Available: {1}</Talented.Tree.UI.AvailablePoints>
 </LanguageData>

@@ -3,7 +3,7 @@
   <!-- Tree Definition -->
   <Talented.UpgradeTreeDef>
     <defName>GenericUpgradeTree</defName>
-    <dimensions>(10,10)</dimensions>
+    <dimensions>(450, 790)</dimensions>
     <nodes>
       <li>GenericTree_Root</li>
     </nodes>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.UpgradeDef>
+      <defName>ArmorUpgrade</defName>
+      <label>Enhanced Defense</label>
+      <description>Improves overall armor effectiveness by 5%.</description>
+      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <statEffects>
+          <li>
+              <statDef>ArmorRating_Sharp</statDef>
+              <value>1.05</value>
+              <operation>Add</operation>
+          </li>
+          <li>
+              <statDef>ArmorRating_Blunt</statDef>
+              <value>1.05</value>
+              <operation>Add</operation>
+          </li>
+          <li>
+              <statDef>ArmorRating_Sharp</statDef>
+              <value>1.05</value>
+              <operation>Add</operation>
+          </li>
+      </statEffects>
+  </Talented.UpgradeDef>
+</Defs>

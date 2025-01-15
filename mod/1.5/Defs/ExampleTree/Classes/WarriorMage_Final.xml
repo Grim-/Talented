@@ -13,7 +13,7 @@
       </hediffEffects>
   </Talented.UpgradeDef>
 
-  <HediffDef ParentName="ImplantHediffBase">
+  <HediffDef>
       <defName>MentalFortification</defName>
       <label>mental fortification</label>
       <description>Parasitic modifications have enhanced both physical and mental resilience.</description>

@@ -76,7 +76,7 @@
       </hediffEffects>
   </Talented.UpgradeDef>
 
-  <HediffDef ParentName="ImplantHediffBase">
+  <HediffDef>
       <defName>EnhancedReflexes</defName>
       <label>enhanced reflexes</label>
       <description>Parasitic modifications have enhanced neural response time.</description>

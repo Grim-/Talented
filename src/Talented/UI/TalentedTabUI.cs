@@ -15,14 +15,20 @@ namespace Talented
         protected const float TREE_BUTTON_SPACING = 5f;
         protected const float LEVEL_WIDTH = 60f;
         protected const float PROGRESS_WIDTH = 100f;
-        protected const float TREE_BANNER_HEIGHT = 80f;
+        protected const float TREE_BANNER_HEIGHT = 60f;
         protected const float TREE_ROW_HEIGHT = 40f;
         protected const float TREE_BANNER_SPACING = 15f;
         protected const float TOOLBAR_MARGIN = 20f;
-        private float TreeButtonExpBarWidth = 80f;
+        private float TreeButtonExpBarWidth = 120f;
+        private float TreeButtonExpBarHeight = 26f;
         protected Vector2 tabSize = new Vector2(500, 400);
-        protected float toolbarHeight => 40f;
+        protected float toolbarHeight => 60f;
         protected Vector2 scrollPosition;
+
+
+        private Texture2D GreyTexture = SolidColorMaterials.NewSolidColorTexture(Color.grey);
+        private Texture2D BannerTexture = SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f));
+        private Texture2D DefaultTreeTexture = SolidColorMaterials.NewSolidColorTexture(Color.gray);
 
         public TalentedTabUI()
         {
@@ -34,16 +40,13 @@ namespace Talented
         {
             var rect = new Rect(0, 0, tabSize.x, tabSize.y);
 
-            if (Prefs.DevMode)
-            {
-                var toolbarRect = rect.TopPartPixels(toolbarHeight);
-                GUI.DrawTexture(toolbarRect, SolidColorMaterials.NewSolidColorTexture(Color.grey));
-                DrawToolbar(toolbarRect);
-            }
+            var toolbarRect = rect.TopPartPixels(toolbarHeight);
+            GUI.DrawTexture(toolbarRect, GreyTexture);
+            DrawToolbar(toolbarRect);
 
-            var contentRect = rect.BottomPartPixels(rect.height - (Prefs.DevMode ? toolbarHeight : 0));
+            var contentRect = rect.BottomPartPixels(rect.height - toolbarHeight);
             contentRect.y += TOOLBAR_MARGIN;
-            contentRect.height -= Prefs.DevMode ? TOOLBAR_MARGIN : 0;
+            contentRect.height -= TOOLBAR_MARGIN;
 
             DrawContent(contentRect);
         }
@@ -51,8 +54,16 @@ namespace Talented
         protected virtual void DrawToolbar(Rect rect)
         {
             float curX = PADDING;
-            var levelLabelRect = new Rect(curX, rect.y + PADDING, LEVEL_WIDTH, rect.height - PADDING * 2);
-            Widgets.DrawHighlight(levelLabelRect);
+
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.LabelFit(rect, "Talent Trees");
+            if (Prefs.DevMode)
+            {
+
+
+            }
+
             Text.Anchor = TextAnchor.UpperLeft;
         }
 
@@ -106,16 +117,17 @@ namespace Talented
 
         protected virtual void DrawGeneBanner(Rect rect, Gene_TalentBase gene)
         {
-            DrawBannerBackground(rect);
+            DrawBannerBackground(rect, gene);
             Rect contentRect = rect.ContractedBy(10f);
 
             DrawBannerHeader(contentRect, gene);
             DrawBannerTrees(contentRect, gene);
         }
 
-        private void DrawBannerBackground(Rect rect)
+        private void DrawBannerBackground(Rect rect, Gene_TalentBase gene)
         {
-            GUI.DrawTexture(rect, SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f)));
+            Widgets.DrawBoxSolidWithOutline(rect, Color.clear, Color.gray);
+           // GUI.DrawTexture(rect, gene.BackgroundTexture ?? BannerTexture);
         }
 
         private void DrawBannerHeader(Rect rect, Gene_TalentBase gene)
@@ -124,11 +136,22 @@ namespace Talented
 
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(headerRect.LeftPartPixels(rect.width * 0.7f), gene.def.label);
+            float labelWidth = Text.CalcSize(gene.def.label).x;
+            Widgets.LabelFit(headerRect, "Talented.Tab.Level".Translate(gene.def.label, gene.CurrentLevel));
 
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.MiddleRight;
-            Widgets.Label(headerRect.RightPartPixels(100f), "Talented.Tab.Level".Translate(gene.CurrentLevel));
+            if (gene is IExperienceHolder expHolder)
+            {
+                Rect expRect = new Rect(
+                    rect.xMax - 10f - TreeButtonExpBarWidth - PADDING,
+                    headerRect.y + 4f, 
+                    TreeButtonExpBarWidth,
+                    TreeButtonExpBarHeight
+                );
+                Widgets.LabelFit(expRect, $"{expHolder.CurrentExperience} / {expHolder.XPForNextLevel}");
+                Widgets.FillableBar(expRect, expHolder.ExperienceProgress);
+            }
+
+            Text.Anchor = TextAnchor.UpperLeft;
         }
 
         private void DrawBannerTrees(Rect rect, Gene_TalentBase gene)
@@ -151,8 +174,9 @@ namespace Talented
 
         private void DrawTreeBackground(Rect rect, BaseTreeHandler tree)
         {
-            GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
-                SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f)));
+            //GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
+            //    BannerTexture, ScaleMode.ScaleAndCrop);
+            Widgets.DrawBoxSolidWithOutline(rect, Color.clear, Color.gray);
         }
 
         private Rect DrawTreeIcon(Rect rect, BaseTreeHandler tree)
@@ -160,7 +184,7 @@ namespace Talented
             float iconSize = rect.height - 4f;
             Rect iconRect = new Rect(rect.x + 2f, rect.y + 2f, iconSize, iconSize);
             GUI.DrawTexture(iconRect, tree.TreeDef.Skin?.BackgroundTexture ??
-                SolidColorMaterials.NewSolidColorTexture(Color.gray));
+               DefaultTreeTexture);
             return iconRect;
         }
 
@@ -171,17 +195,6 @@ namespace Talented
 
             Rect labelRect = new Rect(iconRect.xMax + PADDING, rect.y, rect.width * 0.3f, rect.height);
             Widgets.LabelFit(labelRect, "Talented.Tab.TreePoints".Translate(tree.TreeDef.treeName, tree.GetAvailablePoints()));
-
-            if (gene is IExperienceHolder expHolder)
-            {
-                Rect expRect = new Rect(
-                    rect.xMax - 5f - TreeButtonExpBarWidth - PADDING,
-                    rect.y + (rect.height - 18f) / 2f,
-                    TreeButtonExpBarWidth,
-                    18f
-                );
-                Widgets.FillableBar(expRect, expHolder.ExperienceProgress);
-            }
         }
 
         private void HandleTreeInteraction(Rect rect, BaseTreeHandler tree, Gene_TalentBase gene)
