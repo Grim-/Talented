@@ -50,7 +50,7 @@ export const renderPrerequisiteEditor = (handleListItemAdd, handleListItemChange
   />
 );
 
-export const renderListEditor = (handleListItemAdd, handleListItemChange, handleListItemRemove, propName, list = []) => (
+const renderListEditor = (handleListItemAdd, handleListItemChange, handleListItemRemove, propName, list) => (
   <div className="space-y-2">
     <button
       onClick={() => handleListItemAdd(propName)}
@@ -58,13 +58,15 @@ export const renderListEditor = (handleListItemAdd, handleListItemChange, handle
     >
       Add Item
     </button>
-
-    {list.map((item, index) => (
+    {(typeof list === 'string' ? [list] : (list || [])).map((item, index) => (
       <div key={index} className="flex gap-2 items-start">
         <div className="flex-1">
-          {propName === 'organEffects' && renderOrganEffectEditor(handleListItemAdd, handleListItemChange, handleListItemRemove, propName, item, index)}
-          {propName === 'abilityEffects' && renderAbilityEffectEditor(handleListItemAdd, handleListItemChange, handleListItemRemove, propName, item, index)}
-          {propName === 'prerequisites' && renderPrerequisiteEditor(handleListItemAdd, handleListItemChange, handleListItemRemove, propName, item, index)}
+          <input
+            type="text"
+            value={item || ''}
+            onChange={e => handleListItemChange(propName, index, null, e.target.value)}
+            className="w-full p-2 border rounded"
+          />
         </div>
         <button
           onClick={() => handleListItemRemove(propName, index)}
@@ -74,5 +76,19 @@ export const renderListEditor = (handleListItemAdd, handleListItemChange, handle
         </button>
       </div>
     ))}
+  </div>
+);
+
+// Usage example:
+const ListEditorWrapper = ({ node, handleListItemAdd, handleListItemChange, handleListItemRemove }) => (
+  <div>
+    <label className="block text-sm font-medium mb-1">Upgrades</label>
+    {renderListEditor(
+      handleListItemAdd,
+      handleListItemChange,
+      handleListItemRemove,
+      'upgrade',
+      node?.upgrade // Using optional chaining here
+    )}
   </div>
 );

@@ -1,5 +1,3 @@
-
-// Session management functions
 export const saveSessionToFile = (nodes, paths) => {
   const sessionData = {
     nodes,
@@ -17,34 +15,34 @@ export const saveSessionToFile = (nodes, paths) => {
   URL.revokeObjectURL(url);
 };
 
-export const loadSessionFromFile = async (event, setNodes, setPaths) => {
-  const file = event.target.files[0];
-  if (file) {
-    try {
-      const text = await file.text();
-      const sessionData = JSON.parse(text);
-      setNodes(sessionData.nodes);
-      setPaths(sessionData.paths);
-    } catch (e) {
-      alert('Error loading session file: ' + e.message);
-    }
+// Instead of taking setNodes/setPaths, return the new state
+export const loadSessionFromFile = async (file) => {
+  if (!file) return null;
+
+  try {
+    const text = await file.text();
+    const sessionData = JSON.parse(text);
+    return {
+      nodes: sessionData.nodes,
+      paths: sessionData.paths
+    };
+  } catch (e) {
+    throw new Error('Error loading session file: ' + e.message);
   }
 };
 
-// Clear only session data
-export const clearSession = (setNodes, setPaths) => {
-  if (window.confirm('Clear current session? Reference data will be preserved.')) {
-    setNodes([{
-      id: 'start',
-      label: 'Basic Parasite Metabolism',
-      type: 'Start',
-      x: 200,
-      y: 50,
-      connections: [],
-      path: '',
-      upgrade: 'BasicParasiteMetabolism',
-      branchPaths: []
-    }]);
-    setPaths([]);
-  }
-};
+// Return default state instead of setting it directly
+export const clearSession = () => ({
+  nodes: [{
+    id: 'start',
+    label: 'RootNode',
+    type: 'Start',
+    x: 200,
+    y: 50,
+    connections: [],
+    path: '',
+    upgrade: ['BasicParasiteMetabolism'],
+    branchPaths: []
+  }],
+  paths: []
+});

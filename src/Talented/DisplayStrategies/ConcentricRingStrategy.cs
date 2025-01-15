@@ -18,16 +18,16 @@ namespace Talented
             this.nodePadding = nodePadding;
         }
 
-        public Dictionary<UpgradeTreeNodeDef, Rect> PositionNodes(
-            List<UpgradeTreeNodeDef> nodes,
+        public Dictionary<TalentTreeNodeDef, Rect> PositionNodes(
+            List<TalentTreeNodeDef> nodes,
             Rect availableSpace,
             float nodeSize,
             float spacing)
         {
             if (nodes == null || nodes.Count == 0)
-                return new Dictionary<UpgradeTreeNodeDef, Rect>();
+                return new Dictionary<TalentTreeNodeDef, Rect>();
 
-            var nodePositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
+            var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
             var pathGroups = GroupNodesByPath(nodes);
             var startNodes = FindStartNodes(nodes);
 
@@ -50,8 +50,8 @@ namespace Talented
         }
 
         private void PositionStartNodes(
-            List<UpgradeTreeNodeDef> startNodes,
-            Dictionary<UpgradeTreeNodeDef, Rect> nodePositions,
+            List<TalentTreeNodeDef> startNodes,
+            Dictionary<TalentTreeNodeDef, Rect> nodePositions,
             Vector2 center,
             float nodeSize)
         {
@@ -90,8 +90,8 @@ namespace Talented
         }
 
         private void PositionPathRings(
-            Dictionary<string, List<UpgradeTreeNodeDef>> pathGroups,
-            Dictionary<UpgradeTreeNodeDef, Rect> nodePositions,
+            Dictionary<string, List<TalentTreeNodeDef>> pathGroups,
+            Dictionary<TalentTreeNodeDef, Rect> nodePositions,
             Vector2 center,
             float firstRingRadius,
             float nodeSize)
@@ -126,28 +126,28 @@ namespace Talented
             }
         }
 
-        private List<UpgradeTreeNodeDef> FindStartNodes(List<UpgradeTreeNodeDef> nodes)
+        private List<TalentTreeNodeDef> FindStartNodes(List<TalentTreeNodeDef> nodes)
         {
             return nodes.FindAll(n => n.type == NodeType.Start);
         }
 
-        private Dictionary<string, List<UpgradeTreeNodeDef>> GroupNodesByPath(List<UpgradeTreeNodeDef> nodes)
+        private Dictionary<string, List<TalentTreeNodeDef>> GroupNodesByPath(List<TalentTreeNodeDef> nodes)
         {
-            var groups = new Dictionary<string, List<UpgradeTreeNodeDef>>();
+            var groups = new Dictionary<string, List<TalentTreeNodeDef>>();
             foreach (var node in nodes.FindAll(n => n.BelongsToUpgradePath))
             {
                 string key = node.path.defName;
                 if (!groups.ContainsKey(key))
-                    groups[key] = new List<UpgradeTreeNodeDef>();
+                    groups[key] = new List<TalentTreeNodeDef>();
                 groups[key].Add(node);
             }
             return groups;
         }
 
-        private List<UpgradeTreeNodeDef> OrderByConnections(List<UpgradeTreeNodeDef> nodes)
+        private List<TalentTreeNodeDef> OrderByConnections(List<TalentTreeNodeDef> nodes)
         {
-            var ordered = new List<UpgradeTreeNodeDef>();
-            var processed = new HashSet<UpgradeTreeNodeDef>();
+            var ordered = new List<TalentTreeNodeDef>();
+            var processed = new HashSet<TalentTreeNodeDef>();
 
             var rootNodes = FindRootNodes(nodes);
 
@@ -167,9 +167,9 @@ namespace Talented
             return ordered;
         }
 
-        private HashSet<UpgradeTreeNodeDef> FindRootNodes(List<UpgradeTreeNodeDef> nodes)
+        private HashSet<TalentTreeNodeDef> FindRootNodes(List<TalentTreeNodeDef> nodes)
         {
-            var targetNodes = new HashSet<UpgradeTreeNodeDef>();
+            var targetNodes = new HashSet<TalentTreeNodeDef>();
             foreach (var node in nodes)
             {
                 if (node.connections != null)
@@ -181,7 +181,7 @@ namespace Talented
                 }
             }
 
-            var rootNodes = new HashSet<UpgradeTreeNodeDef>();
+            var rootNodes = new HashSet<TalentTreeNodeDef>();
             foreach (var node in nodes)
             {
                 if (!targetNodes.Contains(node))
@@ -194,9 +194,9 @@ namespace Talented
         }
 
         private static void ProcessNode(
-            UpgradeTreeNodeDef node,
-            HashSet<UpgradeTreeNodeDef> processed,
-            List<UpgradeTreeNodeDef> ordered)
+            TalentTreeNodeDef node,
+            HashSet<TalentTreeNodeDef> processed,
+            List<TalentTreeNodeDef> ordered)
         {
             if (processed.Contains(node)) return;
 

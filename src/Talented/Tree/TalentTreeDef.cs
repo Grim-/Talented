@@ -5,14 +5,14 @@ using Verse;
 
 namespace Talented
 {
-    public class UpgradeTreeDef : Def
+    public class TalentTreeDef : Def
     {
         public string treeName = "A Talent Tree";
-        public List<UpgradeTreeNodeDef> nodes;
+        public List<TalentTreeNodeDef> nodes;
         public IntVec2 dimensions;
         public Type handlerClass;
-        public UpgradeTreeSkinDef skin;
-        public List<UpgradePathDef> availablePaths;
+        public TalentTreeSkinDef skin;
+        public List<TalentPathDef> availablePaths;
         public TreeDisplayStrategyDef displayStrategy;
 
         public TalentPointFormulaDef talentPointFormula;
@@ -30,7 +30,7 @@ namespace Talented
             }
         }
 
-        public UpgradeTreeNodeDef RootNode
+        public TalentTreeNodeDef RootNode
         {
             get
             {
@@ -45,25 +45,25 @@ namespace Talented
         }
 
 
-        public UpgradeTreeSkinDef Skin
+        public TalentTreeSkinDef Skin
         {
             get
             {
                 if (skin == null)
                 {
-                    skin = TalentedDefOf.DefaultTreeSkin == null ? DefDatabase<UpgradeTreeSkinDef>.GetNamed("DefaultTreeSkin") : TalentedDefOf.DefaultTreeSkin;
+                    skin = TalentedDefOf.DefaultTreeSkin == null ? DefDatabase<TalentTreeSkinDef>.GetNamed("DefaultTreeSkin") : TalentedDefOf.DefaultTreeSkin;
                 }
 
                 return skin;
             }
         }
-        public List<UpgradeTreeNodeDef> GetAllNodes()
+        public List<TalentTreeNodeDef> GetAllNodes()
         {
             if (nodes.NullOrEmpty())
-                return new List<UpgradeTreeNodeDef>();
+                return new List<TalentTreeNodeDef>();
 
-            var allNodes = new HashSet<UpgradeTreeNodeDef>();
-            var toProcess = new Queue<UpgradeTreeNodeDef>();
+            var allNodes = new HashSet<TalentTreeNodeDef>();
+            var toProcess = new Queue<TalentTreeNodeDef>();
             toProcess.Enqueue(nodes[0]);
 
             while (toProcess.Count > 0)

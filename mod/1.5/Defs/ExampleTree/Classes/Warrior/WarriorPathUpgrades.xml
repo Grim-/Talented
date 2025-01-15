@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>WarriorStrengthUpgrade</defName>
       <label>Warrior's Might</label>
       <description>Enhances physical strength through parasitic muscle enhancement.</description>
@@ -18,10 +18,10 @@
               <operation>Multiply</operation>
           </li>
       </statEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <!-- Warrior Battle Fury Ability -->
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>BattleFuryUpgrade</defName>
       <label>Battle Fury</label>
       <description>Grants the ability to enter a fury state, temporarily boosting combat capabilities.</description>
@@ -35,7 +35,7 @@
               </abilities>
           </li>
       </abilityEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <AbilityDef>
       <defName>BattleFuryAbility</defName>
@@ -64,7 +64,7 @@
   </HediffDef>
 
   <!-- Warrior Armored Hide Hediff -->
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>ArmoredHideUpgrade</defName>
       <label>Armored Hide</label>
       <description>Develops hardened skin plates that provide natural armor protection.</description>
@@ -74,7 +74,7 @@
               <hediffDef>ArmoredHide</hediffDef>
           </li>
       </hediffEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <HediffDef>
       <defName>ArmoredHide</defName>

@@ -4,10 +4,10 @@ using Verse;
 
 namespace Talented
 {
-    public class UpgradeDef : Def
+    public class TalentDef : Def
     {
         public int parasiteLevelRequired;
-        public List<UpgradeDef> prerequisites;
+        public List<TalentDef> prerequisites;
         public string uiIconPath;
         public int pointCost = 1;
 

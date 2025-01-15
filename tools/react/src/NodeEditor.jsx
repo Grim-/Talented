@@ -4,8 +4,8 @@ import Button from './components/Button';
 import Node from './components/Node';
 import PropertiesPanel from './components/PropertiesPanel'
 import { saveDef, loadDefs } from './storage';
-import { serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
-
+import { importFromXml, exportToXml, serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
+import {saveSessionToFile, loadSessionFromFile,  clearSession } from './utils/sessions';
 
 
 
@@ -33,56 +33,6 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
     localStorage.setItem('nodeEditorReferenceDefs', JSON.stringify(referenceDefs));
   }, [referenceDefs]);
 
-  // Session management functions
-  const saveSessionToFile = (setNodes, setPaths) => {
-    const sessionData = {
-      nodes,
-      paths,
-      timestamp: new Date().toISOString()
-    };
-    const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `node-editor-session-${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const loadSessionFromFile = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        const text = await file.text();
-        const sessionData = JSON.parse(text);
-        setNodes(sessionData.nodes);
-        setPaths(sessionData.paths);
-      } catch (e) {
-        alert('Error loading session file: ' + e.message);
-      }
-    }
-  };
-
-  // Clear only session data
-  const clearSession = (setNodes, setPaths) => {
-    if (window.confirm('Clear current session? Reference data will be preserved.')) {
-      setNodes([{
-        id: 'start',
-        label: 'Basic Parasite Metabolism',
-        type: 'Start',
-        x: 200,
-        y: 50,
-        connections: [],
-        path: '',
-        upgrade: 'BasicParasiteMetabolism',
-        branchPaths: []
-      }]);
-      setPaths([]);
-    }
-  };
-
   const clearReferenceDefs = () => {
     if (window.confirm('Clear all reference data? This will not affect your current session.')) {
       setReferenceDefs([]);
@@ -100,139 +50,22 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
 
   // XML Import/Export Functions
   const handleFileSelect = async (event) => {
-    const files = event.target.files;
-    let allDefs = [...referenceDefs];
-    let allNodes = [];
-    let allPaths = [];
+    try {
+      // Just use your existing importFromXml function
+      const fileContents = await Promise.all(
+        Array.from(event.target.files).map(file => file.text())
+      );
+      const { nodes: newNodes, paths: newPaths } = importFromXml(fileContents);
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      try {
-        const text = await file.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(text, "text/xml");
-
-        // Import paths from this file
-        const pathDefs = xmlDoc.getElementsByTagName("Talented.UpgradePathDef");
-        const newPaths = Array.from(pathDefs).map(pathDef => ({
-          id: pathDef.getElementsByTagName("defName")[0].textContent,
-          name: pathDef.getElementsByTagName("defName")[0].textContent,
-          description: pathDef.getElementsByTagName("pathDescription")[0]?.textContent || '',
-          fileName: file.name
-        }));
-
-        // Import nodes from this file
-        const nodeDefs = xmlDoc.getElementsByTagName("Talented.UpgradeTreeNodeDef");
-        const newNodes = Array.from(nodeDefs).map(nodeDef => {
-          const position = nodeDef.getElementsByTagName("position")[0]?.textContent || "(0,0)";
-          const [x, y] = position.replace(/[()]/g, '').split(',').map(n => parseInt(n) * 50);
-
-          const connections = Array.from(nodeDef.getElementsByTagName("connections")[0]?.getElementsByTagName("li") || [])
-            .map(li => li.textContent);
-
-          const branchPathElements = nodeDef.getElementsByTagName("branchPaths")[0]?.getElementsByTagName("li") || [];
-          const branchPaths = Array.from(branchPathElements).map(branchElem => ({
-            path: branchElem.getElementsByTagName("path")[0]?.textContent || '',
-            nodes: Array.from(branchElem.getElementsByTagName("nodes")[0]?.getElementsByTagName("li") || [])
-              .map(li => li.textContent)
-          }));
-
-          return {
-            id: nodeDef.getElementsByTagName("defName")[0].textContent,
-            label: nodeDef.getElementsByTagName("defName")[0].textContent,
-            type: nodeDef.getElementsByTagName("type")[0]?.textContent || "Normal",
-            x,
-            y,
-            connections,
-            path: nodeDef.getElementsByTagName("path")[0]?.textContent || "",
-            upgrade: nodeDef.getElementsByTagName("upgrade")[0]?.textContent || "",
-            branchPaths,
-            fileName: file.name
-          };
-        });
-
-        allNodes = [...allNodes, ...newNodes];
-        allPaths = [...allPaths, ...newPaths];
-      } catch (e) {
-        alert(`Error parsing file ${file.name}: ${e.message}`);
-      }
+      setNodes([...nodes, ...newNodes]);
+      setPaths([...paths, ...newPaths]);
+      setShowImport(false);
+    } catch (e) {
+      alert(e.message);
     }
-
-    // Update nodes and paths
-    setNodes([...nodes, ...allNodes]);
-    setPaths([...paths, ...allPaths]);
-    setShowImport(false);
   };
 
-  const exportToXml = () => {
-      let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
 
-      // Existing paths
-      paths.forEach(path => {
-        xml += `  <Talented.UpgradePathDef>\n`;
-        xml += `    <defName>${path.name}</defName>\n`;
-        xml += `    <pathDescription>${path.description}</pathDescription>\n`;
-        xml += `  </Talented.UpgradePathDef>\n\n`;
-      });
-
-      // Existing nodes + any other node-like defs
-      nodes.forEach(node => {
-        // Determine the correct def type based on node properties
-        const defType = node.upgrade ? 'Talented.UpgradeTreeNodeDef' :
-                       node.dimensions ? 'Talented.UpgradeTreeDef' :
-                       node.pointCost ? 'Talented.UpgradeDef' :
-                       'Talented.UpgradeTreeNodeDef';
-
-        xml += `  <${defType}>\n`;
-        xml += `    <defName>${node.id}</defName>\n`;
-
-        // Add all non-empty properties based on their type
-        if (node.position || node.x !== undefined) {
-          xml += `    <position>(${Math.round((node.x || 0)/50)},${Math.round((node.y || 0)/50)})</position>\n`;
-        }
-        if (node.type) xml += `    <type>${node.type}</type>\n`;
-
-        // Convert single upgrade to upgrades list
-        if (node.upgrade) {
-          xml += `    <upgrades>\n`;
-          xml += `      <li>${node.upgrade}</li>\n`;
-          xml += `    </upgrades>\n`;
-        }
-
-        if (node.path) xml += `    <path>${node.path}</path>\n`;
-        if (node.parasiteLevelRequired) xml += `    <parasiteLevelRequired>${node.parasiteLevelRequired}</parasiteLevelRequired>\n`;
-        if (node.pointCost) xml += `    <pointCost>${node.pointCost}</pointCost>\n`;
-        if (node.uiIcon) xml += `    <uiIcon>${node.uiIcon}</uiIcon>\n`;
-        if (node.dimensions) xml += `    <dimensions>(${node.dimensions.x},${node.dimensions.y})</dimensions>\n`;
-
-        if (node.connections?.length > 0) {
-          xml += `    <connections>\n`;
-          node.connections.forEach(conn => {
-            xml += `      <li>${conn}</li>\n`;
-          });
-          xml += `    </connections>\n`;
-        }
-        if (node.branchPaths?.length > 0) {
-          xml += `    <branchPaths>\n`;
-          node.branchPaths.forEach(branch => {
-            xml += `      <li>\n`;
-            xml += `        <path>${branch.path}</path>\n`;
-            xml += `        <nodes>\n`;
-            branch.nodes.forEach(nodeId => {
-              xml += `          <li>${nodeId}</li>\n`;
-            });
-            xml += `        </nodes>\n`;
-            xml += `      </li>\n`;
-          });
-          xml += `    </branchPaths>\n`;
-        }
-        xml += `  </${defType}>\n\n`;
-      });
-
-      xml += '</Defs>';
-      setExportedXml(xml);
-      setShowExport(true);
-    };
 
   // Node event handlers
   const handleMouseDown = (e, nodeId) => {
@@ -357,7 +190,11 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
           id="sessionLoad"
           type="file"
           accept=".json"
-          onChange={loadSessionFromFile}
+          onChange={async (e) => {
+            const data = await loadSessionFromFile(e.target.files[0]);
+            setNodes(data.nodes);
+            setPaths(data.paths);
+          }}
           className="hidden"
         />
         <Button onClick={(e) => saveSessionToFile(nodes, paths)} className="bg-blue-500 text-white">
@@ -369,75 +206,15 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
       </div>
 
       {/* Properties Panel */}
-      <div className="w-64 absolute left-4 top-4 bg-white rounded-lg shadow-lg p-4">
-        <h3 className="font-bold mb-4">Properties</h3>
-        {selectedNode && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Label</label>
-              <input
-                type="text"
-                value={nodes.find(n => n.id === selectedNode)?.label || ''}
-                onChange={(e) => updateNodeProperty(selectedNode, 'label', e.target.value)}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Type</label>
-              <select
-                value={nodes.find(n => n.id === selectedNode)?.type || 'Normal'}
-                onChange={(e) => updateNodeProperty(selectedNode, 'type', e.target.value)}
-                className="w-full p-2 border rounded"
-              >
-                <option>Start</option>
-                <option>Normal</option>
-                <option>Branch</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Path</label>
-              <input
-                type="text"
-                value={nodes.find(n => n.id === selectedNode)?.path || ''}
-                onChange={(e) => updateNodeProperty(selectedNode, 'path', e.target.value)}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Upgrade</label>
-              <input
-                type="text"
-                value={nodes.find(n => n.id === selectedNode)?.upgrade || ''}
-                onChange={(e) => updateNodeProperty(selectedNode, 'upgrade', e.target.value)}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            {nodes.find(n => n.id === selectedNode)?.type === 'Branch' && (
-              <div>
-                <label className="block text-sm font-medium mb-1">Branch Paths</label>
-                <Button
-                  onClick={() => addBranchPath(selectedNode)}
-                  className="bg-blue-500 text-white mb-2 w-full"
-                  size="sm"
-                >
-                  Add Branch Path
-                </Button>
-                {nodes.find(n => n.id === selectedNode)?.branchPaths.map((branch, idx) => (
-                  <div key={idx} className="ml-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="Path name"
-                      value={branch.path}
-                      onChange={(e) => updateBranchPath(selectedNode, idx, 'path', e.target.value)}
-                      className="w-full p-2 border rounded mb-1"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {selectedNode && (
+        <PropertiesPanel
+          selectedNode={selectedNode}
+          node={nodes.find(n => n.id === selectedNode)}
+          onUpdateProperty={(property, value) => updateNodeProperty(selectedNode, property, value)}
+          onAddBranchPath={() => addBranchPath(selectedNode)}
+          onUpdateBranchPath={(index, property, value) => updateBranchPath(selectedNode, index, property, value)}
+        />
+      )}
 
       {/* Main canvas area */}
       <div

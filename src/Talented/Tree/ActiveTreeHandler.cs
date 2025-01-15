@@ -10,13 +10,13 @@ namespace Talented
         {
         }
 
-        public ActiveTreeHandler(Pawn pawn, Gene_TalentBase gene, UpgradeTreeDef treeDef)
+        public ActiveTreeHandler(Pawn pawn, Gene_TalentBase gene, TalentTreeDef treeDef)
             : base(pawn, gene, treeDef)
         {
             TryUnlockNextUpgrade(this.treeDef.RootNode, true);
         }
 
-        protected override UnlockResult ValidateTreeSpecificRules(UpgradeTreeNodeDef node)
+        protected override UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node)
         {
             if (node.type != NodeType.Start && !HasSelectedAPath())
             {
@@ -38,7 +38,7 @@ namespace Talented
             return UnlockResult.Succeeded();
         }
 
-        public override UnlockResult TryUnlockNode(UpgradeTreeNodeDef node)
+        public override UnlockResult TryUnlockNode(TalentTreeNodeDef node)
         {
             UnlockResult result = base.TryUnlockNode(node);
             if (!result.Success)
@@ -68,7 +68,7 @@ namespace Talented
             return unlockResult;
         }
 
-        public override void OnPathSelected(UpgradePathDef path)
+        public override void OnPathSelected(TalentPathDef path)
         {
         }
 

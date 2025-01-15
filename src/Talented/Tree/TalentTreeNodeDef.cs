@@ -4,18 +4,18 @@ using Verse;
 
 namespace Talented
 {
-    public class UpgradeTreeNodeDef : Def
+    public class TalentTreeNodeDef : Def
     {
-        public List<UpgradeDef> upgrades;
+        public List<TalentDef> upgrades;
         public IntVec2 position;
-        public List<UpgradeTreeNodeDef> connections;
+        public List<TalentTreeNodeDef> connections;
         public NodeType type = NodeType.Normal;
-        public UpgradePathDef path;
+        public TalentPathDef path;
         public List<BranchPathData> branchPaths;
 
         public bool sequential = false;
         public bool hide = false;
-        public List<UpgradeDef> prerequisitesToShow;
+        public List<TalentDef> prerequisitesToShow;
         public int UpgradeCount => upgrades != null ? upgrades.Count : 0;
         public int ConnectionCount => connections != null ? connections.Count : 0;
         public bool BelongsToUpgradePath => path != null;
@@ -43,7 +43,7 @@ namespace Talented
         }
 
 
-        public IEnumerable<UpgradeTreeNodeDef> GetPredecessors(UpgradeTreeDef treeDef)
+        public IEnumerable<TalentTreeNodeDef> GetPredecessors(TalentTreeDef treeDef)
         {
             return treeDef.GetAllNodes().Where(n =>
                 n.connections != null && n.connections.Contains(this));
@@ -67,7 +67,7 @@ namespace Talented
             }
             return true;
         }
-        public UpgradeDef GetUpgrade(int upgradeIndex)
+        public TalentDef GetUpgrade(int upgradeIndex)
         {
             if (upgradeIndex < 0 || upgradeIndex > upgrades.Count)
             {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
   <!-- Rogue-Mage Psychic Stealth Enhancement -->
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>PsychicStealthUpgrade</defName>
       <label>Psychic Stealth</label>
       <description>Uses psychic energy to enhance stealth capabilities.</description>
@@ -11,7 +11,7 @@
               <hediffDef>PsychicStealth</hediffDef>
           </li>
       </hediffEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <HediffDef>
       <defName>PsychicStealth</defName>

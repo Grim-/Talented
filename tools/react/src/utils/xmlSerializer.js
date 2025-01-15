@@ -1,10 +1,10 @@
 // utils/xmlSerializer.js
 // Configuration object for def types
 export const DefTypeConfig = {
-  NODE: 'UpgradeTreeNodeDef',
-  TREE: 'UpgradeTreeDef',
-  PATH: 'UpgradePathDef',
-  UPGRADE: 'UpgradeDef',
+  NODE: 'TalentTreeNodeDef',
+  TREE: 'TalentTreeDef',
+  PATH: 'TalentPathDef',
+  UPGRADE: 'TalentDef',
   GENE: 'TalentedGeneDef'
 };
 

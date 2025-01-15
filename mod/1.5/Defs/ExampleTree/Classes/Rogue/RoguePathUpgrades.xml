@@ -2,7 +2,7 @@
 <Defs>
 
   <!-- Rogue Base Stat Upgrade -->
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>SwiftMovementUpgrade</defName>
       <label>Swift Movement</label>
       <description>Enhances movement capabilities through parasitic muscle enhancement.</description>
@@ -19,10 +19,10 @@
               <operation>Add</operation>
           </li>
       </statEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <!-- Rogue Shadow Strike Ability -->
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>ShadowStrikeUpgrade</defName>
       <label>Shadow Strike</label>
       <description>Grants the ability to briefly become invisible and perform a powerful strike.</description>
@@ -36,7 +36,7 @@
               </abilities>
           </li>
       </abilityEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <AbilityDef>
       <defName>ShadowStrikeAbility</defName>
@@ -64,7 +64,7 @@
   </HediffDef>
 
   <!-- Rogue Enhanced Reflexes -->
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>EnhancedReflexesUpgrade</defName>
       <label>Enhanced Reflexes</label>
       <description>Develops improved neural pathways for better reflexes and coordination.</description>
@@ -74,7 +74,7 @@
               <hediffDef>EnhancedReflexes</hediffDef>
           </li>
       </hediffEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 
   <HediffDef>
       <defName>EnhancedReflexes</defName>

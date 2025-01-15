@@ -2,9 +2,11 @@
 {
     public class StandardTalentPointWorker : TalentPointFormulaWorker
     {
-        public override int GetTalentPointsForLevel(int levels)
+        public int pointsPerLevel = 1;
+        public override int GetTalentPointsForLevel(int previousLevel, int newLevel)
         {
-            return levels;
+            int levelsGained = newLevel - previousLevel;
+            return levelsGained * pointsPerLevel;
         }
     }
 }

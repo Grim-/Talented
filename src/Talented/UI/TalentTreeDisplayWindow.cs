@@ -10,14 +10,14 @@ namespace Talented
     public class TalentTreeDisplayWindow : Window
     {
         private readonly Gene_TalentBase parasiteGene;
-        private readonly UpgradeTreeDef treeDef;
+        private readonly TalentTreeDef treeDef;
         private readonly BaseTreeHandler treeHandler;
         private Vector2 scrollPosition;
-        private readonly List<UpgradeTreeNodeDef> allNodes;
+        private readonly List<TalentTreeNodeDef> allNodes;
         private readonly ITreeDisplayStrategy displayStrategy;
-        private Dictionary<UpgradeTreeNodeDef, Rect> nodePositions;
+        private Dictionary<TalentTreeNodeDef, Rect> nodePositions;
         private readonly List<UIAnimationState> activeAnimations = new List<UIAnimationState>();
-        private readonly UpgradeTreeSkinDef skin;
+        private readonly TalentTreeSkinDef skin;
 
         protected override float Margin => skin != null ? skin.windowMargin : 0;
 
@@ -25,7 +25,7 @@ namespace Talented
         private Vector2 WindowSize = new Vector2(450f, 800f);
         public override Vector2 InitialSize => WindowSize;
 
-        public TalentTreeDisplayWindow(Gene_TalentBase parasite, UpgradeTreeDef tree, BaseTreeHandler handler, TreeDisplayStrategyDef displayStrategyDef)
+        public TalentTreeDisplayWindow(Gene_TalentBase parasite, TalentTreeDef tree, BaseTreeHandler handler, TreeDisplayStrategyDef displayStrategyDef)
         {
             if (parasite == null)
             {
@@ -56,7 +56,7 @@ namespace Talented
             treeDef = tree;
             this.WindowSize = new Vector2(this.treeDef.dimensions.x > 0 ? this.treeDef.dimensions.x : this.InitialSize.x, this.treeDef.dimensions.z > 0 ? this.treeDef.dimensions.z : this.InitialSize.y);
             treeHandler = handler;
-            allNodes = treeDef.GetAllNodes() ?? new List<UpgradeTreeNodeDef>();
+            allNodes = treeDef.GetAllNodes() ?? new List<TalentTreeNodeDef>();
             skin = tree.Skin;
 
             displayStrategy = (ITreeDisplayStrategy)Activator.CreateInstance(displayStrategyDef.strategyClass);
@@ -93,13 +93,27 @@ namespace Talented
             }
         }
 
-        private void DrawNode(UpgradeTreeNodeDef node, Rect nodeRect)
+        private void DrawNode(TalentTreeNodeDef node, Rect nodeRect)
         {
             UnlockResult canUnlockResult = treeHandler.ValidateUnlock(node);
             int currentProgress = treeHandler.GetNodeProgress(node);
             bool isFullyUnlocked = treeHandler.IsNodeFullyUnlocked(node);
+
             if (!node.hide || node.hide && node.MeetsVisibilityRequirements(treeHandler))
             {
+                if (node.BelongsToUpgradePath)
+                {
+                    float borderThickness = 2;
+                    Rect pathRect = nodeRect;
+                    pathRect.x -= borderThickness;
+                    pathRect.y -= borderThickness;
+                    pathRect.width += 4;
+                    pathRect.height += 4;
+                    GUI.color = node.path.pathColor;
+                    GUI.DrawTexture(pathRect, skin.NodeTexture);
+                }
+
+ 
                 GUI.color = treeHandler.GetNodeColor(node, currentProgress);
                 GUI.DrawTexture(nodeRect, skin.NodeTexture);
                 GUI.color = Color.white;
@@ -110,16 +124,14 @@ namespace Talented
                     Rect progressRect = nodeRect;
                     progressRect.height *= progressPercentage;
                     progressRect.y = nodeRect.yMax - progressRect.height;
-
                     GUI.color = Color.red;
                     GUI.DrawTexture(progressRect, skin.NodeTexture);
                     GUI.color = Color.white;
                 }
 
                 DrawNodeIconBG(node, nodeRect);
-                DrawNodeIcon(node,  treeHandler, nodeRect);
+                DrawNodeIcon(node, treeHandler, nodeRect);
                 DrawNodeBadge(node, nodeRect);
-
                 HandleNodeClick(nodeRect, node, canUnlockResult);
 
                 if (Mouse.IsOver(nodeRect))
@@ -129,13 +141,20 @@ namespace Talented
             }
             else
             {
-                GUI.color = new Color(0.1f, 0.1f, 0.1f, 0.1f);
+                if (node.BelongsToUpgradePath)
+                {
+                    GUI.color = new Color(node.path.pathColor.r, node.path.pathColor.g, node.path.pathColor.b, 0.1f);
+                }
+                else
+                {
+                    GUI.color = new Color(0.1f, 0.1f, 0.1f, 0.1f);
+                }
                 GUI.DrawTexture(nodeRect, skin.NodeTexture);
                 GUI.color = Color.white;
             }
         }
 
-        private void DrawNodeBadge(UpgradeTreeNodeDef node, Rect nodeRect)
+        private void DrawNodeBadge(TalentTreeNodeDef node, Rect nodeRect)
         {
             int progress = treeHandler.GetNodeProgress(node);
             string label = $"{progress}/{node.upgrades.Count}";
@@ -149,7 +168,7 @@ namespace Talented
 
             Widgets.Label(badgeRect, label);
         }
-        private void HandleNodeClick(Rect nodeRect, UpgradeTreeNodeDef node, UnlockResult canUnlockResult)
+        private void HandleNodeClick(Rect nodeRect, TalentTreeNodeDef node, UnlockResult canUnlockResult)
         {
             if (!Widgets.ButtonInvisible(nodeRect))
                 return;
@@ -172,7 +191,7 @@ namespace Talented
             }
         }
 
-        private void HandleSuccessfulUnlock(UpgradeTreeNodeDef node)
+        private void HandleSuccessfulUnlock(TalentTreeNodeDef node)
         {
             if (treeHandler != null)
             {
@@ -192,7 +211,7 @@ namespace Talented
             //    }
             //}
         }
-        private void HandlePathSelection(UpgradeTreeNodeDef node)
+        private void HandlePathSelection(TalentTreeNodeDef node)
         {
             if (node.BelongsToUpgradePath && node.path != null &&
                 !treeHandler.IsPathSelected(node.path) && treeHandler.CanSelectPath(node.path))
@@ -227,7 +246,7 @@ namespace Talented
             }
         }
 
-        private void DrawNodeIcon(UpgradeTreeNodeDef node, BaseTreeHandler tree, Rect nodeRect)
+        private void DrawNodeIcon(TalentTreeNodeDef node, BaseTreeHandler tree, Rect nodeRect)
         {
             Rect iconRect = nodeRect.ContractedBy(8f);
             Texture2D iconToUse = null;
@@ -235,7 +254,7 @@ namespace Talented
             {
                 int progress = tree.GetNodeProgress(node);
                 int upgradeIndex = progress > 0 ? progress - 1 : 0;
-                UpgradeDef upgrade = node.GetUpgrade(upgradeIndex);
+                TalentDef upgrade = node.GetUpgrade(upgradeIndex);
 
                 if (upgrade != null && !string.IsNullOrEmpty(upgrade.uiIconPath))
                 {
@@ -251,7 +270,7 @@ namespace Talented
                 Widgets.DrawTextureFitted(iconRect, iconToUse, 1f);
             }
         }
-        private void DrawNodeIconBG(UpgradeTreeNodeDef node, Rect nodeRect)
+        private void DrawNodeIconBG(TalentTreeNodeDef node, Rect nodeRect)
         {
             //Rect iconRect = nodeRect.ContractedBy(1f);
             //Texture2D icon = skin.NodeBackgroundTexture;
@@ -261,7 +280,7 @@ namespace Talented
             //}
         }
 
-        private void DrawDescription(Rect nodeRect, UpgradeTreeNodeDef node, int currentProgress)
+        private void DrawDescription(Rect nodeRect, TalentTreeNodeDef node, int currentProgress)
         {
             bool isFullyUnlocked = treeHandler.IsNodeFullyUnlocked(node);
             UnlockResult canUnlockResult = treeHandler.ValidateUnlock(node);
@@ -354,7 +373,7 @@ namespace Talented
             }
         }
 
-        private void DrawConnection(UpgradeTreeNodeDef from, UpgradeTreeNodeDef to)
+        private void DrawConnection(TalentTreeNodeDef from, TalentTreeNodeDef to)
         {
             Vector2 start = nodePositions[from].center;
             Vector2 end = nodePositions[to].center;
@@ -367,7 +386,7 @@ namespace Talented
                 DrawConnectionArrow(start, end, lineColor);
             }
         }
-        private void DrawTexturedConnection(UpgradeTreeNodeDef from, UpgradeTreeNodeDef to)
+        private void DrawTexturedConnection(TalentTreeNodeDef from, TalentTreeNodeDef to)
         {
             if (from == null || to == null || skin == null || skin.ConnectionTexture == null)
             {
@@ -414,7 +433,7 @@ namespace Talented
             }
         }
 
-        private Color GetPathStatusColor(UpgradeTreeNodeDef from, UpgradeTreeNodeDef to)
+        private Color GetPathStatusColor(TalentTreeNodeDef from, TalentTreeNodeDef to)
         {
             if (treeHandler == null)
             {

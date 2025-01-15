@@ -20,7 +20,7 @@ namespace Talented
         protected const float TREE_BANNER_SPACING = 15f;
         protected const float TOOLBAR_MARGIN = 20f;
         private float TreeButtonExpBarWidth = 120f;
-        private float TreeButtonExpBarHeight = 26f;
+        private float TreeButtonExpBarHeight = 18f;
         protected Vector2 tabSize = new Vector2(500, 400);
         protected float toolbarHeight => 60f;
         protected Vector2 scrollPosition;
@@ -126,8 +126,14 @@ namespace Talented
 
         private void DrawBannerBackground(Rect rect, Gene_TalentBase gene)
         {
-            Widgets.DrawBoxSolidWithOutline(rect, Color.clear, Color.gray);
-           // GUI.DrawTexture(rect, gene.BackgroundTexture ?? BannerTexture);
+            if (gene.HasCustomBackground)
+            {
+                GUI.DrawTexture(rect, gene.BackgroundTexture ?? BannerTexture);
+            }
+            else
+            {
+                Widgets.DrawBoxSolidWithOutline(rect, Color.clear, Color.gray);
+            } 
         }
 
         private void DrawBannerHeader(Rect rect, Gene_TalentBase gene)
@@ -147,7 +153,11 @@ namespace Talented
                     TreeButtonExpBarWidth,
                     TreeButtonExpBarHeight
                 );
-                Widgets.LabelFit(expRect, $"{expHolder.CurrentExperience} / {expHolder.XPForNextLevel}");
+
+                if (Mouse.IsOver(rect))
+                {
+                    TooltipHandler.TipRegion(expRect, $"{expHolder.CurrentExperience} / {expHolder.XPForNextLevel}");
+                }
                 Widgets.FillableBar(expRect, expHolder.ExperienceProgress);
             }
 
@@ -174,9 +184,22 @@ namespace Talented
 
         private void DrawTreeBackground(Rect rect, BaseTreeHandler tree)
         {
-            //GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
-            //    BannerTexture, ScaleMode.ScaleAndCrop);
-            Widgets.DrawBoxSolidWithOutline(rect, Color.clear, Color.gray);
+            if (tree.TreeDef?.Skin != null)
+            {
+                if (tree.TreeDef.Skin.HasCustomTreeListBG)
+                {
+                    GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
+                        BannerTexture, tree.TreeDef.Skin.treeListbackgroundScaleMode);
+                }
+                else
+                {
+                    Widgets.DrawBoxSolidWithOutline(rect, tree.TreeDef.Skin.TreeListColor, tree.TreeDef.Skin.TreeListOutlineColor);
+                }
+            }
+            else
+            {
+                Widgets.DrawBoxSolidWithOutline(rect, Color.clear, Color.gray);
+            }
         }
 
         private Rect DrawTreeIcon(Rect rect, BaseTreeHandler tree)

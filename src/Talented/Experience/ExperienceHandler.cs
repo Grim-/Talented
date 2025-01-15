@@ -53,7 +53,7 @@ namespace Talented
         {
             if (dealer == gene.pawn)
             {
-                var expType = settings.experienceTypes.OfType<DamageExperienceTypeDef>().FirstOrDefault();
+                var expType = settings.experienceTypes.OfType<DamageDealtExperienceTypeDef>().FirstOrDefault();
                 if (expType != null)
                 {
                     float xp = expType.GetExperience(gene.pawn, result);
@@ -68,7 +68,7 @@ namespace Talented
         {
             if (pawn == gene.pawn)
             {
-                var expType = settings.experienceTypes.OfType<DamageExperienceTypeDef>().FirstOrDefault();
+                var expType = settings.experienceTypes.OfType<DamageTakenExperienceTypeDef>().FirstOrDefault();
                 if (expType != null)
                 {
                     float xp = expType.GetExperience(gene.pawn) * info.Amount;

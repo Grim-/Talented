@@ -5,9 +5,12 @@
         public int pointsPerPeriod = 1;
         public int levelPeriod = 5;
 
-        public override int GetTalentPointsForLevel(int levelsGained)
+        public override int GetTalentPointsForLevel(int previousLevel, int newLevel)
         {
-            return (levelsGained / levelPeriod) * pointsPerPeriod;
+            int previousThresholds = previousLevel / levelPeriod;
+            int currentThresholds = newLevel / levelPeriod;
+
+            return (currentThresholds - previousThresholds) * pointsPerPeriod;
         }
     }
 }

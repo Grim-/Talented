@@ -3,7 +3,7 @@ using Verse;
 
 namespace Talented
 {
-    public class UpgradeTreeSkinDef : Def
+    public class TalentTreeSkinDef : Def
     {
         // Background configuration
         public string backgroundTexturePath;
@@ -11,10 +11,15 @@ namespace Talented
         public Color? backgroundColor;
 
 
+
+        public Color TreeListColor = Color.clear;
+        public Color TreeListOutlineColor = Color.grey;
+
         //Tree list appearance
-        public string treeListbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
-        public ScaleMode treeListbackgroundScaleMode = ScaleMode.StretchToFill;
-        private string defaulttreeListbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
+        public string treeListbackgroundTexturePath;
+        public ScaleMode treeListbackgroundScaleMode = ScaleMode.ScaleAndCrop;
+        public bool HasCustomTreeListBG => !string.IsNullOrEmpty(treeListbackgroundTexturePath);
+
 
         // Node appearance
         public string nodeTexturePath = "UI/Tree/defaultnode";
@@ -57,17 +62,12 @@ namespace Talented
         // Toolbar configuration
         public float toolbarHeight = 80f;
 
-        private Texture2D cachedtreeListBackgroundTexture;
-        private Texture2D cachedBackgroundTexture;
-        private Texture2D cachedNodeTexture;
-        private Texture2D cachedConnectionTexture;
-        private Texture2D cachedgeneListBackgroundTexture;
 
-        private Texture2D cachedDefaultUpgradeIcon;
+
+
 
         public static Texture2D LoadTexture(string customPath, string defaultPath, string textureType)
         {
-            // Try loading custom texture if specified
             if (!customPath.NullOrEmpty())
             {
                 Texture2D customTexture = ContentFinder<Texture2D>.Get(customPath, false);
@@ -86,17 +86,22 @@ namespace Talented
             }
             return defaultTexture;
         }
+
+
+        private Texture2D cachedtreeListBackgroundTexture;
         public Texture2D TreeListBackgroundTexture
         {
             get
             {
-                if (cachedtreeListBackgroundTexture == null)
+                if (cachedtreeListBackgroundTexture == null && HasCustomTreeListBG)
                 {
-                    cachedtreeListBackgroundTexture = LoadTexture(treeListbackgroundTexturePath, defaulttreeListbackgroundTexturePath, "background");
+                    cachedtreeListBackgroundTexture = ContentFinder<Texture2D>.Get(treeListbackgroundTexturePath, false);
                 }
                 return cachedtreeListBackgroundTexture;
             }
         }
+
+        private Texture2D cachedBackgroundTexture;
         public Texture2D BackgroundTexture
         {
             get
@@ -108,7 +113,7 @@ namespace Talented
                 return cachedBackgroundTexture;
             }
         }
-
+        private Texture2D cachedNodeTexture;
         public Texture2D NodeTexture
         {
             get
@@ -120,6 +125,9 @@ namespace Talented
                 return cachedNodeTexture;
             }
         }
+
+
+        private Texture2D cachedDefaultUpgradeIcon;
         public Texture2D DefaultUpgradeIcon
         {
             get
@@ -131,6 +139,9 @@ namespace Talented
                 return cachedDefaultUpgradeIcon;
             }
         }
+
+
+        private Texture2D cachedConnectionTexture;
         public Texture2D ConnectionTexture
         {
             get

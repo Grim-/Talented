@@ -9,9 +9,9 @@ namespace Talented
     {
         protected Pawn pawn;
         protected Gene_TalentBase gene;
-        protected UpgradeTreeDef treeDef;
+        protected TalentTreeDef treeDef;
 
-        public UpgradeTreeDef TreeDef
+        public TalentTreeDef TreeDef
         {
             get
             {
@@ -19,14 +19,14 @@ namespace Talented
             }
         }
 
-        protected HashSet<UpgradeDef> unlockedUpgrades;
-        protected HashSet<UpgradeTreeNodeDef> unlockedNodes;
-        public Dictionary<UpgradeDef, List<UpgradeEffect>> activeEffects;
+        protected HashSet<TalentDef> unlockedUpgrades;
+        protected HashSet<TalentTreeNodeDef> unlockedNodes;
+        public Dictionary<TalentDef, List<UpgradeEffect>> activeEffects;
 
-        protected HashSet<UpgradePathDef> selectedPaths;
-        protected Dictionary<UpgradeTreeNodeDef, int> nodeProgress;
+        protected HashSet<TalentPathDef> selectedPaths;
+        protected Dictionary<TalentTreeNodeDef, int> nodeProgress;
 
-        public Dictionary<UpgradeTreeNodeDef, int> NodeProgress
+        public Dictionary<TalentTreeNodeDef, int> NodeProgress
         {
             get
             {
@@ -35,7 +35,7 @@ namespace Talented
         }
 
         protected TalentPointFormulaWorker talentPointWorker;
-        public bool HasUnlockUpgrade(UpgradeDef upgradeDef)
+        public bool HasUnlockUpgrade(TalentDef upgradeDef)
         {
             return unlockedUpgrades.Contains(upgradeDef);
         }
@@ -45,32 +45,32 @@ namespace Talented
         {
         }
 
-        public BaseTreeHandler(Pawn pawn, Gene_TalentBase gene, UpgradeTreeDef treeDef)
+        public BaseTreeHandler(Pawn pawn, Gene_TalentBase gene, TalentTreeDef treeDef)
         {
             this.pawn = pawn;
             this.gene = gene;
             this.treeDef = treeDef;
-            this.unlockedUpgrades = new HashSet<UpgradeDef>();
-            this.unlockedNodes = new HashSet<UpgradeTreeNodeDef>();
-            this.activeEffects = new Dictionary<UpgradeDef, List<UpgradeEffect>>();
-            this.selectedPaths = new HashSet<UpgradePathDef>();
-            this.nodeProgress = new Dictionary<UpgradeTreeNodeDef, int>();
+            this.unlockedUpgrades = new HashSet<TalentDef>();
+            this.unlockedNodes = new HashSet<TalentTreeNodeDef>();
+            this.activeEffects = new Dictionary<TalentDef, List<UpgradeEffect>>();
+            this.selectedPaths = new HashSet<TalentPathDef>();
+            this.nodeProgress = new Dictionary<TalentTreeNodeDef, int>();
             if (treeDef.talentPointFormula != null)
             {
                 talentPointWorker = treeDef.talentPointFormula.CreateWorker();
             }
         }
 
-        public virtual void OnLevelUp(int levels)
+        public virtual void OnLevelUp(int previousLevel, int newLevel)
         {
             if (talentPointWorker != null)
             {
-                int points = talentPointWorker.GetTalentPointsForLevel(levels);
+                int points = talentPointWorker.GetTalentPointsForLevel(previousLevel, newLevel);
                 OnTalentPointsGained(points);
             }
             else
             {
-                OnTalentPointsGained(levels);
+                OnTalentPointsGained(1);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Talented
                 }
             }
         }
-        private void ApplyUpgradeEffects(UpgradeDef upgrade)
+        private void ApplyUpgradeEffects(TalentDef upgrade)
         {
             activeEffects[upgrade] = new List<UpgradeEffect>();
             var effects = upgrade.CreateEffects();
@@ -120,13 +120,13 @@ namespace Talented
             }
         }
         #region Nodes
-        public virtual UnlockResult TryUnlockNode(UpgradeTreeNodeDef node)
+        public virtual UnlockResult TryUnlockNode(TalentTreeNodeDef node)
         {
             UnlockResult result = ValidateUnlock(node);
             return result;
         }
 
-        public bool IsNodeFullyUnlocked(UpgradeTreeNodeDef node)
+        public bool IsNodeFullyUnlocked(TalentTreeNodeDef node)
         {
             if (node?.upgrades == null)
             {
@@ -143,18 +143,18 @@ namespace Talented
         //    return ValidateUnlock(node);
         //}
 
-        public int GetNodeProgress(UpgradeTreeNodeDef node)
+        public int GetNodeProgress(TalentTreeNodeDef node)
         {
             return nodeProgress.TryGetValue(node, out int progress) ? progress : 0;
         }
 
-        public bool CanUnlockNextUpgrade(UpgradeTreeNodeDef node)
+        public bool CanUnlockNextUpgrade(TalentTreeNodeDef node)
         {
             if (node?.upgrades == null) return false;
             int currentProgress = GetNodeProgress(node);
             return currentProgress < node.upgrades.Count;
         }
-        public Color GetNodeColor(UpgradeTreeNodeDef node, int currentProgress)
+        public Color GetNodeColor(TalentTreeNodeDef node, int currentProgress)
         {
             bool isFullyUnlocked = IsNodeFullyUnlocked(node);
 
@@ -184,7 +184,7 @@ namespace Talented
             return this.treeDef.Skin.availableNodeColor;
         }
 
-        public virtual UnlockResult TryUnlockNextUpgrade(UpgradeTreeNodeDef node, bool ignoreRequirements = false)
+        public virtual UnlockResult TryUnlockNextUpgrade(TalentTreeNodeDef node, bool ignoreRequirements = false)
         {
             if (ignoreRequirements)
             {
@@ -222,7 +222,7 @@ namespace Talented
             return UnlockResult.Succeeded();
         }
 
-        protected virtual void OnNodeFullyUnlocked(UpgradeTreeNodeDef node)
+        protected virtual void OnNodeFullyUnlocked(TalentTreeNodeDef node)
         {
 
 
@@ -242,7 +242,7 @@ namespace Talented
             }
         }
 
-        public void ForceUnlockNode(UpgradeTreeNodeDef node)
+        public void ForceUnlockNode(TalentTreeNodeDef node)
         {
             if (node == null || IsNodeFullyUnlocked(node))
                 return;
@@ -252,7 +252,7 @@ namespace Talented
                 TryUnlockNextUpgrade(node, true);
             }
         }
-        public virtual void UnlockUpgrade(UpgradeDef upgrade)
+        public virtual void UnlockUpgrade(TalentDef upgrade)
         {
             var node = treeDef.GetAllNodes().FirstOrDefault(n => n.upgrades != null && n.upgrades.Contains(upgrade));
             bool isSequential = node?.sequential ?? false;
@@ -276,7 +276,7 @@ namespace Talented
             unlockedUpgrades.Add(upgrade);
         }
 
-        protected void RemovePreviousNodeUpgrades(UpgradeTreeNodeDef node, UpgradeDef untilUpgrade)
+        protected void RemovePreviousNodeUpgrades(TalentTreeNodeDef node, TalentDef untilUpgrade)
         {
             var previousUpgrades = node.upgrades
                 .TakeWhile(u => u != untilUpgrade)
@@ -296,7 +296,7 @@ namespace Talented
             }
         }
 
-        public virtual UnlockResult ValidateUnlock(UpgradeTreeNodeDef node)
+        public virtual UnlockResult ValidateUnlock(TalentTreeNodeDef node)
         {
             if (node?.upgrades == null || !node.upgrades.Any())
                 return UnlockResult.Failed(UpgradeUnlockError.InvalidNode, "Invalid node");
@@ -319,15 +319,15 @@ namespace Talented
 
         #endregion
 
-        protected abstract UnlockResult ValidateTreeSpecificRules(UpgradeTreeNodeDef node);
+        protected abstract UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node);
 
 
 
         #region Progression Paths
-        public bool IsPathSelected(UpgradePathDef path) => selectedPaths.Contains(path);
+        public bool IsPathSelected(TalentPathDef path) => selectedPaths.Contains(path);
 
 
-        public PathStatus GetPathStatusBetweenNodes(UpgradeTreeNodeDef StartNode, UpgradeTreeNodeDef EndNode)
+        public PathStatus GetPathStatusBetweenNodes(TalentTreeNodeDef StartNode, TalentTreeNodeDef EndNode)
         {
             if (IsPathUnlocked(StartNode, EndNode))
             {
@@ -342,13 +342,13 @@ namespace Talented
                 return PathStatus.Locked;
             }
         }
-        public bool IsPathActive(UpgradeTreeNodeDef StartNode, UpgradeTreeNodeDef EndNode)
+        public bool IsPathActive(TalentTreeNodeDef StartNode, TalentTreeNodeDef EndNode)
         {
             return IsNodeFullyUnlocked(StartNode) ||
                   IsNodeFullyUnlocked(EndNode);
         }
 
-        public bool IsPathUnlocked(UpgradeTreeNodeDef StartNode, UpgradeTreeNodeDef EndNode)
+        public bool IsPathUnlocked(TalentTreeNodeDef StartNode, TalentTreeNodeDef EndNode)
         {
             return IsNodeFullyUnlocked(StartNode) &&
                   IsNodeFullyUnlocked(EndNode);
@@ -356,7 +356,7 @@ namespace Talented
 
 
 
-        protected virtual bool ValidateUpgradePath(UpgradeTreeNodeDef node)
+        protected virtual bool ValidateUpgradePath(TalentTreeNodeDef node)
         {
             if (node.type == NodeType.Branch)
                 return node.path != null && CanSelectPath(node.path);
@@ -367,7 +367,7 @@ namespace Talented
 
             return true;
         }
-        public virtual UnlockResult SelectPath(UpgradePathDef path)
+        public virtual UnlockResult SelectPath(TalentPathDef path)
         {
             if (!CanSelectPath(path))
                 return UnlockResult.Failed(UpgradeUnlockError.ExclusivePath, "Path conflicts with current selections");
@@ -377,7 +377,7 @@ namespace Talented
             return UnlockResult.Succeeded();
         }
 
-        public virtual bool CanSelectPath(UpgradePathDef path)
+        public virtual bool CanSelectPath(TalentPathDef path)
         {
             if (path == null) return false;
             if (selectedPaths.Contains(path)) return false;
@@ -410,7 +410,7 @@ namespace Talented
             return selectedPaths != null && selectedPaths.Count > 0;
         }
 
-        public abstract void OnPathSelected(UpgradePathDef path);
+        public abstract void OnPathSelected(TalentPathDef path);
 
         #endregion
  
@@ -495,11 +495,11 @@ namespace Talented
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                if (unlockedUpgrades == null) unlockedUpgrades = new HashSet<UpgradeDef>();
-                if (unlockedNodes == null) unlockedNodes = new HashSet<UpgradeTreeNodeDef>();
-                if (selectedPaths == null) selectedPaths = new HashSet<UpgradePathDef>();
-                if (nodeProgress == null) nodeProgress = new Dictionary<UpgradeTreeNodeDef, int>();
-                if (activeEffects == null) activeEffects = new Dictionary<UpgradeDef, List<UpgradeEffect>>();
+                if (unlockedUpgrades == null) unlockedUpgrades = new HashSet<TalentDef>();
+                if (unlockedNodes == null) unlockedNodes = new HashSet<TalentTreeNodeDef>();
+                if (selectedPaths == null) selectedPaths = new HashSet<TalentPathDef>();
+                if (nodeProgress == null) nodeProgress = new Dictionary<TalentTreeNodeDef, int>();
+                if (activeEffects == null) activeEffects = new Dictionary<TalentDef, List<UpgradeEffect>>();
 
                 foreach (var path in selectedPaths.ToList())
                 {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-  <Talented.UpgradeDef>
+  <Talented.TalentDef>
       <defName>ArmorUpgrade</defName>
       <label>Enhanced Defense</label>
       <description>Improves overall armor effectiveness by 5%.</description>
@@ -22,5 +22,5 @@
               <operation>Add</operation>
           </li>
       </statEffects>
-  </Talented.UpgradeDef>
+  </Talented.TalentDef>
 </Defs>

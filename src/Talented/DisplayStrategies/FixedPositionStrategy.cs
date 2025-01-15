@@ -19,16 +19,16 @@ namespace Talented
             this.MARGIN = margin;
         }
 
-        public Dictionary<UpgradeTreeNodeDef, Rect> PositionNodes(
-            List<UpgradeTreeNodeDef> nodes,
+        public Dictionary<TalentTreeNodeDef, Rect> PositionNodes(
+            List<TalentTreeNodeDef> nodes,
             Rect availableSpace,
             float nodeSize,
             float spacing)
         {
             if (nodes == null || nodes.Count == 0)
-                return new Dictionary<UpgradeTreeNodeDef, Rect>();
+                return new Dictionary<TalentTreeNodeDef, Rect>();
 
-            var nodePositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
+            var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
 
             int minX = int.MaxValue;
             int maxX = int.MinValue;

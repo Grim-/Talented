@@ -17,24 +17,24 @@ namespace Talented
             CENTER_PADDING = centerPadding;
         }
 
-        public Dictionary<UpgradeTreeNodeDef, Rect> PositionNodes(
-            List<UpgradeTreeNodeDef> nodes,
+        public Dictionary<TalentTreeNodeDef, Rect> PositionNodes(
+            List<TalentTreeNodeDef> nodes,
             Rect availableSpace,
             float nodeSize,
             float spacing)
         {
             if (nodes == null || nodes.Count == 0)
-                return new Dictionary<UpgradeTreeNodeDef, Rect>();
+                return new Dictionary<TalentTreeNodeDef, Rect>();
 
-            var nodePositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
+            var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
             var startNodes = nodes.FindAll(n => n.type == NodeType.Start);
 
             if (startNodes.Count == 0)
                 return nodePositions;
 
             // Create path sections and calculate max depth
-            var pathSections = new Dictionary<UpgradeTreeNodeDef, (float startAngle, float endAngle)>();
-            var nodeDepths = new Dictionary<UpgradeTreeNodeDef, int>();
+            var pathSections = new Dictionary<TalentTreeNodeDef, (float startAngle, float endAngle)>();
+            var nodeDepths = new Dictionary<TalentTreeNodeDef, int>();
             int maxDepth = CalculateDepthsAndSections(startNodes[0], nodes, pathSections, nodeDepths);
 
             // Calculate the maximum radius based on available space
@@ -90,15 +90,15 @@ namespace Talented
         }
 
         private int CalculateDepthsAndSections(
-            UpgradeTreeNodeDef startNode,
-            List<UpgradeTreeNodeDef> allNodes,
-            Dictionary<UpgradeTreeNodeDef, (float startAngle, float endAngle)> pathSections,
-            Dictionary<UpgradeTreeNodeDef, int> nodeDepths)
+            TalentTreeNodeDef startNode,
+            List<TalentTreeNodeDef> allNodes,
+            Dictionary<TalentTreeNodeDef, (float startAngle, float endAngle)> pathSections,
+            Dictionary<TalentTreeNodeDef, int> nodeDepths)
         {
-            var visited = new HashSet<UpgradeTreeNodeDef>();
+            var visited = new HashSet<TalentTreeNodeDef>();
             int maxDepth = 0;
 
-            void TraverseTree(UpgradeTreeNodeDef node, int depth, float startAngle, float endAngle)
+            void TraverseTree(TalentTreeNodeDef node, int depth, float startAngle, float endAngle)
             {
                 if (visited.Contains(node))
                     return;
@@ -124,7 +124,7 @@ namespace Talented
             return maxDepth;
         }
 
-        private UpgradeTreeNodeDef FindParentPath(UpgradeTreeNodeDef node, List<UpgradeTreeNodeDef> allNodes)
+        private TalentTreeNodeDef FindParentPath(TalentTreeNodeDef node, List<TalentTreeNodeDef> allNodes)
         {
             foreach (var potential in allNodes)
             {
@@ -134,13 +134,13 @@ namespace Talented
             return null;
         }
 
-        private List<UpgradeTreeNodeDef> GetSiblingNodes(
-            UpgradeTreeNodeDef node,
-            UpgradeTreeNodeDef parent,
-            List<UpgradeTreeNodeDef> allNodes)
+        private List<TalentTreeNodeDef> GetSiblingNodes(
+            TalentTreeNodeDef node,
+            TalentTreeNodeDef parent,
+            List<TalentTreeNodeDef> allNodes)
         {
             if (parent?.connections == null)
-                return new List<UpgradeTreeNodeDef>();
+                return new List<TalentTreeNodeDef>();
 
             return parent.connections;
         }

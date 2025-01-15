@@ -53,13 +53,68 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
         return {
           abilityDef: ''
         };
+      case 'statEffects':
+        return {
+          statDef: '',
+          value: 0,
+          operation: 'Add'
+        };
+      case 'hediffEffects':
+        return {
+          hediffDef: '',
+          severity: 1.0
+        };
       case 'prerequisites':
         return '';
       default:
         return '';
     }
   };
-
+  const renderStatEffectEditor = (item, index, propName) => (
+    <div className="space-y-2 p-4 bg-white rounded">
+      <input
+        type="text"
+        value={item.statDef}
+        onChange={e => handleListItemChange(propName, index, 'statDef', e.target.value)}
+        className="w-full p-2 border rounded"
+        placeholder="Stat Def Name"
+      />
+      <input
+        type="number"
+        value={item.value}
+        onChange={e => handleListItemChange(propName, index, 'value', parseFloat(e.target.value))}
+        className="w-full p-2 border rounded"
+        placeholder="Value"
+      />
+      <select
+        value={item.operation}
+        onChange={e => handleListItemChange(propName, index, 'operation', e.target.value)}
+        className="w-full p-2 border rounded"
+      >
+        <option value="Add">Add</option>
+        <option value="Multiply">Multiply</option>
+        <option value="Override">Override</option>
+      </select>
+    </div>
+  );
+  const renderHediffEffectEditor = (item, index, propName) => (
+  <div className="space-y-2 p-4 bg-white rounded">
+    <input
+      type="text"
+      value={item.hediffDef}
+      onChange={e => handleListItemChange(propName, index, 'hediffDef', e.target.value)}
+      className="w-full p-2 border rounded"
+      placeholder="Hediff Def Name"
+    />
+    <input
+      type="number"
+      value={item.severity}
+      onChange={e => handleListItemChange(propName, index, 'severity', parseFloat(e.target.value))}
+      className="w-full p-2 border rounded"
+      placeholder="Severity"
+    />
+  </div>
+);
   const handleListItemAdd = (propName) => {
     setCurrentDef(prev => ({
       ...prev,
@@ -160,6 +215,8 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
           <div className="flex-1">
             {propName === 'organEffects' && renderOrganEffectEditor(item, index, propName)}
             {propName === 'abilityEffects' && renderAbilityEffectEditor(item, index, propName)}
+            {propName === 'statEffects' && renderStatEffectEditor(item, index, propName)}
+            {propName === 'hediffEffects' && renderHediffEffectEditor(item, index, propName)}
             {propName === 'prerequisites' && renderPrerequisiteEditor(item, index, propName)}
           </div>
           <button
@@ -176,6 +233,14 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
           </button>
         </div>
       ))}
+      {list.length === 0 && (
+        <button
+          onClick={() => handleListItemAdd(propName)}
+          className="w-full p-2 bg-blue-200 text-white rounded hover:bg-blue-600"
+        >
+          Add Item
+        </button>
+      )}
     </div>
   );
 

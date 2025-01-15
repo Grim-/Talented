@@ -34,20 +34,21 @@ namespace Talented
         private ExperienceFormulaWorker formulaWorker;
 
         public string genelistbackgroundTexturePath = "UI/Tree/genelistbackground";
-        private string defaultgenelistbackgroundTexturePath = "UI/Tree/defaulttreelistbackground";
 
         private Texture2D cachedBackgroundTexture;
         public Texture2D BackgroundTexture
         {
             get
             {
-                if (cachedBackgroundTexture == null)
+                if (cachedBackgroundTexture == null && HasCustomBackground)
                 {
-                    cachedBackgroundTexture = UpgradeTreeSkinDef.LoadTexture(genelistbackgroundTexturePath, defaultgenelistbackgroundTexturePath, "background");
+                    cachedBackgroundTexture = ContentFinder<Texture2D>.Get(TalentedGeneDef.geneListBackgroundTexturePath, false);
                 }
                 return cachedBackgroundTexture;
             }
         }
+
+        public bool HasCustomBackground => !String.IsNullOrEmpty(TalentedGeneDef.geneListBackgroundTexturePath);
 
         public float XPForNextLevel => MaxExperienceForLevel(currentLevel);
 
@@ -120,7 +121,7 @@ namespace Talented
         {
 
         }
-        public virtual void OnLevelGained(int levels)
+        public virtual void OnLevelGained(int previousLevel, int newLevel)
         {
 
         }
@@ -160,9 +161,9 @@ namespace Talented
             int newLevel = Math.Min(oldLevel + levels, MaxLevel);
             currentLevel = newLevel;
 
-            passiveTree?.OnLevelUp(currentLevel);
-            activeTree?.OnLevelUp(levels);
-            OnLevelGained(levels);
+            passiveTree?.OnLevelUp(oldLevel, currentLevel);
+            activeTree?.OnLevelUp(oldLevel, currentLevel);
+            OnLevelGained(oldLevel, currentLevel);
 
             Messages.Message($"{pawn.Label} gained {levels} level{(levels > 1 ? "s" : "")} (level = {currentLevel})",
                 MessageTypeDefOf.PositiveEvent);
@@ -191,11 +192,11 @@ namespace Talented
 
         public struct TreeInstanceData
         {
-            public UpgradeTreeDef treeDef;
+            public TalentTreeDef treeDef;
             public BaseTreeHandler handler;
             public string label;
 
-            public TreeInstanceData(UpgradeTreeDef treeDef, BaseTreeHandler handler, string label)
+            public TreeInstanceData(TalentTreeDef treeDef, BaseTreeHandler handler, string label)
             {
                 this.treeDef = treeDef;
                 this.handler = handler;
@@ -215,7 +216,7 @@ namespace Talented
             }
         }
 
-        public bool CanAffordUpgrade(UpgradeDef upgrade)
+        public bool CanAffordUpgrade(TalentDef upgrade)
         {
             return HasTalentPointsAvailable(upgrade.pointCost);
         }

@@ -6,6 +6,6 @@ namespace Talented
     public class TalentedDefOf
     {
         public static ExperienceFormulaDef Basic_LinearXP;
-        public static UpgradeTreeSkinDef DefaultTreeSkin;
+        public static TalentTreeSkinDef DefaultTreeSkin;
     }
 }

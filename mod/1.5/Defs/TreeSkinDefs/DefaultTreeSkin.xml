@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-<Talented.UpgradeTreeSkinDef>
+<Talented.TalentTreeSkinDef>
   <defName>DefaultTreeSkin</defName>
   <label>Default Tree Skin</label>
   <description>Default visual style for upgrade trees</description>
@@ -49,5 +49,5 @@
 
     <!-- Toolbar configuration -->
     <toolbarHeight>35</toolbarHeight>
-</Talented.UpgradeTreeSkinDef>
+</Talented.TalentTreeSkinDef>
 </Defs>

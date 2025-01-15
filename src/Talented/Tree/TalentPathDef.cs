@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace Talented
 {
-    public class UpgradePathDef : Def
+    public class TalentPathDef : Def
     {
-        public List<UpgradePathDef> exclusiveWith;
+        public List<TalentPathDef> exclusiveWith;
         public string pathDescription;
         public string pathUIIcon;
+        public Color pathColor = Color.white;
 
 
-        public bool IsPathExclusiveWith(UpgradePathDef otherPath)
+        public bool IsPathExclusiveWith(TalentPathDef otherPath)
         {
             if (exclusiveWith == null || otherPath == null)
                 return false;
@@ -19,7 +21,7 @@ namespace Talented
             return exclusiveWith.Contains(otherPath);
         }
 
-        public bool IsPathExclusiveWith(IEnumerable<UpgradePathDef> otherPaths)
+        public bool IsPathExclusiveWith(IEnumerable<TalentPathDef> otherPaths)
         {
             if (exclusiveWith == null || otherPaths == null || !otherPaths.Any())
                 return false;

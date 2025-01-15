@@ -21,9 +21,9 @@ namespace Talented
 
         private readonly float padding = 50f;
 
-        private Dictionary<UpgradeTreeNodeDef, Vector2> currentVelocities;
-        private Dictionary<UpgradeTreeNodeDef, Rect> targetPositions;
-        private Dictionary<UpgradeTreeNodeDef, Rect> currentPositions;
+        private Dictionary<TalentTreeNodeDef, Vector2> currentVelocities;
+        private Dictionary<TalentTreeNodeDef, Rect> targetPositions;
+        private Dictionary<TalentTreeNodeDef, Rect> currentPositions;
         private bool isAnimating;
 
         // Track if any nodes are currently fleeing from mouse
@@ -31,23 +31,23 @@ namespace Talented
 
         public ForceDirectedStrategy()
         {
-            currentVelocities = new Dictionary<UpgradeTreeNodeDef, Vector2>();
-            targetPositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
-            currentPositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
+            currentVelocities = new Dictionary<TalentTreeNodeDef, Vector2>();
+            targetPositions = new Dictionary<TalentTreeNodeDef, Rect>();
+            currentPositions = new Dictionary<TalentTreeNodeDef, Rect>();
             isAnimating = false;
         }
 
         public ForceDirectedStrategy(float padding = 50f)
         {
             this.padding = padding;
-            currentVelocities = new Dictionary<UpgradeTreeNodeDef, Vector2>();
-            targetPositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
-            currentPositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
+            currentVelocities = new Dictionary<TalentTreeNodeDef, Vector2>();
+            targetPositions = new Dictionary<TalentTreeNodeDef, Rect>();
+            currentPositions = new Dictionary<TalentTreeNodeDef, Rect>();
             isAnimating = false;
         }
 
-        public Dictionary<UpgradeTreeNodeDef, Rect> PositionNodes(
-            List<UpgradeTreeNodeDef> nodes,
+        public Dictionary<TalentTreeNodeDef, Rect> PositionNodes(
+            List<TalentTreeNodeDef> nodes,
             Rect availableSpace,
             float nodeSize,
             float spacing)
@@ -59,10 +59,10 @@ namespace Talented
 
             UpdatePositions(nodes, availableSpace, nodeSize);
 
-            return new Dictionary<UpgradeTreeNodeDef, Rect>(currentPositions);
+            return new Dictionary<TalentTreeNodeDef, Rect>(currentPositions);
         }
 
-        private bool NeedsReset(List<UpgradeTreeNodeDef> nodes)
+        private bool NeedsReset(List<TalentTreeNodeDef> nodes)
         {
             foreach (var node in nodes)
             {
@@ -71,7 +71,7 @@ namespace Talented
             return false;
         }
 
-        private void InitializePositions(List<UpgradeTreeNodeDef> nodes, Rect availableSpace, float nodeSize)
+        private void InitializePositions(List<TalentTreeNodeDef> nodes, Rect availableSpace, float nodeSize)
         {
             currentPositions.Clear();
             currentVelocities.Clear();
@@ -92,7 +92,7 @@ namespace Talented
             isAnimating = true;
         }
 
-        private void UpdatePositions(List<UpgradeTreeNodeDef> nodes, Rect availableSpace, float nodeSize)
+        private void UpdatePositions(List<TalentTreeNodeDef> nodes, Rect availableSpace, float nodeSize)
         {
             var forces = CalculateForces(nodes, currentPositions, nodeSize);
             var totalMovement = 0f;
@@ -126,12 +126,12 @@ namespace Talented
             }
         }
 
-        private Dictionary<UpgradeTreeNodeDef, Vector2> CalculateForces(
-            List<UpgradeTreeNodeDef> nodes,
-            Dictionary<UpgradeTreeNodeDef, Rect> positions,
+        private Dictionary<TalentTreeNodeDef, Vector2> CalculateForces(
+            List<TalentTreeNodeDef> nodes,
+            Dictionary<TalentTreeNodeDef, Rect> positions,
             float nodeSize)
         {
-            var forces = new Dictionary<UpgradeTreeNodeDef, Vector2>();
+            var forces = new Dictionary<TalentTreeNodeDef, Vector2>();
             var pathCenters = new Dictionary<string, (Vector2 position, int count)>();
 
             // Get current mouse position in world space

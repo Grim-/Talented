@@ -1,29 +1,31 @@
 export const DefTypes = {
-  UPGRADE: 'Talented.UpgradeDef',
-  UPGRADE_TREE: 'Talented.UpgradeTreeDef',
-  UPGRADE_TREE_NODE: 'Talented.UpgradeTreeNodeDef',
-  UPGRADE_PATH: 'Talented.UpgradePathDef'
+  UPGRADE: 'Talented.TalentDef',
+  UPGRADE_TREE: 'Talented.TalentTreeDef',
+  UPGRADE_TREE_NODE: 'Talented.TalentTreeNodeDef',
+  UPGRADE_PATH: 'Talented.TalentPathDef'
 };
 // Types available for editing in the DefEditor
 export const EditableDefTypes = {
-  UPGRADE: 'Talented.UpgradeDef',
-  UPGRADE_TREE: 'Talented.UpgradeTreeDef',
-  UPGRADE_PATH: 'Talented.UpgradePathDef'
+  UPGRADE: DefTypes.UPGRADE,
+  UPGRADE_TREE: DefTypes.UPGRADE_TREE,
+  UPGRADE_PATH: DefTypes.UPGRADE_PATH
 };
+
 export const DefStructures = {
-  'Talented.UpgradeDef': {
+  [DefTypes.UPGRADE] : {
     required: ['defName', 'parasiteLevelRequired', 'pointCost'],
     properties: {
       parasiteLevelRequired: 'number',
       prerequisites: 'defList',
       uiIcon: 'string',
       pointCost: 'number',
+      statEffects: 'defList',
       hediffEffects: 'defList',
       abilityEffects: 'defList',
       organEffects: 'defList'
     }
   },
-  'Talented.UpgradeTreeDef': {
+  [DefTypes.UPGRADE_TREE] : {
     required: ['defName', 'dimensions'],
     properties: {
       dimensions: {
@@ -37,7 +39,7 @@ export const DefStructures = {
       displayStrategy: 'string'
     }
   },
-  'Talented.UpgradeTreeNodeDef': {
+  [DefTypes.UPGRADE_TREE_NODE]: {
     required: ['defName', 'position', 'type'],
     properties: {
       upgrades: 'defList',
@@ -61,7 +63,7 @@ export const DefStructures = {
       }
     }
   },
-  'Talented.UpgradePathDef': {
+  [DefTypes.UPGRADE_PATH]: {
     required: ['defName'],
     properties: {
       exclusiveWith: 'defList',
@@ -72,19 +74,21 @@ export const DefStructures = {
 };
 const DefTypeButtons = ({ onSelectType }) => {
   const defTypes = {
-    'UpgradeTreeNodeDef': {
+    [DefTypes.UPGRADE_TREE_NODE]:
+    {
       label: 'Node Definition',
       description: 'Basic node in the upgrade tree'
     },
-    'UpgradeTreeDef': {
+    [DefTypes.UPGRADE_TREE]:
+    {
       label: 'Tree Definition',
       description: 'Defines the structure of an upgrade tree'
     },
-    'UpgradeDef': {
+    [DefTypes.UPGRADE]: {
       label: 'Upgrade Definition',
       description: 'Defines an individual upgrade'
     },
-    'UpgradePathDef': {
+      [DefTypes.UPGRADE_PATH]: {
       label: 'Path Definition',
       description: 'Defines a progression path'
     }

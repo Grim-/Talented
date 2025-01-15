@@ -15,14 +15,14 @@ namespace Talented
         {
         }
 
-        public PassiveTreeHandler(Pawn pawn, Gene_TalentBase gene, UpgradeTreeDef treeDef)
+        public PassiveTreeHandler(Pawn pawn, Gene_TalentBase gene, TalentTreeDef treeDef)
             : base(pawn, gene, treeDef)
         {
             this.unspentLevels = 0;
             this.availablePoints = 1;
         }
 
-        protected override UnlockResult ValidateTreeSpecificRules(UpgradeTreeNodeDef node)
+        protected override UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node)
         {
             int currentProgress = GetNodeProgress(node);
             if (currentProgress >= node.UpgradeCount)
@@ -45,7 +45,7 @@ namespace Talented
             return UnlockResult.Succeeded();
         }
 
-        public override UnlockResult TryUnlockNode(UpgradeTreeNodeDef node)
+        public override UnlockResult TryUnlockNode(TalentTreeNodeDef node)
         {
             UnlockResult result = ValidateUnlock(node);
             if (!result.Success)
@@ -75,7 +75,7 @@ namespace Talented
             return unlockResult;
         }
 
-        public override void OnPathSelected(UpgradePathDef path)
+        public override void OnPathSelected(TalentPathDef path)
         {
             Log.Message("Talented.Tree.Log.PathSelected".Translate(treeDef.defName, path.defName, unspentLevels));
             if (unspentLevels > 0)

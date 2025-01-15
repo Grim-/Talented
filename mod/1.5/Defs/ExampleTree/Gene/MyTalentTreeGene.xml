@@ -14,7 +14,12 @@
       <experienceGainSettings>
           <experienceTypes>
               <!-- Combat XP -->
-              <li Class="Talented.DamageExperienceTypeDef">
+              <li Class="Talented.DamageDealtExperienceTypeDef">
+                  <baseXP>10</baseXP>
+                  <damageFactor>0.1</damageFactor>
+              </li>
+
+              <li Class="Talented.DamageTakenExperienceTypeDef">
                   <baseXP>10</baseXP>
                   <damageFactor>0.1</damageFactor>
               </li>

@@ -42,16 +42,16 @@ namespace Talented
             this.VERTICAL_PADDIN = verticalPadding;
         }
 
-        public Dictionary<UpgradeTreeNodeDef, Rect> PositionNodes(
-            List<UpgradeTreeNodeDef> nodes,
+        public Dictionary<TalentTreeNodeDef, Rect> PositionNodes(
+            List<TalentTreeNodeDef> nodes,
             Rect availableSpace,
             float nodeSize,
             float spacing)
         {
             if (nodes == null || nodes.Count == 0)
-                return new Dictionary<UpgradeTreeNodeDef, Rect>();
+                return new Dictionary<TalentTreeNodeDef, Rect>();
 
-            var nodePositions = new Dictionary<UpgradeTreeNodeDef, Rect>();
+            var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
             var startNodes = FindStartNodes(nodes);
             var layoutTree = CreateLayoutTree(nodes);
 
@@ -88,13 +88,13 @@ namespace Talented
             }
 
             // Build parent-child relationships and find max children per level
-            var children = new Dictionary<UpgradeTreeNodeDef, List<UpgradeTreeNodeDef>>();
+            var children = new Dictionary<TalentTreeNodeDef, List<TalentTreeNodeDef>>();
             var maxChildrenPerLevel = new Dictionary<int, int>();
             foreach (var node in nodes)
             {
                 if (node.connections != null)
                 {
-                    children[node] = new List<UpgradeTreeNodeDef>(node.connections);
+                    children[node] = new List<TalentTreeNodeDef>(node.connections);
 
                     // Track max children per level for spread calculation
                     if (children[node].Count > 1)
@@ -129,7 +129,7 @@ namespace Talented
                     startY + (level * verticalSpacing);
 
                 // Find all nodes in this level that need positioning
-                var nodesToPosition = new HashSet<UpgradeTreeNodeDef>();
+                var nodesToPosition = new HashSet<TalentTreeNodeDef>();
                 foreach (var layoutNode in nodesInLevel)
                 {
                     nodesToPosition.Add(layoutNode.node);
@@ -201,12 +201,12 @@ namespace Talented
 
             return nodePositions;
         }
-        private int GetNodeLevel(UpgradeTreeNodeDef node, Dictionary<UpgradeTreeNodeDef, List<UpgradeTreeNodeDef>> children)
+        private int GetNodeLevel(TalentTreeNodeDef node, Dictionary<TalentTreeNodeDef, List<TalentTreeNodeDef>> children)
         {
             int level = 0;
-            var visited = new HashSet<UpgradeTreeNodeDef>();
+            var visited = new HashSet<TalentTreeNodeDef>();
 
-            void FindLevel(UpgradeTreeNodeDef current, int currentLevel)
+            void FindLevel(TalentTreeNodeDef current, int currentLevel)
             {
                 if (visited.Contains(current)) return;
                 visited.Add(current);
@@ -227,15 +227,15 @@ namespace Talented
 
         private class LayoutNode
         {
-            public UpgradeTreeNodeDef node;
+            public TalentTreeNodeDef node;
             public List<LayoutNode> children = new List<LayoutNode>();
             public int depth;
             public float horizontalWeight;
         }
 
-        private LayoutNode CreateLayoutTree(List<UpgradeTreeNodeDef> nodes)
+        private LayoutNode CreateLayoutTree(List<TalentTreeNodeDef> nodes)
         {
-            var nodeMap = new Dictionary<UpgradeTreeNodeDef, LayoutNode>();
+            var nodeMap = new Dictionary<TalentTreeNodeDef, LayoutNode>();
             var rootNodes = FindRootNodes(nodes);
 
             // Create LayoutNodes for all nodes
@@ -323,12 +323,12 @@ namespace Talented
             }
         }
 
-        private List<UpgradeTreeNodeDef> FindStartNodes(List<UpgradeTreeNodeDef> nodes) =>
+        private List<TalentTreeNodeDef> FindStartNodes(List<TalentTreeNodeDef> nodes) =>
             nodes.FindAll(n => n.type == NodeType.Start);
 
-        private HashSet<UpgradeTreeNodeDef> FindRootNodes(List<UpgradeTreeNodeDef> nodes)
+        private HashSet<TalentTreeNodeDef> FindRootNodes(List<TalentTreeNodeDef> nodes)
         {
-            var targetNodes = new HashSet<UpgradeTreeNodeDef>();
+            var targetNodes = new HashSet<TalentTreeNodeDef>();
             foreach (var node in nodes)
             {
                 if (node.connections != null)
@@ -340,7 +340,7 @@ namespace Talented
                 }
             }
 
-            var rootNodes = new HashSet<UpgradeTreeNodeDef>();
+            var rootNodes = new HashSet<TalentTreeNodeDef>();
             foreach (var node in nodes)
             {
                 if (!targetNodes.Contains(node))

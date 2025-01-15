@@ -5,7 +5,7 @@ namespace Talented
 {
     public class StatEffect : UpgradeEffect
     {
-        public UpgradeDef parentUpgrade;
+        public TalentDef parentUpgrade;
         public StatDef statDef;
         public float value;
         public StatModifierOperation operation;
