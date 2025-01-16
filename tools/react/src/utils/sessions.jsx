@@ -32,22 +32,33 @@ export const loadSessionFromFile = async (file) => {
 };
 
 // Return default state instead of setting it directly
-export const clearSession = (setNodes, setPaths) => {
+export const clearSession = (setNodes, setPaths, clearAll = false) => {
   const initialSession = {
     nodes: [{
       id: 'start',
       label: 'RootNode',
       type: 'Start',
-      x: 200,
-      y: 50,
+      x: 850,
+      y: 650,
       connections: [],
       path: '',
-      upgrade: ['BasicParasiteMetabolism'],
+      upgrades: ['BasicParasiteMetabolism'],
       branchPaths: []
     }],
     paths: []
   };
-
-  setNodes(initialSession.nodes);
-  setPaths(initialSession.paths);
+  const emptySession = {
+    nodes: [],
+    paths: []
+  };
+  if (clearAll)
+  {
+      setNodes(emptySession.nodes);
+      setPaths(emptySession.paths);
+  }
+  else
+  {
+      setNodes(initialSession.nodes);
+      setPaths(initialSession.paths);
+  }  
 };

@@ -56,7 +56,7 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
         Array.from(event.target.files).map(file => file.text())
       );
       const { nodes: newNodes, paths: newPaths } = importFromXml(fileContents);
-
+      clearSession(setNodes, setPaths, true);
       setNodes([...nodes, ...newNodes]);
       setPaths([...paths, ...newPaths]);
       setShowImport(false);

@@ -11,6 +11,8 @@ const Node = ({
   onDelete,
   onCopyProperty
 }) => {
+
+
   return (
     <div
       className={`absolute p-4 rounded-lg shadow-lg w-40 cursor-move
@@ -46,7 +48,9 @@ const Node = ({
         {node.path && `Path: ${node.path}`}
       </div>
       {/* Display upgrades as a list */}
-      {node.upgrades != null && node.upgrades.length > 0 ? (
+      {console.log(node.upgrades)}  // Log the upgrades array to ensure it looks as expected
+
+      {node.upgrades && Array.isArray(node.upgrades) && node.upgrades.length > 0 && (
         node.upgrades.map((upgrade, index) => (
           <div
             key={index}
@@ -57,22 +61,10 @@ const Node = ({
             }}
             title="Click to copy upgrade"
           >
-            {`Upgrade ${index + 1}: ${upgrade}`}
+            {`Upgrade ${index + 1}: ${upgrade}`}  {/* Display only the upgrade name */}
           </div>
         ))
-      ) : node.upgrade ? (
-        // Fallback for legacy single upgrade
-        <div
-          className="text-xs text-gray-500 mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
-          onClick={(e) => {
-            e.stopPropagation();
-            onCopyProperty(node.upgrade, 'upgrade');
-          }}
-          title="Click to copy upgrade"
-        >
-          {`Upgrade: ${node.upgrade}`}
-        </div>
-      ) : null}
+      )}
       <div className="flex justify-between items-center">
         <Button
           size="sm"

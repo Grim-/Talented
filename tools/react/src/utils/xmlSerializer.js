@@ -109,6 +109,27 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
 export const exportToXml = (nodes, paths, config = DefTypeConfig) => {
   let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
 
+  // Add TalentTreeDef node
+  xml += '  <Talented.TalentTreeDef>\n';
+  xml += '    <defName>GenericUpgradeTree</defName>\n';
+  xml += '    <dimensions>(450, 790)</dimensions>\n';
+  xml += '    <nodes>\n';
+  // Find and add root nodes
+  nodes.filter(node => node.type === 'Start')
+       .forEach(node => {
+    xml += `      <li>${node.id}</li>\n`;
+  });
+  xml += '    </nodes>\n';
+  xml += '    <availablePaths>\n';
+  // Add all paths
+  paths?.forEach(path => {
+    xml += `      <li>${path.name}</li>\n`;
+  });
+  xml += '    </availablePaths>\n';
+  xml += '    <displayStrategy>VerticalStrategy</displayStrategy>\n';
+  xml += '    <talentPointFormula>PerLevel</talentPointFormula>\n';
+  xml += '  </Talented.TalentTreeDef>\n\n';
+
   // Export paths
   paths?.forEach(path => {
     const pathDefType = getFullDefName(config.PATH);
