@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-  <!-- Tree Definition -->
   <Talented.TalentTreeDef>
     <defName>GenericUpgradeTree</defName>
     <dimensions>(450, 790)</dimensions>
@@ -16,182 +15,169 @@
     <talentPointFormula>PerLevel</talentPointFormula>
   </Talented.TalentTreeDef>
 
-    <Talented.TalentTreeNodeDef>
-      <defName>GenericTree_Root</defName>
-      <position>(17,14)</position>
-      <type>Start</type>
-      <upgrades>
-        <li>ArmorUpgrade</li>
-      </upgrades>
-      <connections>
-        <li>node_1736804112098</li>
-        <li>node_1736804108892</li>
-        <li>node_1736804106708</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804106708</defName>
-      <position>(11,9)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>WarriorStrengthUpgrade</li>
-      </upgrades>
-      <path>WarriorPath</path>
-      <connections>
-        <li>node_1736804171092</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804108892</defName>
-      <position>(17,9)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>PsychicAmplificationUpgrade</li>
-      </upgrades>
-      <path>MagePath</path>
-      <connections>
-        <li>node_1736804180512</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804112098</defName>
-      <position>(23,9)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>SwiftMovementUpgrade</li>
-      </upgrades>
-      <path>RoguePath</path>
-      <connections>
-        <li>node_1736804186540</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804171092</defName>
-      <position>(10,6)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>BattleFuryUpgrade</li>
-      </upgrades>
-      <path>WarriorPath</path>
-      <connections>
-        <li>node_1736804173626</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804173626</defName>
-      <position>(10,2)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>ArmoredHideUpgrade</li>
-      </upgrades>
-      <path>WarriorPath</path>
-      <connections>
-        <li>node_1736804203650</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804180512</defName>
-      <position>(17,6)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>PsyBurstUpgrade</li>
-      </upgrades>
-      <path>MagePath</path>
-      <connections>
-        <li>node_1736804183550</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804183550</defName>
-      <position>(17,3)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>PsychicResonanceUpgrade</li>
-      </upgrades>
-      <path>MagePath</path>
-      <connections>
-        <li>node_1736804211048</li>
-        <li>node_1736804203650</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804186540</defName>
-      <position>(23,6)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>ShadowStrikeUpgrade</li>
-      </upgrades>
-      <path>RoguePath</path>
-      <connections>
-        <li>node_1736804190350</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804190350</defName>
-      <position>(23,3)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>EnhancedReflexesUpgrade</li>
-      </upgrades>
-      <path>RoguePath</path>
-      <connections>
-        <li>node_1736804211048</li>
-      </connections>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804203650</defName>
-      <position>(14,0)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>MentalFortificationUpgrade</li>
-      </upgrades>
-    </Talented.TalentTreeNodeDef>
-
-    <Talented.TalentTreeNodeDef>
-      <defName>node_1736804211048</defName>
-      <position>(21,0)</position>
-      <type>Normal</type>
-      <upgrades>
-        <li>PsychicStealthUpgrade</li>
-      </upgrades>
-    </Talented.TalentTreeNodeDef>
-
   <Talented.TalentPathDef>
     <defName>WarriorPath</defName>
     <pathDescription>Warrior path</pathDescription>
-    <exclusiveWith>
-      <li>MagePath</li>
-      <li>RoguePath</li>
-    </exclusiveWith>
   </Talented.TalentPathDef>
-
 
   <Talented.TalentPathDef>
     <defName>MagePath</defName>
     <pathDescription>Mage path</pathDescription>
-    <exclusiveWith>
-      <li>WarriorPath</li>
-      <li>RoguePath</li>
-    </exclusiveWith>
   </Talented.TalentPathDef>
-
 
   <Talented.TalentPathDef>
     <defName>RoguePath</defName>
     <pathDescription>Rogue path</pathDescription>
-    <exclusiveWith>
-      <li>WarriorPath</li>
-      <li>MagePath</li>
-    </exclusiveWith>
   </Talented.TalentPathDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>GenericTree_Root</defName>
+    <position>(17,14)</position>
+    <type>Start</type>
+    <upgrades>
+      <li>ArmorUpgrade</li>
+    </upgrades>
+    <connections>
+      <li>node_1736804112098</li>
+      <li>node_1736804108892</li>
+      <li>node_1736804106708</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804106708</defName>
+    <position>(11,9)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>WarriorStrengthUpgrade</li>
+    </upgrades>
+    <path>WarriorPath</path>
+    <connections>
+      <li>node_1736804171092</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804108892</defName>
+    <position>(17,9)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>PsychicAmplificationUpgrade</li>
+    </upgrades>
+    <path>MagePath</path>
+    <connections>
+      <li>node_1736804180512</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804112098</defName>
+    <position>(23,9)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>SwiftMovementUpgrade</li>
+    </upgrades>
+    <path>RoguePath</path>
+    <connections>
+      <li>node_1736804186540</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804171092</defName>
+    <position>(10,6)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>BattleFuryUpgrade</li>
+    </upgrades>
+    <path>WarriorPath</path>
+    <connections>
+      <li>node_1736804173626</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804173626</defName>
+    <position>(10,2)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>ArmoredHideUpgrade</li>
+    </upgrades>
+    <path>WarriorPath</path>
+    <connections>
+      <li>node_1736804203650</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804180512</defName>
+    <position>(17,6)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>PsyBurstUpgrade</li>
+    </upgrades>
+    <path>MagePath</path>
+    <connections>
+      <li>node_1736804183550</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804183550</defName>
+    <position>(17,3)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>PsychicResonanceUpgrade</li>
+    </upgrades>
+    <path>MagePath</path>
+    <connections>
+      <li>node_1736804211048</li>
+      <li>node_1736804203650</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804186540</defName>
+    <position>(23,6)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>ShadowStrikeUpgrade</li>
+    </upgrades>
+    <path>RoguePath</path>
+    <connections>
+      <li>node_1736804190350</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804190350</defName>
+    <position>(23,3)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>EnhancedReflexesUpgrade</li>
+    </upgrades>
+    <path>RoguePath</path>
+    <connections>
+      <li>node_1736804211048</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804203650</defName>
+    <position>(14,0)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>MentalFortificationUpgrade</li>
+    </upgrades>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>node_1736804211048</defName>
+    <position>(21,0)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>PsychicStealthUpgrade</li>
+    </upgrades>
+  </Talented.TalentTreeNodeDef>
+
 </Defs>

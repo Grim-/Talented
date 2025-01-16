@@ -16,11 +16,6 @@
               <value>1.05</value>
               <operation>Add</operation>
           </li>
-          <li>
-              <statDef>ArmorRating_Sharp</statDef>
-              <value>1.05</value>
-              <operation>Add</operation>
-          </li>
       </statEffects>
   </Talented.TalentDef>
 </Defs>

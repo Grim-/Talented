@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-  <!-- Warrior-Mage Mental Fortification -->
+
   <Talented.TalentDef>
       <defName>MentalFortificationUpgrade</defName>
       <label>Mental Fortification</label>
