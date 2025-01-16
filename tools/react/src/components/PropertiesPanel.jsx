@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from './Button';
+import DefSelector from './DefRefSelector'
 
 const PropertiesPanel = ({
   selectedNode,
@@ -8,26 +9,27 @@ const PropertiesPanel = ({
   onAddBranchPath,
   onUpdateBranchPath
 }) => {
-  if (!selectedNode) return null;
+  if (!selectedNode || !node) return null;
 
   const renderListEditor = (propName, list) => {
     // Handle both legacy 'upgrade' and new 'upgrades' format
     let items = [];
     if (propName === 'upgrades') {
-      // If we have an upgrades array, use it
       if (Array.isArray(node.upgrades)) {
         items = node.upgrades;
-      }
-      // Otherwise, if we have a legacy upgrade string, convert it to array
-      else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
+      } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
         items = [node.upgrade];
       }
     } else {
-      // For other properties, handle normal array conversion
       items = Array.isArray(list) ? list :
              (typeof list === 'string' && list !== '') ? [list] :
              [];
     }
+
+    // Get saved defs from localStorage
+    const savedDefs = JSON.parse(localStorage.getItem('savedDefs') || '{}');
+    const defType = propName === 'upgrades' ? 'TalentUpgradeDef' : 'AbilityDef';
+    const availableDefs = Object.keys(savedDefs[defType] || {});
 
     return (
       <div className="space-y-2">
@@ -37,7 +39,7 @@ const PropertiesPanel = ({
               <input
                 type="text"
                 value={item}
-                onChange={e => handleListItemChange(propName, index, null, e.target.value)}
+                onChange={e => handleListItemChange(propName, index, e.target.value)}
                 className="w-full p-2 border rounded"
                 placeholder={`${propName} ${index + 1}`}
               />
@@ -50,25 +52,33 @@ const PropertiesPanel = ({
             </button>
           </div>
         ))}
-        <button
-          onClick={() => handleListItemAdd(propName)}
-          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Add {propName}
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={() => handleListItemAdd(propName)}
+            className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Add Empty
+          </button>
+          {availableDefs.length > 0 && (
+            <DefSelector
+              defType="TalentUpgradeDef" // Adjust to match the correct defType
+              value={[]} // If you need a specific value here, make sure to set it
+              onChange={(newValue) => handleListItemAdd(propName, newValue)}
+              className="w-full p-2 border rounded"
+            />
+          )}
+        </div>
       </div>
     );
   };
 
-  const handleListItemAdd = (propName) => {
+  const handleListItemAdd = (propName, value = '') => {
     let currentList = [];
     if (propName === 'upgrades') {
-      // Handle legacy upgrade conversion
       if (Array.isArray(node.upgrades)) {
         currentList = node.upgrades;
       } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
         currentList = [node.upgrade];
-        // Also clear the legacy upgrade field
         onUpdateProperty('upgrade', '');
       }
     } else {
@@ -76,7 +86,7 @@ const PropertiesPanel = ({
                    (typeof node[propName] === 'string' && node[propName] !== '') ? [node[propName]] :
                    [];
     }
-    onUpdateProperty(propName, [...currentList, '']);
+    onUpdateProperty(propName, [...currentList, value]);
   };
 
   const handleListItemRemove = (propName, index) => {
@@ -86,7 +96,6 @@ const PropertiesPanel = ({
         currentList = node.upgrades;
       } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
         currentList = [node.upgrade];
-        // Clear legacy upgrade field
         onUpdateProperty('upgrade', '');
       }
     } else {
@@ -99,14 +108,13 @@ const PropertiesPanel = ({
     onUpdateProperty(propName, newList);
   };
 
-  const handleListItemChange = (propName, index, _, value) => {
+  const handleListItemChange = (propName, index, value) => {
     let currentList = [];
     if (propName === 'upgrades') {
       if (Array.isArray(node.upgrades)) {
         currentList = node.upgrades;
       } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
         currentList = [node.upgrade];
-        // Clear legacy upgrade field
         onUpdateProperty('upgrade', '');
       }
     } else {
@@ -155,7 +163,7 @@ const PropertiesPanel = ({
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Upgrades</label>
-          {renderListEditor('upgrades', null)} {/* We handle the list inside renderListEditor */}
+          {renderListEditor('upgrades', null)}
         </div>
         {node.type === 'Branch' && (
           <div>

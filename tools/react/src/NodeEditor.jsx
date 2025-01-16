@@ -201,8 +201,17 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
           Save Session
         </Button>
         <Button onClick={(e) => setShowImport(true)} className="bg-green-500 text-white">Import XML</Button>
-        <Button onClick={exportToXml} className="bg-purple-500 text-white">Export XML</Button>
-        <Button onClick={(e) => clearSession(setNodes, setPaths)} className="bg-red-500 text-white">Clear Session</Button>
+        <Button
+          onClick={(e) => {
+            const xml = exportToXml(nodes, paths);
+            setExportedXml(xml);
+            setShowExport(true);
+          }}
+          className="bg-purple-500 text-white"
+        >
+          Export XML
+        </Button>
+        <Button onClick={() => clearSession(setNodes, setPaths)} className="bg-red-500 text-white">Clear Session</Button>
       </div>
 
       {/* Properties Panel */}

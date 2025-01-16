@@ -6,37 +6,41 @@ export const DefTypes = {
 };
 // Types available for editing in the DefEditor
 export const EditableDefTypes = {
-  UPGRADE: DefTypes.UPGRADE,
-  UPGRADE_TREE: DefTypes.UPGRADE_TREE,
-  UPGRADE_PATH: DefTypes.UPGRADE_PATH
+  UPGRADE: 'TalentDef',
+  UPGRADE_TREE: 'TalentTreeDef',
+  UPGRADE_PATH: 'TalentPathDef'
 };
 
 export const DefStructures = {
-  [DefTypes.UPGRADE] : {
+  [DefTypes.UPGRADE]: {
     required: ['defName', 'parasiteLevelRequired', 'pointCost'],
     properties: {
       parasiteLevelRequired: 'number',
       prerequisites: 'defList',
-      uiIcon: 'string',
+      uiIconPath: 'string',
       pointCost: 'number',
       statEffects: 'defList',
       hediffEffects: 'defList',
       abilityEffects: 'defList',
-      organEffects: 'defList'
+      organEffects: 'defList',
+      DescriptionString: 'string'
     }
   },
-  [DefTypes.UPGRADE_TREE] : {
+  [DefTypes.UPGRADE_TREE]: {
     required: ['defName', 'dimensions'],
     properties: {
+      treeName: 'string',
       dimensions: {
         type: 'vector2',
         x: 'number',
         y: 'number'
       },
+      nodes: 'defList',
       handlerClass: 'string',
       skin: 'string',
       availablePaths: 'defList',
-      displayStrategy: 'string'
+      displayStrategy: 'string',
+      talentPointFormula: 'string'
     }
   },
   [DefTypes.UPGRADE_TREE_NODE]: {
@@ -68,7 +72,14 @@ export const DefStructures = {
     properties: {
       exclusiveWith: 'defList',
       pathDescription: 'string',
-      pathUIIcon: 'string'
+      pathUIIcon: 'string',
+      pathColor: {
+        type: 'color',
+        r: 'number',
+        g: 'number',
+        b: 'number',
+        a: 'number'
+      }
     }
   }
 };

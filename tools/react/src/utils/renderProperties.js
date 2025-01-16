@@ -75,6 +75,64 @@
         </div>
       );
     }
+    if (propDef.type === 'color') {
+        const defaultValue = { r: 1, g: 1, b: 1, a: 1 }; // Default to white
+        const currentValue = value || defaultValue;
+
+        return (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min="0"
+                max="1"
+                step="0.1"
+                value={currentValue.r}
+                onChange={e => onChange({ ...currentValue, r: Number(e.target.value) })}
+                className="w-1/4 p-2 border rounded"
+                placeholder="R"
+              />
+              <input
+                type="number"
+                min="0"
+                max="1"
+                step="0.1"
+                value={currentValue.g}
+                onChange={e => onChange({ ...currentValue, g: Number(e.target.value) })}
+                className="w-1/4 p-2 border rounded"
+                placeholder="G"
+              />
+              <input
+                type="number"
+                min="0"
+                max="1"
+                step="0.1"
+                value={currentValue.b}
+                onChange={e => onChange({ ...currentValue, b: Number(e.target.value) })}
+                className="w-1/4 p-2 border rounded"
+                placeholder="B"
+              />
+              <input
+                type="number"
+                min="0"
+                max="1"
+                step="0.1"
+                value={currentValue.a}
+                onChange={e => onChange({ ...currentValue, a: Number(e.target.value) })}
+                className="w-1/4 p-2 border rounded"
+                placeholder="A"
+              />
+            </div>
+            <div
+              className="h-8 w-full rounded border"
+              style={{
+                backgroundColor: `rgba(${currentValue.r * 255}, ${currentValue.g * 255}, ${currentValue.b * 255}, ${currentValue.a})`
+              }}
+            />
+          </div>
+        );
+      }
+
 
     if (propDef.type === 'enum') {
       return (

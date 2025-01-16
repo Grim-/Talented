@@ -10,7 +10,9 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
     return saved ? JSON.parse(saved) : {};
   });
 
+  // And in DefEditor, add:
   useEffect(() => {
+    console.log("Saving to localStorage:", savedDefs);
     localStorage.setItem('savedDefs', JSON.stringify(savedDefs));
   }, [savedDefs]);
 
@@ -24,10 +26,10 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
   };
 
   const createEmptyDefForType = (type) => {
-    const structure = DefStructures[type];
+    const structure = DefStructures[getNamespacedType(type)];
     const emptyDef = {};
 
-    Object.keys(structure.properties).forEach(prop => {
+  Object.keys(structure.properties).forEach(prop => {
       const propDef = structure.properties[prop];
       if (propDef === 'string') emptyDef[prop] = '';
       else if (propDef === 'number') emptyDef[prop] = 0;
@@ -157,7 +159,9 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
       return newDefs;
     });
   };
-
+  const getNamespacedType = (uiType) => {
+    return `Talented.${uiType}`;
+  };
   const renderOrganEffectEditor = (item, index, propName) => (
     <div className="space-y-2 p-4 bg-white rounded">
       <input
@@ -352,7 +356,7 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {Object.entries(DefStructures[selectedType].properties).map(([propName, propDef]) => (
+              {Object.entries(DefStructures[getNamespacedType(selectedType)].properties).map(([propName, propDef]) => (
                   <div key={propName}>
                     <label className="block text-xs font-medium mb-1">{propName}</label>
                     {propDef === 'defList' ? (

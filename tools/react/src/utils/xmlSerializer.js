@@ -34,6 +34,14 @@ export const serializeDefToXml = (def, config = DefTypeConfig) => {
   return xml;
 };
 
+// Add this to your xmlSerializer.js or create a new utils file
+
+// Helper to strip namespace prefix from def type
+export const stripNamespace = (fullDefType) => {
+  return fullDefType.replace(`${NamespaceConfig.prefix}${NamespaceConfig.separator}`, '');
+};
+
+
 export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = DefTypeConfig) => {
   const files = event.target.files;
   let newDefs = { ...savedDefs };
@@ -43,48 +51,58 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
       const text = await file.text();
       const xmlDoc = new DOMParser().parseFromString(text, "text/xml");
 
-      Object.values(config).forEach(defType => {
-        const fullDefType = getFullDefName(defType);
-        Array.from(xmlDoc.getElementsByTagName(fullDefType)).forEach(defNode => {
-          const defName = defNode.getElementsByTagName("defName")[0]?.textContent;
-          if (!defName) return;
+      // Get ALL elements
+      const allElements = xmlDoc.getElementsByTagName('*');
 
-          const def = { defName, type: defType };
-          Array.from(defNode.children).forEach(child => {
-            if (child.tagName === 'defName') return;
+      // Filter for our def types
+      for (const element of Array.from(allElements)) {
+        Object.values(config).forEach(defType => {
+          const fullDefType = getFullDefName(defType);
+          // Check if this element matches our def type
+          if (element.tagName === fullDefType) {
+            const defName = element.getElementsByTagName("defName")[0]?.textContent;
+            if (!defName) return;
 
-            if (!child.children.length) {
-              def[child.tagName] = child.textContent;
-              return;
-            }
+            const def = { defName, type: defType };
+            Array.from(element.children).forEach(child => {
+              if (child.tagName === 'defName') return;
+              if (!child.children.length) {
+                def[child.tagName] = child.textContent;
+                return;
+              }
+              const liElements = Array.from(child.getElementsByTagName('li'));
+              if (liElements.length) {
+                def[child.tagName] = liElements.map(li => {
+                  if (!li.children.length) return li.textContent;
+                  return Array.from(li.children).reduce((obj, prop) => ({
+                    ...obj,
+                    [prop.tagName]: prop.textContent
+                  }), {});
+                });
+                return;
+              }
+              def[child.tagName] = Array.from(child.children).reduce((obj, prop) => ({
+                ...obj,
+                [prop.tagName]: prop.textContent
+              }), {});
+            });
 
-            const liElements = Array.from(child.getElementsByTagName('li'));
-            if (liElements.length) {
-              def[child.tagName] = liElements.map(li => {
-                if (!li.children.length) return li.textContent;
-                return Array.from(li.children).reduce((obj, prop) => ({
-                  ...obj,
-                  [prop.tagName]: prop.textContent
-                }), {});
-              });
-              return;
-            }
+            // Console log to verify we found and processed the def
+            console.log("Found and processing def:", fullDefType, defName);
 
-            def[child.tagName] = Array.from(child.children).reduce((obj, prop) => ({
-              ...obj,
-              [prop.tagName]: prop.textContent
-            }), {});
-          });
-
-          newDefs[defType] = { ...(newDefs[defType] || {}), [defName]: def };
+            newDefs[defType] = { ...(newDefs[defType] || {}), [defName]: def };
+          }
         });
-      });
+      }
     } catch (e) {
       console.error(`Error parsing ${file.name}:`, e);
     }
   }
 
+  console.log("Current savedDefs:", savedDefs);
   setSavedDefs(newDefs);
+  console.log("New savedDefs:", newDefs);
+
   event.target.value = '';
 };
 
@@ -114,7 +132,13 @@ export const exportToXml = (nodes, paths, config = DefTypeConfig) => {
       xml += `    <position>(${Math.round(node.x/50)},${Math.round(node.y/50)})</position>\n`;
     }
     if (node.type) xml += `    <type>${node.type}</type>\n`;
-    if (node.upgrade) xml += `    <upgrade>${node.upgrade}</upgrade>\n`;
+    if (node.upgrades) {
+          xml += `    <upgrades>\n`;
+          node.upgrades.forEach((item, i) => {
+            xml += `      <li>${item}</li>\n`;
+          });
+          xml += `    </upgrades>\n`;
+    }
     if (node.path) xml += `    <path>${node.path}</path>\n`;
 
     if (node.connections?.length > 0) {
@@ -171,6 +195,10 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
       const connections = Array.from(nodeDef.getElementsByTagName("connections")[0]?.getElementsByTagName("li") || [])
         .map(li => li.textContent);
 
+      // Read upgrades as a list of li elements
+      const upgrades = Array.from(nodeDef.getElementsByTagName("upgrades")[0]?.getElementsByTagName("li") || [])
+        .map(li => li.textContent);
+
       const branchPaths = Array.from(nodeDef.getElementsByTagName("branchPaths")[0]?.getElementsByTagName("li") || [])
         .map(branchElem => ({
           path: branchElem.getElementsByTagName("path")[0]?.textContent || '',
@@ -186,7 +214,7 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
         y,
         connections,
         path: nodeDef.getElementsByTagName("path")[0]?.textContent || "",
-        upgrade: nodeDef.getElementsByTagName("upgrade")[0]?.textContent || "",
+        upgrades: upgrades.length > 0 ? upgrades : undefined, // Only include if there are upgrades
         branchPaths
       });
     });
@@ -195,7 +223,6 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
   return { nodes, paths };
 };
 
-// Helper function remains unchanged
 export const serializeProperty = (key, value, indent) => {
   const spaces = ' '.repeat(indent * 2);
 

@@ -46,7 +46,7 @@ const Node = ({
         {node.path && `Path: ${node.path}`}
       </div>
       {/* Display upgrades as a list */}
-      {node.upgrades && node.upgrades.length > 0 ? (
+      {node.upgrades != null && node.upgrades.length > 0 ? (
         node.upgrades.map((upgrade, index) => (
           <div
             key={index}
