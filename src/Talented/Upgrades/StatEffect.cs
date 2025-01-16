@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System.Linq;
 using Verse;
 
 namespace Talented
@@ -12,7 +13,7 @@ namespace Talented
 
         protected override bool IsEffectPresent(Pawn pawn)
         {
-            return isActive;
+            return IsActive;
         }
 
         protected override void Apply(Pawn pawn)

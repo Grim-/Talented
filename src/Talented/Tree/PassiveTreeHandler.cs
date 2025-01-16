@@ -19,7 +19,7 @@ namespace Talented
             : base(pawn, gene, treeDef)
         {
             this.unspentLevels = 0;
-            this.availablePoints = 1;
+            this.availablePoints = 0;
         }
 
         protected override UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node)

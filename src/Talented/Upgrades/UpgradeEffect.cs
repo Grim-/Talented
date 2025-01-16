@@ -21,7 +21,6 @@ namespace Talented
             {
                 Apply(pawn);
             }
-            isActive = true;
         }
 
         protected virtual void RemoveExistingEffects(Pawn pawn)
@@ -39,7 +38,10 @@ namespace Talented
         }
 
         protected abstract bool IsEffectPresent(Pawn pawn);
-        protected abstract void Apply(Pawn pawn);
+        protected virtual void Apply(Pawn pawn)
+        {
+            isActive = true;
+        }
         protected abstract void Remove(Pawn pawn);
 
         public virtual void ExposeData()

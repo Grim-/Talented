@@ -19,8 +19,8 @@ namespace Talented
             }
         }
 
-        protected HashSet<TalentDef> unlockedUpgrades;
-        protected HashSet<TalentTreeNodeDef> unlockedNodes;
+        public HashSet<TalentDef> unlockedUpgrades;
+        public HashSet<TalentTreeNodeDef> unlockedNodes;
         public Dictionary<TalentDef, List<UpgradeEffect>> activeEffects;
 
         protected HashSet<TalentPathDef> selectedPaths;

@@ -10,32 +10,23 @@ namespace Talented
     {
         public override void TransformValue(StatRequest req, ref float val)
         {
-            if (parentStat == null) return;
-
-            if (!req.HasThing)
-                return;
-
+            if (!req.HasThing || parentStat == null) return;
             Pawn pawn = req.Thing as Pawn;
-            if (pawn == null || pawn.genes == null)
-                return;
+            if (pawn == null || pawn.genes == null) return;
 
-            var talentGenes = pawn.genes.GenesListForReading
-                .OfType<Gene_TalentBase>();
-
-            foreach (var gene in talentGenes)
+            foreach (var gene in pawn.genes.GenesListForReading.OfType<Gene_TalentBase>())
             {
-                foreach (var TreeInstanceData in gene.AvailableTrees())
+                foreach (var tree in gene.AvailableTrees())
                 {
-                    if (TreeInstanceData.handler == null || TreeInstanceData.handler.activeEffects == null)
-                        continue;
+                    if (tree.handler == null) continue;
 
-                    foreach (var effectList in TreeInstanceData.handler.activeEffects.Values)
+                    foreach (var upgrade in tree.handler.unlockedUpgrades)
                     {
-                        foreach (var effect in effectList)
+                        if (!tree.handler.activeEffects.TryGetValue(upgrade, out var effects)) continue;
+
+                        foreach (var effect in effects)
                         {
-                            if (effect is StatEffect statEffect &&
-                                statEffect.statDef == parentStat &&
-                                statEffect.IsActive)
+                            if (effect is StatEffect statEffect && statEffect.statDef == parentStat && statEffect.IsActive)
                             {
                                 switch (statEffect.operation)
                                 {
@@ -88,57 +79,86 @@ namespace Talented
             var talentGenes = pawn.genes.GenesListForReading
                 .OfType<Gene_TalentBase>();
 
-            var effectDetails = new List<(StatEffect effect, BaseTreeHandler handler)>();
+            // Dictionary to track effects by talent
+            var talentEffects = new Dictionary<string, List<(StatEffect effect, BaseTreeHandler handler)>>();
 
+            // Collect all effects, grouped by talent (upgrade)
             foreach (var gene in talentGenes)
             {
-                foreach (var TreeInstanceData in gene.AvailableTrees())
+                foreach (var treeInstance in gene.AvailableTrees())
                 {
-                    if (TreeInstanceData.handler == null || TreeInstanceData.handler.activeEffects == null)
-                        continue;
+                    if (treeInstance.handler == null) continue;
 
-                    foreach (var effectList in TreeInstanceData.handler.activeEffects.Values)
+                    foreach (var upgrade in treeInstance.handler.unlockedUpgrades)
                     {
-                        foreach (var effect in effectList)
+                        if (!treeInstance.handler.activeEffects.TryGetValue(upgrade, out var effects)) continue;
+
+                        foreach (var effect in effects)
                         {
-                            if (effect is StatEffect statEffect &&
-                                statEffect.statDef == parentStat &&
-                                statEffect.IsActive)
+                            if (effect is StatEffect statEffect && statEffect.statDef == parentStat && statEffect.IsActive)
                             {
-                                effectDetails.Add((statEffect, TreeInstanceData.handler));
+                                string upgradeLabel = GetUpgradeLabel(statEffect, treeInstance.handler);
+
+                                // If this talent isn't already tracked, add it
+                                if (!talentEffects.ContainsKey(upgradeLabel))
+                                {
+                                    talentEffects[upgradeLabel] = new List<(StatEffect, BaseTreeHandler)>();
+                                }
+
+                                talentEffects[upgradeLabel].Add((statEffect, treeInstance.handler));
                             }
                         }
                     }
                 }
             }
 
-            if (!effectDetails.Any())
+            if (!talentEffects.Any())
                 return null;
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("From talents:");
 
-            foreach (var (effect, handler) in effectDetails)
+            // Now iterate through each talent and show its effects
+            foreach (var talent in talentEffects)
             {
-                string modifierText;
-                switch (effect.operation)
+                string upgradeLabel = talent.Key;  // e.g., "Enhanced Defense"
+                var effectsForTalent = talent.Value;
+
+                // For each talent, we now combine the effects and display them once
+                float combinedValue = 0;
+                string combinedModifier = "";
+
+                foreach (var (effect, handler) in effectsForTalent)
                 {
-                    case StatModifierOperation.Add:
-                        modifierText = effect.value.ToStringWithSign();
-                        break;
-                    case StatModifierOperation.Multiply:
-                        modifierText = "x" + effect.value.ToStringPercent();
-                        break;
-                    case StatModifierOperation.Override:
-                        modifierText = "= " + effect.value;
-                        break;
-                    default:
-                        modifierText = effect.value.ToString();
-                        break;
+                    string modifierText = "";
+
+                    switch (effect.operation)
+                    {
+                        case StatModifierOperation.Add:
+                            combinedValue += effect.value;  // Add to the combined value
+                            modifierText = effect.value.ToStringWithSign();
+                            break;
+
+                        case StatModifierOperation.Multiply:
+                            combinedValue *= effect.value;  // Multiply the combined value
+                            modifierText = "x" + effect.value.ToStringPercent();
+                            break;
+
+                        case StatModifierOperation.Override:
+                            combinedValue = effect.value;  // Override the value
+                            modifierText = "= " + effect.value;
+                            break;
+
+                        default:
+                            modifierText = effect.value.ToString();
+                            break;
+                    }
+
+                    combinedModifier = modifierText;  // Update with the latest modifier
                 }
 
-                string upgradeInfo = GetUpgradeLabel(effect, handler);
-                sb.AppendLine($"  {upgradeInfo}: {modifierText}");
+                // After processing all effects for the talent, append it to the explanation
+                sb.AppendLine($"  {upgradeLabel}: {combinedModifier}");
             }
 
             return sb.ToString().TrimEnd();

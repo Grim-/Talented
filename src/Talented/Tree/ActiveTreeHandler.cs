@@ -13,7 +13,7 @@ namespace Talented
         public ActiveTreeHandler(Pawn pawn, Gene_TalentBase gene, TalentTreeDef treeDef)
             : base(pawn, gene, treeDef)
         {
-            TryUnlockNextUpgrade(this.treeDef.RootNode, true);
+           // TryUnlockNextUpgrade(this.treeDef.RootNode, true);
         }
 
         protected override UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node)
