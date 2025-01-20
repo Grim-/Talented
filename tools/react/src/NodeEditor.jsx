@@ -5,12 +5,13 @@ import Node from './components/Node';
 import PropertiesPanel from './components/PropertiesPanel'
 import { saveDef, loadDefs } from './utils/storage';
 import { importFromXml, exportToXml, serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
-import {saveSessionToFile, loadSessionFromFile,  clearSession } from './utils/sessions';
-import { Toolbar} from './components/Toolbar';
-import { ContextMenu }  from './components/ContextMenu';
+import { saveSessionToFile, loadSessionFromFile, clearSession } from './utils/sessions';
+import { Toolbar } from './components/Toolbar';
+import { ContextMenu } from './components/ContextMenu';
 import NodeDisplay from './components/NodeDisplay';
 import CanvasInstructions from './components/CanvasInstructions';
 import { useLockBodyScroll } from "@uidotdev/usehooks";
+import ConnectionsDisplay from './components/ConnectionsDisplay';
 
 const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName }) => {
   useLockBodyScroll();
@@ -194,9 +195,21 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
     }));
   };
 
+  const handleDeleteConnection = (sourceId, targetId) => {
+    setNodes(prevNodes => {
+      return prevNodes.map(node => {
+        if (node.id === sourceId) {
+          return {
+            ...node,
+            connections: node.connections.filter(id => id !== targetId)
+          };
+        }
+        return node;
+      });
+    });
+  };
 
-  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 600, y = 100, width = 150, height = 80) =>
-  {
+  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 600, y = 100, width = 150, height = 80) => {
     const newID = Node.NewId();
     setNodes([...nodes, new Node(id == null ? newID : id, label, type, x, y, width, height)]);
     setSelectedNode(newID);
@@ -222,12 +235,12 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
   };
 
   return (
-    <div 
+    <div
       className="w-full h-screen bg-gray-100 relative p-4"
       onContextMenu={handleContextMenu}
     >
       {/* Top toolbar */}
-      <Toolbar 
+      <Toolbar
         treeName={treeName || ''}
         onAddNode={addNewNode}
         onSaveSession={(e) => saveSessionToFile(nodes, paths)}
@@ -240,50 +253,49 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
         onClearSession={() => clearSession(setNodes, setPaths)}
         setTreeName={setTreeName}
       />
-  <ContextMenu
-    isOpen={contextMenu.isOpen}
-    x={contextMenu.x}
-    y={contextMenu.y}
-    menuType={contextMenu.menuType}
-    onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
-    onSelect={(action, type) => {
-      if (type === 'canvas') {
-        addNewNode(null, "New Node", action, contextMenu.x - 75, contextMenu.y - 40);
-      } else {
-        switch (action) {
-          case 'connect':
-            startConnection(contextMenu.nodeId);
-            break;
-          case 'copy-path':
-            const node = nodes.find(n => n.id === contextMenu.nodeId);
-            copyToClipboard(node.path, 'path');
-            break;
-          case 'delete':
-            setNodes(nodes.filter(n => n.id !== contextMenu.nodeId));
-            setSelectedNode(null);
-            break;
-        }
-      }
-    }}
-  />
+      <ContextMenu
+        isOpen={contextMenu.isOpen}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        menuType={contextMenu.menuType}
+        onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
+        onSelect={(action, type) => {
+          if (type === 'canvas') {
+            addNewNode(null, "New Node", action, contextMenu.x - 75, contextMenu.y - 40);
+          } else {
+            switch (action) {
+              case 'connect':
+                startConnection(contextMenu.nodeId);
+                break;
+              case 'copy-path':
+                const node = nodes.find(n => n.id === contextMenu.nodeId);
+                copyToClipboard(node.path, 'path');
+                break;
+              case 'delete':
+                setNodes(nodes.filter(n => n.id !== contextMenu.nodeId));
+                setSelectedNode(null);
+                break;
+            }
+          }
+        }}
+      />
       {/* Header */}
       <div className="w-80 absolute left-4 top-4 bg-white rounded-lg shadow-lg">
-      <div className="px-4 py-3 border-b border-gray-200">
-      <div className="flex justify-between items-center space-x-4">
-        <h3 className="text-lg font-semibold text-gray-900">Properties</h3>
-        <input 
-          type="text"
-          id="treeNameField"
-          placeholder="YourTalentTreeDefName"
-          className={`flex-1 rounded px-2 py-1 ${
-            treeName ? 'bg-green-500 text-white placeholder-green-200' : 'bg-red-500 text-white placeholder-red-200'
-          }`}
-          value={treeName}
-          onChange={(e) => setTreeName(e.target.value)}
-        />
+        <div className="px-4 py-3 border-b border-gray-200">
+          <div className="flex justify-between items-center space-x-4">
+            <h3 className="text-lg font-semibold text-gray-900">Properties</h3>
+            <input
+              type="text"
+              id="treeNameField"
+              placeholder="YourTalentTreeDefName"
+              className={`flex-1 rounded px-2 py-1 ${treeName ? 'bg-green-500 text-white placeholder-green-200' : 'bg-red-500 text-white placeholder-red-200'
+                }`}
+              value={treeName}
+              onChange={(e) => setTreeName(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
       {/* Properties Panel */}
       {selectedNode && (
         <PropertiesPanel
@@ -292,8 +304,8 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           onUpdateProperty={(property, value) => updateNodeProperty(selectedNode, property, value)}
           onAddBranchPath={() => addBranchPath(selectedNode)}
           onUpdateBranchPath={(index, property, value) => updateBranchPath(selectedNode, index, property, value)}
-          treeName = {treeName}
-          setTreeName = {setTreeName}
+          treeName={treeName}
+          setTreeName={setTreeName}
         />
       )}
 
@@ -303,41 +315,17 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-          <CanvasInstructions nodes={nodes} />
+        <CanvasInstructions nodes={nodes} />
         {/* Connection lines */}
-        <svg className="w-full h-full absolute top-0 left-0 pointer-events-none">
-          {nodes.map(node =>
-            node.connections.map(targetId => {
-              const target = nodes.find(n => n.id === targetId);
-              if (!target) return null;
-              return (
-                <line
-                  key={`${node.id}-${targetId}`}
-                  x1={node.x + (node.width || 150)/2}
-                  y1={node.y + (node.height || 50)/2}
-                  x2={target.x + (target.width || 150)/2}
-                  y2={target.y + (target.height || 50)/2}
-                  stroke="black"
-                  strokeWidth="2"
-                />
-              );
-            })
-          )}
-          {connecting && (
-            <line
-              x1={nodes.find(n => n.id === connecting)?.x + 75 || 0}
-              y1={nodes.find(n => n.id === connecting)?.y + 25 || 0}
-              x2={draggingNode ? nodes.find(n => n.id === draggingNode)?.x + 75 : 0}
-              y2={draggingNode ? nodes.find(n => n.id === draggingNode)?.y + 25 : 0}
-              stroke="blue"
-              strokeWidth="2"
-              strokeDasharray="5,5"
-            />
-          )}
-        </svg>
+        <ConnectionsDisplay
+          nodes={nodes}
+          connecting={connecting}
+          draggingNode={draggingNode}
+          onDeleteConnection={handleDeleteConnection}
+        />
 
         {/* Nodes */}
-        <NodeDisplay 
+        <NodeDisplay
           nodes={nodes}
           selectedNode={selectedNode}
           connecting={connecting}
