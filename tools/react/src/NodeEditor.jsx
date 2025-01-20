@@ -3,15 +3,17 @@ import Modal from './components/Modal';
 import Button from './components/Button';
 import Node from './components/Node';
 import PropertiesPanel from './components/PropertiesPanel'
-import { saveDef, loadDefs } from './storage';
+import { saveDef, loadDefs } from './utils/storage';
 import { importFromXml, exportToXml, serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
 import {saveSessionToFile, loadSessionFromFile,  clearSession } from './utils/sessions';
 import { Toolbar} from './components/Toolbar';
 import { ContextMenu }  from './components/ContextMenu';
 import NodeDisplay from './components/NodeDisplay';
+import CanvasInstructions from './components/CanvasInstructions';
+import { useLockBodyScroll } from "@uidotdev/usehooks";
 
 const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName }) => {
-
+  useLockBodyScroll();
   //state
   const [referenceDefs, setReferenceDefs] = useState(() => {
 
@@ -178,10 +180,10 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
   };
 
 
-  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 600, y = 100) =>
+  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 600, y = 100, width = 150, height = 80) =>
   {
     const newID = Node.NewId();
-    setNodes([...nodes, new Node(id == null ? newID : id, label, type, x, y)]);
+    setNodes([...nodes, new Node(id == null ? newID : id, label, type, x, y, width, height)]);
     setSelectedNode(newID);
   };
 
@@ -213,16 +215,22 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           addNewNode(null, "New Node", nodeType, contextMenu.x - 50, contextMenu.y - 50);
       }}
     />
-      <div className="w-65 absolute left-4 top-4 bg-white rounded-lg shadow-lg p-4">
-      <label>Talent Tree Name </label>
-      <input type="field"
-        id="treeNameField"
-        placeholder = "treeName"
-        className = "bg-green-500 text-white rounded px-4 py-2"
-        value={treeName || ''}
-        onChange={(e) => setTreeName(e.target.value)}
+      {/* Header */}
+      <div className="w-80 absolute left-4 top-4 bg-white rounded-lg shadow-lg">
+      <div className="px-4 py-3 border-b border-gray-200">
+      <div className="flex justify-between items-center space-x-4">
+        <h3 className="text-lg font-semibold text-gray-900">Properties</h3>
+        <input 
+          type="text"
+          id="treeNameField"
+          placeholder="YourTalentTreeDefName"
+          className="flex-1 bg-green-500 text-white rounded px-2 py-1 placeholder-green-200"
+          value={treeName || ''}
+          onChange={(e) => setTreeName(e.target.value)}
         />
       </div>
+    </div>
+    </div>
       {/* Properties Panel */}
       {selectedNode && (
         <PropertiesPanel
@@ -231,6 +239,8 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           onUpdateProperty={(property, value) => updateNodeProperty(selectedNode, property, value)}
           onAddBranchPath={() => addBranchPath(selectedNode)}
           onUpdateBranchPath={(index, property, value) => updateBranchPath(selectedNode, index, property, value)}
+          treeName = {treeName}
+          setTreeName = {setTreeName}
         />
       )}
 
@@ -240,6 +250,7 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
+          <CanvasInstructions nodes={nodes} />
         {/* Connection lines */}
         <svg className="w-full h-full absolute top-0 left-0 pointer-events-none">
           {nodes.map(node =>
@@ -249,10 +260,10 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
               return (
                 <line
                   key={`${node.id}-${targetId}`}
-                  x1={node.x + 75}
-                  y1={node.y + 25}
-                  x2={target.x + 75}
-                  y2={target.y + 25}
+                  x1={node.x + (node.width || 150)/2}
+                  y1={node.y + (node.height || 50)/2}
+                  x2={target.x + (target.width || 150)/2}
+                  y2={target.y + (target.height || 50)/2}
                   stroke="black"
                   strokeWidth="2"
                 />

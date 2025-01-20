@@ -2,13 +2,14 @@ import React from 'react';
 import Button from './Button';
 import DefSelector from './DefRefSelector'
 import ListEditor from './PropertiesList';
+import { Trash2 } from 'lucide-react';
 
 const PropertiesPanel = ({
   selectedNode,
   node,
   onUpdateProperty,
-  onAddBranchPath,
-  onUpdateBranchPath
+  treeName,
+  setTreeName
 }) => {
   if (!selectedNode || !node) return null;
 
@@ -52,99 +53,131 @@ const PropertiesPanel = ({
   };
 
   return (
-    <div className="w-66 absolute left-4 top-24 bg-white rounded-lg shadow-lg p-4">
-      <h3 className="font-bold mb-4">Properties</h3>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Label</label>
-          <input
-            type="text"
-            value={node.label || ''}
-            onChange={(e) => onUpdateProperty('label', e.target.value)}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Points</label>
-          <input
-            type="number"
-            value={node.points || 0}
-            onChange={(e) => onUpdateProperty('points', e.target.value)}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Type</label>
-          <select
-            value={node.type || 'Normal'}
-            onChange={(e) => onUpdateProperty('type', e.target.value)}
-            className="w-full p-2 border rounded"
-          >
-            <option>Start</option>
-            <option>Normal</option>
-            <option>Branch</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Path</label>
-          <input
-            type="text"
-            value={node.path || ''}
-            onChange={(e) => onUpdateProperty('path', e.target.value)}
-            className="w-full p-2 border rounded"
-          />
-        <DefSelector
-          defType="TalentPathDef"
-          onChange={(e) => 
-            { 
-              handleListItemAdd('', e) 
-              onUpdateProperty('path', e)
-            }
-          }
-        />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Upgrades</label>
-          <ListEditor
-            node={node}
-            propName="upgrades"
-            list={null}
-            onItemChange={handleListItemChange}
-            onItemRemove={handleListItemRemove} 
-            onItemAdd={handleListItemAdd}
-          />
-        </div>
-        {node.type === 'Branch' && (
+    <div className="w-80 absolute left-4 top-20 bg-white rounded-lg shadow-lg">
+      <div className="p-4 space-y-6">
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Branch Paths</label>
-            <Button
-              onClick={onAddBranchPath}
-              className="bg-blue-500 text-white mb-2 w-full"
-              size="sm"
-            >
-              Add Branch Path
-            </Button>
-            {node.branchPaths?.map((branch, idx) => (
-              <div key={idx} className="ml-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Path name"
-                  value={branch.path}
-                  onChange={(e) => onUpdateBranchPath(idx, 'path', e.target.value)}
-                  className="w-full p-2 border rounded mb-1"
-                />
-              </div>
-            ))}
+            <label className="block text-sm font-medium text-gray-700 mb-1" title="The name that will be displayed for this node in the talent tree">
+              Label ℹ️
+            </label>
+            <input
+              type="text"
+              value={node.label || ''}
+              onChange={(e) => onUpdateProperty('label', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
-        )}
 
-        <DefSelector
-          defType="TalentDef"
-          onChange={(e) => handleListItemAdd('upgrades', e)}
-        />
+          <div className="flex space-x-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1" title="Number of talent points required to unlock this node">
+                Points ℹ️
+              </label>
+              <input
+                type="number"
+                value={node.points || 1}
+                onChange={(e) => {
+                  const clamped = e.target.value < 0 ? 0 : e.target.value;
+                  onUpdateProperty('points', clamped);
+                }}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1" title="Node type: Start (beginning node), Normal (standard node), or Branch (splits into multiple paths)">
+                Type ℹ️
+              </label>
+              <select
+                value={node.type || 'Normal'}
+                onChange={(e) => onUpdateProperty('type', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option>Start</option>
+                <option>Normal</option>
+                <option>Branch</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-gray-200">
+          <label className="block text-sm font-medium text-gray-700 mb-1" title="List of upgrades/bonuses that this node provides when unlocked">
+            Upgrades ℹ️
+          </label>
+          <div className="space-y-2">
+            <ListEditor
+              node={node}
+              propName="upgrades"
+              list={null}
+              onItemChange={handleListItemChange}
+              onItemRemove={handleListItemRemove}
+              onItemAdd={handleListItemAdd}
+            />
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-gray-200">
+          <label className="block text-sm font-medium text-gray-700 mb-1" title="The progression path this node belongs to. Affects node appearance and grouping">
+            Path ℹ️
+          </label>
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={node.path || ''}
+              onChange={(e) => onUpdateProperty('path', e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <DefSelector
+              defType="TalentPathDef"
+              onChange={(e) => {
+                handleListItemAdd('', e);
+                onUpdateProperty('path', e);
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default PropertiesPanel;
+
+
+
+
+
+
+        {/* Branch Paths Section - Only shown for Branch type */}
+        {/* (
+          <div className="pt-4 border-t border-gray-200">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">Branch Paths</label>
+              <button
+                onClick={onAddBranchPath}
+                className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+              >
+                Add Path
+              </button>
+            </div>
+            <div className="space-y-2">
+              {node.branchPaths?.map((branch, idx) => (
+                <div key={idx} className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Path name"
+                    value={branch.path}
+                    onChange={(e) => onUpdateBranchPath(idx, 'path', e.target.value)}
+                    className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    onClick={() => handleListItemRemove('branchPaths', idx)}
+                    className="p-1 text-gray-400 hover:text-red-500"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) */}

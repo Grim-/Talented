@@ -36,7 +36,7 @@ export const loadSessionFromFile = async (file) => {
 
 export const clearSession = (setNodes, setPaths, clearAll = false) => {
     const initialSession = {
-      nodes: [new Node(null, "NewRootNode", 'Start')],
+      nodes: [new Node(null, "NewRootNode", 'Start', 0, 0)],
       paths: []
     };
 

@@ -6,7 +6,7 @@ namespace Talented
 {
     public class TalentDef : Def
     {
-        public int parasiteLevelRequired;
+        public int levelRequired;
         public List<TalentDef> prerequisites;
         public string uiIconPath;
         public int pointCost = 1;

@@ -9,17 +9,14 @@ export const ListEditor = ({
     onItemRemove, 
     onItemAdd 
    }) => {
-    const items = propName === 'upgrades' ? 
-      (Array.isArray(node.upgrades) ? node.upgrades :
-       typeof node.upgrade === 'string' && node.upgrade !== '' ? [node.upgrade] : 
-       []) :
-      (Array.isArray(list) ? list :
-       typeof list === 'string' && list !== '' ? [list] :
-       []);
-   
-    const savedDefs = JSON.parse(localStorage.getItem('savedDefs') || '{}');
-    const availableDefs = Object.keys(savedDefs['TalentUpgradeDef'] || {});
-   
+  const items = propName === 'upgrades' ? 
+    (Array.isArray(node.upgrades) ? node.upgrades :
+      typeof node.upgrade === 'string' && node.upgrade !== '' ? [node.upgrade] : 
+      []) :
+    (Array.isArray(list) ? list :
+      typeof list === 'string' && list !== '' ? [list] :
+      []);
+     
     return (
       <div className="space-y-2">
         {items.map((item, index) => (
@@ -40,22 +37,19 @@ export const ListEditor = ({
           </div>
         ))}
    
-        <div className="space-y-2">
+      <div className="flex space-x-2">
+          <div className="flex-1">
+            <DefSelector
+              defType="TalentDef"
+              onChange={(e) => onItemAdd('upgrades', e)}
+            />
+          </div>
           <button
             onClick={() => onItemAdd(propName)}
-            className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Add Empty
-          </button>
-   
-          {availableDefs.length > 0 && (
-            <DefSelector
-              defType="TalentUpgradeDef"
-              value={[]}
-              onChange={newValue => onItemAdd(propName, newValue)}
-              className="w-full p-2 border rounded"
-            />
-          )}
+          </button>  
         </div>
       </div>
     );

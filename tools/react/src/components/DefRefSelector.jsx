@@ -12,7 +12,7 @@ const DefSelector = ({ defType, value, onChange, className }) => {
         onChange={e => onChange(e.target.value)} 
         className={`w-full p-2 border rounded ${className}`}
       >
-        <option value="">Select {defType}</option>
+        <option value="">{defType}</option>
         {defNames.map((defName) => (
           <option key={defName} value={defName}>
             {defName}

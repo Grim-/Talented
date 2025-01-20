@@ -144,18 +144,13 @@ export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
 
     xml += `  <${defType}>\n`;
     xml += `    <defName>${node.id}</defName>\n`;
+    if (node.label) xml += `    <label>${node.label}</label>\n`;
 
     if (node.x !== undefined) {
       xml += `    <position>(${Math.round(node.x/50)},${Math.round(node.y/50)})</position>\n`;
     }
 
-
-    if(node.points !== undefined)
-    {
-      xml += '    <parasiteLevelRequired>'+ (node.points === undefined ? 0 : node.points) +'</parasiteLevelRequired>\n';
-    }
-
- 
+    xml += '    <pointCost>'+ (node.points === undefined ? 0 :  Math.max(0, Math.min(node.points, 100))) +'</pointCost>\n';
 
     if (node.type) xml += `    <type>${node.type}</type>\n`;
     if (node.upgrades) {
@@ -234,8 +229,9 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
 
       nodes.push({
         id: nodeDef.getElementsByTagName("defName")[0].textContent,
-        label: nodeDef.getElementsByTagName("defName")[0].textContent,
+        label: nodeDef.getElementsByTagName("label")[0]?.textContent || "DisplayLabel",
         type: nodeDef.getElementsByTagName("type")[0]?.textContent || "Normal",
+        points: nodeDef.getElementsByTagName("pointCost")?.textContent || 1,
         x,
         y,
         connections,

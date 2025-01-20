@@ -13,9 +13,9 @@ export const EditableDefTypes = {
 
 export const DefStructures = {
   [DefTypes.UPGRADE]: {
-    required: ['defName', 'parasiteLevelRequired', 'pointCost'],
+    required: ['defName', 'levelRequired', 'pointCost'],
     properties: {
-      parasiteLevelRequired: 'number',
+      levelRequired: 'number',
       prerequisites: 'defList',
       uiIconPath: 'string',
       pointCost: 'number',

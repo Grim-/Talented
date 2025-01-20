@@ -9,15 +9,11 @@ function App() {
   const [activeTab, setActiveTab] = useState('nodes');
   const [nodes, setNodes] = useState([new Node(null, "ROOT", 'Start', 400, 100)]);
   const [paths, setPaths] = useState([]);
-  const [treeName, setTreeName] = useState('TREE_CHANGEME');
+  const [treeName, setTreeName] = useState('');
 
   // Lift def editor state up
   const [selectedType, setSelectedType] = useState(null);
   const [currentDef, setCurrentDef] = useState(null);
-
-  const handleTreeNameChange = (e) => {
-    setTreeName(e.target.value);
-  };
 
   return (
     <div className="App">

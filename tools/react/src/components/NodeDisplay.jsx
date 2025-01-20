@@ -19,7 +19,9 @@ const NodeDisplay = ({
           nodeData.label,
           nodeData.type,
           nodeData.x,
-          nodeData.y
+          nodeData.y,
+          nodeData.width,
+          nodeData.height
         );
 
         node.path = nodeData.path;
@@ -28,16 +30,24 @@ const NodeDisplay = ({
         node.branchPaths = nodeData.branchPaths;
         node.upgrades = nodeData.upgrades;
         node.points = nodeData.points;
+        node.levelRequired = nodeData.levelRequired;
+        node.x = nodeData.x;
+        node.y = nodeData.y;
+        node.width = nodeData.width;
+        node.height = nodeData.height;
         
-        return node.render({
-          selected: selectedNode === node.id,
-          connecting: connecting === node.id,
-          onMouseDown: (e) => handleMouseDown(e, node.id),
-          onClick: (e) => handleNodeSelect(node.id, e),
-          onStartConnection: (id) => startConnection(id),
-          onDelete: (id) => setNodes(nodes.filter(n => n.id !== id)),
-          onCopyProperty: copyToClipboard
-        });
+        return React.cloneElement(
+          node.render({
+            selected: selectedNode === node.id,
+            connecting: connecting === node.id,
+            onMouseDown: (e) => handleMouseDown(e, node.id),
+            onClick: (e) => handleNodeSelect(node.id, e),
+            onStartConnection: (id) => startConnection(id),
+            onDelete: (id) => setNodes(nodes.filter(n => n.id !== id)),
+            onCopyProperty: copyToClipboard
+          }),
+          { key: node.id }
+        );
       })}
     </div>
   );
