@@ -2,7 +2,8 @@ import React from 'react';
 import Button from './Button';
 import DefSelector from './DefRefSelector'
 import ListEditor from './PropertiesList';
-import { Trash2 } from 'lucide-react';
+import { BadgeHelp } from 'lucide-react';
+
 
 const PropertiesPanel = ({
   selectedNode,
@@ -21,30 +22,30 @@ const PropertiesPanel = ({
       }
       return [];
     }
-  
+
     const value = node[propName];
     if (Array.isArray(value)) return value;
     if (typeof value === 'string' && value !== '') return [value];
     return [];
   };
-  
+
   const handleListItemAdd = (propName, value = '') => {
     const currentList = getNodeList(node, propName);
-    
+
     if (propName === 'upgrades' && node.upgrade) {
       onUpdateProperty('upgrade', '');
     }
-    
+
     onUpdateProperty(propName, [...currentList, value]);
   };
-  
+
   const handleListItemRemove = (propName, index) => {
     const currentList = getNodeList(node, propName);
     const newList = [...currentList];
     newList.splice(index, 1);
     onUpdateProperty(propName, newList);
   };
-  
+
   const handleListItemChange = (propName, index, value) => {
     const currentList = getNodeList(node, propName);
     const newList = [...currentList];
@@ -57,9 +58,14 @@ const PropertiesPanel = ({
       <div className="p-4 space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" title="The name that will be displayed for this node in the talent tree">
-              Label ℹ️
-            </label>
+          <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                title="The name that will be displayed for this node in the talent tree"
+              >
+                <div className="flex items-center gap-1">
+                Label <BadgeHelp className="h-4 w-4" />
+                </div>
+              </label>
             <input
               type="text"
               value={node.label || ''}
@@ -70,8 +76,13 @@ const PropertiesPanel = ({
 
           <div className="flex space-x-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1" title="Number of talent points required to unlock this node">
-                Points ℹ️
+            <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                title="Number of talent points required to unlock this node"
+              >
+                <div className="flex items-center gap-1">
+                Points <BadgeHelp className="h-4 w-4" />
+                </div>
               </label>
               <input
                 type="number"
@@ -84,8 +95,13 @@ const PropertiesPanel = ({
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1" title="Node type: Start (beginning node), Normal (standard node), or Branch (splits into multiple paths)">
-                Type ℹ️
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                title="Node type: Start (beginning node), Normal (standard node), or Branch (splits into multiple paths)"
+              >
+                <div className="flex items-center gap-1">
+                  Type <BadgeHelp className="h-4 w-4" />
+                </div>
               </label>
               <select
                 value={node.type || 'Normal'}
@@ -101,8 +117,13 @@ const PropertiesPanel = ({
         </div>
 
         <div className="pt-4 border-t border-gray-200">
-          <label className="block text-sm font-medium text-gray-700 mb-1" title="List of upgrades/bonuses that this node provides when unlocked">
-            Upgrades ℹ️
+          <label
+            className="block text-sm font-medium text-gray-700 mb-1"
+            title="List of upgrades/bonuses that this node provides when unlocked"
+          >
+            <div className="flex items-center gap-1">
+              Upgrades <BadgeHelp className="h-4 w-4" />
+            </div>
           </label>
           <div className="space-y-2">
             <ListEditor
@@ -117,8 +138,13 @@ const PropertiesPanel = ({
         </div>
 
         <div className="pt-4 border-t border-gray-200">
-          <label className="block text-sm font-medium text-gray-700 mb-1" title="The progression path this node belongs to. Affects node appearance and grouping">
-            Path ℹ️
+          <label
+            className="block text-sm font-medium text-gray-700 mb-1"
+            title="The progression path this node belongs to. Affects node appearance and grouping"
+          >
+            <div className="flex items-center gap-1">
+              Path <BadgeHelp className="h-4 w-4" />
+            </div>
           </label>
           <div className="space-y-2">
             <input
@@ -148,8 +174,8 @@ export default PropertiesPanel;
 
 
 
-        {/* Branch Paths Section - Only shown for Branch type */}
-        {/* (
+{/* Branch Paths Section - Only shown for Branch type */ }
+{/* (
           <div className="pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700">Branch Paths</label>

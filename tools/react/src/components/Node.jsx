@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from './Button';
-
+import { ArrowLeftRight } from 'lucide-react';
 export class Node {
     constructor(id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 200, height = 80) {
         this.id = id == null ? `node_${Date.now()}` : id;
@@ -102,7 +102,7 @@ export class Node {
                         }}
                         className="bg-blue-500 text-white"
                     >
-                        ⚡
+                        <ArrowLeftRight />
                     </Button>
                     <Button
                         size="sm"

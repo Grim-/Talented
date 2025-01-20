@@ -224,8 +224,10 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           type="text"
           id="treeNameField"
           placeholder="YourTalentTreeDefName"
-          className="flex-1 bg-green-500 text-white rounded px-2 py-1 placeholder-green-200"
-          value={treeName || ''}
+          className={`flex-1 rounded px-2 py-1 ${
+            treeName ? 'bg-green-500 text-white placeholder-green-200' : 'bg-red-500 text-white placeholder-red-200'
+          }`}
+          value={treeName}
           onChange={(e) => setTreeName(e.target.value)}
         />
       </div>

@@ -107,7 +107,7 @@ export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
 
   // Add TalentTreeDef node
   xml += '  <Talented.TalentTreeDef>\n';
-  xml += '    <defName>'+ treeName + '</defName>\n';
+  xml += `    <defName>${treeName || 'GIVE_ME_A_PROPER_NAME'}</defName>\n`;
   xml += '    <dimensions>(450, 790)</dimensions>\n';
   xml += '    <nodes>\n';
   // Find and add root nodes
