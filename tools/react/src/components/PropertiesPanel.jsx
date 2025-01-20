@@ -119,7 +119,7 @@ const PropertiesPanel = ({
         <div className="pt-4 border-t border-gray-200">
           <label
             className="block text-sm font-medium text-gray-700 mb-1"
-            title="List of upgrades/bonuses that this node provides when unlocked"
+            title="List of upgrades/bonuses that this node provides when unlocked, you can import Defs in the Def Editor tab."
           >
             <div className="flex items-center gap-1">
               Upgrades <BadgeHelp className="h-4 w-4" />
@@ -168,42 +168,3 @@ const PropertiesPanel = ({
 };
 
 export default PropertiesPanel;
-
-
-
-
-
-
-{/* Branch Paths Section - Only shown for Branch type */ }
-{/* (
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">Branch Paths</label>
-              <button
-                onClick={onAddBranchPath}
-                className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
-              >
-                Add Path
-              </button>
-            </div>
-            <div className="space-y-2">
-              {node.branchPaths?.map((branch, idx) => (
-                <div key={idx} className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Path name"
-                    value={branch.path}
-                    onChange={(e) => onUpdateBranchPath(idx, 'path', e.target.value)}
-                    className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    onClick={() => handleListItemRemove('branchPaths', idx)}
-                    className="p-1 text-gray-400 hover:text-red-500"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) */}

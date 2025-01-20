@@ -30,7 +30,9 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
   const [contextMenu, setContextMenu] = useState({
     isOpen: false,
     x: 0,
-    y: 0
+    y: 0,
+    menuType: 'canvas',
+    nodeId: null
   });
 
   const handleContextMenu = (e) => {
@@ -38,10 +40,23 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
     setContextMenu({
       isOpen: true,
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
+      menuType: 'canvas',
+      nodeId: null
     });
   };
 
+  const handleNodeContextMenu = (e, nodeId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({
+      isOpen: true,
+      x: e.clientX,
+      y: e.clientY,
+      menuType: 'node',
+      nodeId: nodeId
+    });
+  };
   useEffect(() => {
     if (contextMenu.isOpen) {
       const handleClick = () => {
@@ -187,6 +202,25 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
     setSelectedNode(newID);
   };
 
+  const contextMenuHandlers = {
+    handleAddNode: (type) => {
+      addNewNode(null, "New Node", type, contextMenu.x - 75, contextMenu.y - 40);
+    },
+    handleStartConnection: (nodeId) => {
+      startConnection(nodeId);
+    },
+    handleCopyPath: (nodeId) => {
+      const node = nodes.find(n => n.id === nodeId);
+      if (node?.path) {
+        copyToClipboard(node.path, 'path');
+      }
+    },
+    handleDeleteNode: (nodeId) => {
+      setNodes(prev => prev.filter(n => n.id !== nodeId));
+      setSelectedNode(null);
+    },
+  };
+
   return (
     <div 
       className="w-full h-screen bg-gray-100 relative p-4"
@@ -206,15 +240,32 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
         onClearSession={() => clearSession(setNodes, setPaths)}
         setTreeName={setTreeName}
       />
-      <ContextMenu
-        isOpen={contextMenu.isOpen}
-        x={contextMenu.x}
-        y={contextMenu.y}
-        onClose={() => setContextMenu({ ...contextMenu, isOpen: false })}
-        onSelect={(nodeType) => {
-          addNewNode(null, "New Node", nodeType, contextMenu.x - 50, contextMenu.y - 50);
-      }}
-    />
+  <ContextMenu
+    isOpen={contextMenu.isOpen}
+    x={contextMenu.x}
+    y={contextMenu.y}
+    menuType={contextMenu.menuType}
+    onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
+    onSelect={(action, type) => {
+      if (type === 'canvas') {
+        addNewNode(null, "New Node", action, contextMenu.x - 75, contextMenu.y - 40);
+      } else {
+        switch (action) {
+          case 'connect':
+            startConnection(contextMenu.nodeId);
+            break;
+          case 'copy-path':
+            const node = nodes.find(n => n.id === contextMenu.nodeId);
+            copyToClipboard(node.path, 'path');
+            break;
+          case 'delete':
+            setNodes(nodes.filter(n => n.id !== contextMenu.nodeId));
+            setSelectedNode(null);
+            break;
+        }
+      }
+    }}
+  />
       {/* Header */}
       <div className="w-80 absolute left-4 top-4 bg-white rounded-lg shadow-lg">
       <div className="px-4 py-3 border-b border-gray-200">
@@ -295,6 +346,7 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           startConnection={startConnection}
           setNodes={setNodes}
           copyToClipboard={copyToClipboard}
+          onContextMenuClick={handleNodeContextMenu}
         />
       </div>
 

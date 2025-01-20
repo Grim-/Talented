@@ -3,6 +3,7 @@ import Modal from './Modal';
 import Button from './Button';
 import NodeTypeSelect from './NodeTypeSelect';
 import { useState } from 'react';
+import { HardDriveUpload, HardDriveDownload, Trash, FolderInput, FolderOutput } from 'lucide-react';
 
 export const Toolbar = ({
   onAddNode,
@@ -28,14 +29,12 @@ export const Toolbar = ({
   return (
     <>
       <div className="absolute top-4 right-4 space-x-2">
-        <NodeTypeSelect 
-          onSelect={(nodeType) => {
-            onAddNode(null, "New", nodeType);
-          }}
-        />
         <Button
           onClick={() => document.getElementById('sessionLoad').click()}
           className="bg-green-500 text-white"
+          leadingIcon={HardDriveUpload} 
+          iconSize={20}
+          iconClassName="text-white-300" 
         >
           Load Session
         </Button>
@@ -60,24 +59,31 @@ export const Toolbar = ({
           }}
           className="hidden"
         />
-
-        <Button
-          onClick={onSaveSession}
-          className="bg-blue-500 text-white"
-        >
-          Save Session
-        </Button>
-
+        <Button 
+            onClick={onSaveSession}
+            className="bg-green-500 text-white"
+            leadingIcon={HardDriveDownload} 
+            iconSize={20}
+            iconClassName="text-white-300" 
+          >
+            Save Session
+          </Button>
         <Button
           onClick={() => setShowImport(true)}
           className="bg-green-500 text-white"
+          leadingIcon={FolderInput} 
+          iconSize={20}
+          iconClassName="text-white-300" 
         >
           Import XML
         </Button>
 
         <Button
           onClick={handleExport}
-          className="bg-purple-500 text-white"
+          className="bg-green-500 text-white"
+          leadingIcon={FolderOutput} 
+          iconSize={20}
+          iconClassName="text-white-300" 
         >
           Export XML
         </Button>
@@ -85,6 +91,9 @@ export const Toolbar = ({
         <Button
           onClick={onClearSession}
           className="bg-red-500 text-white"
+          leadingIcon={Trash} 
+          iconSize={20}
+          iconClassName="text-white-300" 
         >
           Clear Session
         </Button>

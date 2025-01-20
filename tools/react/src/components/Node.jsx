@@ -1,25 +1,23 @@
 import React from 'react';
 import Button from './Button';
-import { ArrowLeftRight } from 'lucide-react';
+import { ArrowLeftRight, Trash } from 'lucide-react';
+
 export class Node {
     constructor(id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 200, height = 80) {
         this.id = id == null ? `node_${Date.now()}` : id;
         this.label = label;
         this.type = type;
         
-        if(x == 0 && y == 0)
-        {
+        if(x === 0 && y === 0) {
             this.x = window.innerWidth / 2;
             this.y = window.innerHeight / 2 - 50;
-        }
-        else
-        {
+        } else {
             this.x = x;
             this.y = y; 
         }
 
         this.width = width;
-        this.height = height + 25;
+        this.height = height + 35;
         this.connections = [];
         this.path = '';
         this.upgrade = '';
@@ -34,7 +32,6 @@ export class Node {
         return `node_${Date.now()}`
     };
 
-
     center = () => {
         return [
             this.x + this.width/2,
@@ -42,25 +39,21 @@ export class Node {
         ];
     }
 
-
-    static getBackGroundClass = (type) =>
-    {
+    static getBackGroundClass = (type) => {
         let backgroundClass = 'bg-white';
-        if(type === 'Start')
-        {
+        if(type === 'Start') {
             backgroundClass = 'bg-green-100';
         }
-        else if(type === 'Branch')
-        {
+        else if(type === 'Branch') {
             backgroundClass = 'bg-yellow-100';
         }
-        else{
+        else {
             backgroundClass = 'bg-white';
         }
         return backgroundClass;
     };
 
-    render({selected, connecting, onMouseDown, onClick, onStartConnection, onDelete, onCopyProperty}) {
+    render({selected, connecting, onMouseDown, onClick, onStartConnection, onDelete, onCopyProperty, onContextMenuClick}) {
         return (
             <div
                 className={`absolute p-4 rounded-lg shadow-lg w-40 cursor-move
@@ -75,45 +68,51 @@ export class Node {
                 }}
                 onMouseDown={onMouseDown}
                 onClick={onClick}
+                onContextMenu={onContextMenuClick}
             >
-                <div
-                    className="text-sm font-medium mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
-                >
-                    {this.label + '  (' + this.points + ')'}
-                    {this.descriptionString}                 
-                </div>
-                <div
-                    className="text-xs text-gray-500 mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onCopyProperty(this.path, 'path');
-                    }}
-                    title="Click to copy path"
-                >
-                    {this.path && `Path: ${this.path}`}
-                </div>
+                <div className="flex flex-col h-full">
 
-                <div className="flex justify-between items-center">
-                    <Button
-                        size="sm"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onStartConnection(this.id);
-                        }}
-                        className="bg-blue-500 text-white"
-                    >
-                        <ArrowLeftRight />
-                    </Button>
-                    <Button
-                        size="sm"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(this.id);
-                        }}
-                        className="bg-red-500 text-white"
-                    >
-                        ×
-                    </Button>
+                    <div className="text-center">
+                        <div
+                            className="text-sm font-medium mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
+                        >
+                            {this.label + '  (' + this.points + ')'}
+                            {this.descriptionString}                 
+                        </div>
+                        <div
+                            className="text-xs text-gray-500 mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onCopyProperty(this.path, 'path');
+                            }}
+                            title="Click to copy path"
+                        >
+                            {this.path && `Path: ${this.path}`}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-row justify-between mt-auto">
+                        <Button
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onStartConnection(this.id);
+                            }}
+                            className="bg-blue-500 text-white"
+                        >
+                            <ArrowLeftRight size={20}/>
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(this.id);
+                            }}
+                            className="bg-red-500 text-white"
+                        >
+                            <Trash size={20}/>
+                        </Button>
+                    </div>
                 </div>
             </div>
         );

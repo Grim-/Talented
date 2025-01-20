@@ -3,7 +3,7 @@ import { ArrowLeftRight } from 'lucide-react';
 
 const CanvasInstructions = ({ nodes }) => {
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="fixed bottom-4 right-4 pointer-events-none">
       <div className="bg-white/5 p-8 rounded-lg shadow-lg max-w-2xl text-gray-700">
         <h2 className="text-2xl font-semibold mb-6 text-gray-900">Getting Started</h2>  
         {/* Basic Actions */}
@@ -24,8 +24,8 @@ const CanvasInstructions = ({ nodes }) => {
             </li>
             <li className="flex items-start space-x-2">
               <span className="text-blue-500">➤</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-right"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg> 
-              <span>Click the connect button  to draw connections between nodes</span>
+              <ArrowLeftRight className="text-gray-700" size={20} />
+              <span>Click the connect button to draw connections between nodes</span>
             </li>
           </ul>
         </div>
