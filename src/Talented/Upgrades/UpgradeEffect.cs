@@ -17,7 +17,7 @@ namespace Talented
                 RemoveExistingEffects(pawn);
             }
 
-            if (!IsEffectPresent(pawn))
+            if (!IsEffectAppliedTo(pawn))
             {
                 Apply(pawn);
             }
@@ -30,14 +30,14 @@ namespace Talented
 
         public void TryRemove(Pawn pawn)
         {
-            if (IsEffectPresent(pawn))
+            if (IsEffectAppliedTo(pawn))
             {
                 Remove(pawn);
             }
             isActive = false;
         }
 
-        protected abstract bool IsEffectPresent(Pawn pawn);
+        protected abstract bool IsEffectAppliedTo(Pawn pawn);
         protected virtual void Apply(Pawn pawn)
         {
             isActive = true;

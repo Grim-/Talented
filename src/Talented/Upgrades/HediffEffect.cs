@@ -10,7 +10,7 @@ namespace Talented
 
 
 
-        protected override bool IsEffectPresent(Pawn pawn)
+        protected override bool IsEffectAppliedTo(Pawn pawn)
         {
             // First try to find our tracked hediff
             if (appliedHediff != null && pawn.health.hediffSet.HasHediff(hediffDef))
@@ -34,6 +34,7 @@ namespace Talented
         }
         protected override void Apply(Pawn pawn)
         {
+            base.Apply(pawn);
             appliedHediff = HediffMaker.MakeHediff(hediffDef, pawn);
             pawn.health.AddHediff(appliedHediff);
         }

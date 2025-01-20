@@ -416,6 +416,39 @@ namespace Talented
  
 
 
+
+
+        public virtual bool TryGetUnlockedUpgradeEffectsByDef(TalentDef TalentDef, out List<UpgradeEffect> upgradeEffect)
+        {
+            if (activeEffects.TryGetValue(TalentDef, out var effects))
+            {
+                upgradeEffect = effects;
+                return true;
+            }
+            upgradeEffect = null;
+            return false;
+        }
+        public virtual bool TryGetUnlockedUpgradeEffectsByDef<T>(TalentDef TalentDef, out List<T> upgradeEffect) where T : UpgradeEffect
+        {
+            List<T> effectsFound = new List<T>();
+            if (activeEffects.TryGetValue(TalentDef, out var effects))
+            {
+                foreach (var item in effects)
+                {
+                    if (item is T itemAsT)
+                    {
+                        effectsFound.Add(itemAsT);
+                    }
+                }
+
+                upgradeEffect = effectsFound;
+                return true;
+            }
+            upgradeEffect = null;
+            return false;
+        }
+
+
         public virtual void DrawToolBar(Rect rect)
         {
  

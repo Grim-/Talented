@@ -13,7 +13,7 @@ namespace Talented
         private List<Hediff> addedParts = new List<Hediff>();
 
 
-        protected override bool IsEffectPresent(Pawn pawn)
+        protected override bool IsEffectAppliedTo(Pawn pawn)
         {
             addedParts.RemoveAll(part => part == null || !pawn.health.hediffSet.HasHediff(part.def));
             bool targetOrganExists = pawn.health.hediffSet.hediffs.Any(h => h.def == addedOrganHediff);
@@ -22,6 +22,7 @@ namespace Talented
 
         protected override void Apply(Pawn pawn)
         {
+            base.Apply(pawn);
             BodyPartDef partToUse = targetOrgan != null ? targetOrgan : BodyPartDefOf.Torso;
             BodyPartRecord targetPart = pawn.RaceProps.body.GetPartsWithDef(partToUse).FirstOrDefault();
             if (targetPart != null)

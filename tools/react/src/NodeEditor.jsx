@@ -6,20 +6,18 @@ import PropertiesPanel from './components/PropertiesPanel'
 import { saveDef, loadDefs } from './storage';
 import { importFromXml, exportToXml, serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
 import {saveSessionToFile, loadSessionFromFile,  clearSession } from './utils/sessions';
+import { Toolbar} from './components/Toolbar';
+import { ContextMenu }  from './components/ContextMenu';
+import NodeDisplay from './components/NodeDisplay';
 
+const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName }) => {
 
-
-const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
-  // Reference data state
+  //state
   const [referenceDefs, setReferenceDefs] = useState(() => {
 
     const savedDefs = localStorage.getItem('nodeEditorReferenceDefs');
     return savedDefs ? JSON.parse(savedDefs) : [];
   });
-
-  // Core state
-
-  // UI state
   const [draggingNode, setDraggingNode] = useState(null);
   const [draggingOffset, setDraggingOffset] = useState({ x: 0, y: 0 });
   const [connecting, setConnecting] = useState(null);
@@ -27,8 +25,32 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
   const [exportedXml, setExportedXml] = useState('');
   const [selectedNode, setSelectedNode] = useState(null);
   const [showImport, setShowImport] = useState(false);
+  const [contextMenu, setContextMenu] = useState({
+    isOpen: false,
+    x: 0,
+    y: 0
+  });
 
-  // Save reference data whenever it changes
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    setContextMenu({
+      isOpen: true,
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+
+  useEffect(() => {
+    if (contextMenu.isOpen) {
+      const handleClick = () => {
+        setContextMenu(prev => ({ ...prev, isOpen: false }));
+      };
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu.isOpen]);
+
+
   useEffect(() => {
     localStorage.setItem('nodeEditorReferenceDefs', JSON.stringify(referenceDefs));
   }, [referenceDefs]);
@@ -48,10 +70,8 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
     }
   };
 
-  // XML Import/Export Functions
   const handleFileSelect = async (event) => {
     try {
-      // Just use your existing importFromXml function
       const fileContents = await Promise.all(
         Array.from(event.target.files).map(file => file.text())
       );
@@ -66,8 +86,6 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
   };
 
 
-
-  // Node event handlers
   const handleMouseDown = (e, nodeId) => {
     if (e.target.tagName.toLowerCase() === 'input') return;
 
@@ -159,61 +177,52 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
     }));
   };
 
-  return (
-    <div className="w-full h-screen bg-gray-100 relative p-4">
-      {/* Top toolbar */}
-      <div className="absolute top-4 right-4 space-x-2">
-        <Button
-          onClick={() => {
-            const newId = `node_${Date.now()}`;
-            setNodes([...nodes, {
-              id: newId,
-              label: 'New Node',
-              type: 'Normal',
-              x: 400,
-              y: 200,
-              connections: [],
-              path: '',
-              upgrade: '',
-              branchPaths: []
-            }]);
-            setSelectedNode(newId);
-          }}
-          className="bg-blue-500 text-white"
-        >
-          Add Node
-        </Button>
-        <Button onClick={() => document.getElementById('sessionLoad').click()} className="bg-green-500 text-white">
-          Load Session
-        </Button>
-        <input
-          id="sessionLoad"
-          type="file"
-          accept=".json"
-          onChange={async (e) => {
-            const data = await loadSessionFromFile(e.target.files[0]);
-            setNodes(data.nodes);
-            setPaths(data.paths);
-          }}
-          className="hidden"
-        />
-        <Button onClick={(e) => saveSessionToFile(nodes, paths)} className="bg-blue-500 text-white">
-          Save Session
-        </Button>
-        <Button onClick={(e) => setShowImport(true)} className="bg-green-500 text-white">Import XML</Button>
-        <Button
-          onClick={(e) => {
-            const xml = exportToXml(nodes, paths);
-            setExportedXml(xml);
-            setShowExport(true);
-          }}
-          className="bg-purple-500 text-white"
-        >
-          Export XML
-        </Button>
-        <Button onClick={() => clearSession(setNodes, setPaths)} className="bg-red-500 text-white">Clear Session</Button>
-      </div>
 
+  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 600, y = 100) =>
+  {
+    const newID = Node.NewId();
+    setNodes([...nodes, new Node(id == null ? newID : id, label, type, x, y)]);
+    setSelectedNode(newID);
+  };
+
+  return (
+    <div 
+      className="w-full h-screen bg-gray-100 relative p-4"
+      onContextMenu={handleContextMenu}
+    >
+      {/* Top toolbar */}
+      <Toolbar 
+        treeName={treeName || ''}
+        onAddNode={addNewNode}
+        onSaveSession={(e) => saveSessionToFile(nodes, paths)}
+        onLoadSession={async (data) => {
+          setNodes(data.nodes);
+          setPaths(data.paths);
+        }}
+        onImportXml={handleFileSelect}
+        onExportXml={() => exportToXml(nodes, paths, treeName)}
+        onClearSession={() => clearSession(setNodes, setPaths)}
+        setTreeName={setTreeName}
+      />
+      <ContextMenu
+        isOpen={contextMenu.isOpen}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        onClose={() => setContextMenu({ ...contextMenu, isOpen: false })}
+        onSelect={(nodeType) => {
+          addNewNode(null, "New Node", nodeType, contextMenu.x - 50, contextMenu.y - 50);
+      }}
+    />
+      <div className="w-65 absolute left-4 top-4 bg-white rounded-lg shadow-lg p-4">
+      <label>Talent Tree Name </label>
+      <input type="field"
+        id="treeNameField"
+        placeholder = "treeName"
+        className = "bg-green-500 text-white rounded px-4 py-2"
+        value={treeName || ''}
+        onChange={(e) => setTreeName(e.target.value)}
+        />
+      </div>
       {/* Properties Panel */}
       {selectedNode && (
         <PropertiesPanel
@@ -264,75 +273,16 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
         </svg>
 
         {/* Nodes */}
-        {nodes.map(node => (
-          <div
-            key={node.id}
-            className={`absolute p-4 rounded-lg shadow-lg w-40 cursor-move
-              ${node.type === 'Start' ? 'bg-green-100' : 'bg-white'}
-              ${node.type === 'Branch' ? 'bg-yellow-100' : ''}
-              ${selectedNode === node.id ? 'ring-2 ring-blue-500' : ''}
-              ${connecting === node.id ? 'ring-2 ring-blue-300' : ''}`}
-            style={{
-              left: node.x,
-              top: node.y
-            }}
-            onMouseDown={(e) => handleMouseDown(e, node.id)}
-            onClick={(e) => handleNodeSelect(node.id, e)}
-          >
-            <div
-              className="text-sm font-medium mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
-              onClick={(e) => {
-                e.stopPropagation();
-                copyToClipboard(node.label, 'label');
-              }}
-              title="Click to copy label"
-            >
-              {node.label}
-            </div>
-            <div
-              className="text-xs text-gray-500 mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
-              onClick={(e) => {
-                e.stopPropagation();
-                copyToClipboard(node.path, 'path');
-              }}
-              title="Click to copy path"
-            >
-              {node.path && `Path: ${node.path}`}
-            </div>
-            <div
-              className="text-xs text-gray-500 mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
-              onClick={(e) => {
-                e.stopPropagation();
-                copyToClipboard(node.upgrade, 'upgrade');
-              }}
-              title="Click to copy upgrade"
-            >
-              {node.upgrade && `Upgrade: ${node.upgrade}`}
-            </div>
-            <div className="flex justify-between items-center">
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  startConnection(node.id);
-                }}
-                className="bg-blue-500 text-white"
-              >
-                →
-              </Button>
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setNodes(nodes.filter(n => n.id !== node.id));
-                }}
-                className="bg-red-500 text-white"
-              >
-                ×
-              </Button>
-            </div>
-          </div>
-        ))}
+        <NodeDisplay 
+          nodes={nodes}
+          selectedNode={selectedNode}
+          connecting={connecting}
+          handleMouseDown={handleMouseDown}
+          handleNodeSelect={handleNodeSelect}
+          startConnection={startConnection}
+          setNodes={setNodes}
+          copyToClipboard={copyToClipboard}
+        />
       </div>
 
       {/* Export Modal */}
@@ -368,7 +318,7 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths }) => {
     </div>
   );
 
-  // Close the NodeEditor component
+
 };
 
 export default NodeEditor;

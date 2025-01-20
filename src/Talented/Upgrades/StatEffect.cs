@@ -11,19 +11,19 @@ namespace Talented
         public float value;
         public StatModifierOperation operation;
 
-        protected override bool IsEffectPresent(Pawn pawn)
+        protected override bool IsEffectAppliedTo(Pawn pawn)
         {
             return IsActive;
         }
 
         protected override void Apply(Pawn pawn)
         {
-            isActive = true;
+            base.Apply(pawn);
         }
 
         protected override void Remove(Pawn pawn)
         {
-            isActive = false;
+            
         }
 
         public override void ExposeData()

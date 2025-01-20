@@ -1,5 +1,3 @@
-// utils/xmlSerializer.js
-// Configuration object for def types
 export const DefTypeConfig = {
   NODE: 'TalentTreeNodeDef',
   TREE: 'TalentTreeDef',
@@ -8,7 +6,7 @@ export const DefTypeConfig = {
   GENE: 'TalentedGeneDef'
 };
 
-// Namespace configuration
+
 export const NamespaceConfig = {
   prefix: 'Talented',
   separator: '.'
@@ -34,9 +32,7 @@ export const serializeDefToXml = (def, config = DefTypeConfig) => {
   return xml;
 };
 
-// Add this to your xmlSerializer.js or create a new utils file
 
-// Helper to strip namespace prefix from def type
 export const stripNamespace = (fullDefType) => {
   return fullDefType.replace(`${NamespaceConfig.prefix}${NamespaceConfig.separator}`, '');
 };
@@ -106,12 +102,12 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
   event.target.value = '';
 };
 
-export const exportToXml = (nodes, paths, config = DefTypeConfig) => {
+export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
   let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
 
   // Add TalentTreeDef node
   xml += '  <Talented.TalentTreeDef>\n';
-  xml += '    <defName>GenericUpgradeTree</defName>\n';
+  xml += '    <defName>'+ treeName + '</defName>\n';
   xml += '    <dimensions>(450, 790)</dimensions>\n';
   xml += '    <nodes>\n';
   // Find and add root nodes
@@ -152,6 +148,15 @@ export const exportToXml = (nodes, paths, config = DefTypeConfig) => {
     if (node.x !== undefined) {
       xml += `    <position>(${Math.round(node.x/50)},${Math.round(node.y/50)})</position>\n`;
     }
+
+
+    if(node.points !== undefined)
+    {
+      xml += '    <parasiteLevelRequired>'+ (node.points === undefined ? 0 : node.points) +'</parasiteLevelRequired>\n';
+    }
+
+ 
+
     if (node.type) xml += `    <type>${node.type}</type>\n`;
     if (node.upgrades) {
           xml += `    <upgrades>\n`;
@@ -235,7 +240,7 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
         y,
         connections,
         path: nodeDef.getElementsByTagName("path")[0]?.textContent || "",
-        upgrades: upgrades.length > 0 ? upgrades : undefined, // Only include if there are upgrades
+        upgrades: upgrades.length > 0 ? upgrades : undefined,
         branchPaths
       });
     });

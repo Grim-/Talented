@@ -10,7 +10,7 @@ namespace Talented
         public List<AbilityDef> abilities;
         private List<Ability> grantedAbilities = new List<Ability>();
 
-        protected override bool IsEffectPresent(Pawn pawn)
+        protected override bool IsEffectAppliedTo(Pawn pawn)
         {
             if (pawn.abilities == null) return false;
 
@@ -23,6 +23,7 @@ namespace Talented
 
         protected override void Apply(Pawn pawn)
         {
+            base.Apply(pawn);
             if (pawn.abilities == null)
                 pawn.abilities = new Pawn_AbilityTracker(pawn);
 

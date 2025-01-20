@@ -1,35 +1,23 @@
 import React from 'react';
 import Modal from './Modal';
 import Button from './Button';
+import NodeTypeSelect from './NodeTypeSelect';
 import { useState } from 'react';
 
-const Toolbar = ({
+export const Toolbar = ({
   onAddNode,
   onSaveSession,
   onLoadSession,
   onExportXml,
   onImportXml,
-  onClearSession
+  onClearSession,
+  setTreeName,
+  treeName
 }) => {
   const [showImport, setShowImport] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [exportedXml, setExportedXml] = useState('');
-
-  const handleFileSelect = async (event) => {
-    const files = event.target.files;
-    if (files.length > 0) {
-      try {
-        const fileContents = await Promise.all(
-          Array.from(files).map(file => file.text())
-        );
-        onImportXml(fileContents);
-        setShowImport(false);
-      } catch (error) {
-        console.error('Error reading files:', error);
-        alert('Error importing files: ' + error.message);
-      }
-    }
-  };
+ 
 
   const handleExport = async () => {
     const xml = await onExportXml();
@@ -40,13 +28,11 @@ const Toolbar = ({
   return (
     <>
       <div className="absolute top-4 right-4 space-x-2">
-        <Button
-          onClick={onAddNode}
-          className="bg-blue-500 text-white"
-        >
-          Add Node
-        </Button>
-
+        <NodeTypeSelect 
+          onSelect={(nodeType) => {
+            onAddNode(null, "New", nodeType);
+          }}
+        />
         <Button
           onClick={() => document.getElementById('sessionLoad').click()}
           className="bg-green-500 text-white"
@@ -119,7 +105,7 @@ const Toolbar = ({
             type="file"
             multiple
             accept=".xml"
-            onChange={handleFileSelect}
+            onChange={onImportXml}
             className="block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4
               file:rounded-md file:border-0

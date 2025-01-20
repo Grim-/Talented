@@ -1,5 +1,6 @@
+import { SliderPicker } from 'react-color';
 
-  export const renderPropertyEditor = (propName, propDef, value, onChange) => {
+ export const renderPropertyEditor = (propName, propDef, value, onChange) => {
     if (typeof propDef === 'string') {
       switch (propDef) {
         case 'string':
@@ -80,56 +81,12 @@
         const currentValue = value || defaultValue;
 
         return (
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <input
-                type="number"
-                min="0"
-                max="1"
-                step="0.1"
-                value={currentValue.r}
-                onChange={e => onChange({ ...currentValue, r: Number(e.target.value) })}
-                className="w-1/4 p-2 border rounded"
-                placeholder="R"
-              />
-              <input
-                type="number"
-                min="0"
-                max="1"
-                step="0.1"
-                value={currentValue.g}
-                onChange={e => onChange({ ...currentValue, g: Number(e.target.value) })}
-                className="w-1/4 p-2 border rounded"
-                placeholder="G"
-              />
-              <input
-                type="number"
-                min="0"
-                max="1"
-                step="0.1"
-                value={currentValue.b}
-                onChange={e => onChange({ ...currentValue, b: Number(e.target.value) })}
-                className="w-1/4 p-2 border rounded"
-                placeholder="B"
-              />
-              <input
-                type="number"
-                min="0"
-                max="1"
-                step="0.1"
-                value={currentValue.a}
-                onChange={e => onChange({ ...currentValue, a: Number(e.target.value) })}
-                className="w-1/4 p-2 border rounded"
-                placeholder="A"
-              />
-            </div>
-            <div
-              className="h-8 w-full rounded border"
-              style={{
-                backgroundColor: `rgba(${currentValue.r * 255}, ${currentValue.g * 255}, ${currentValue.b * 255}, ${currentValue.a})`
-              }}
-            />
-          </div>
+          <SliderPicker
+          color={currentValue}
+          onChange={(color) => {
+            onChange(color);
+          }}
+        />
         );
       }
 

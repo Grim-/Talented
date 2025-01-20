@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from './Button';
 import DefSelector from './DefRefSelector'
+import ListEditor from './PropertiesList';
 
 const PropertiesPanel = ({
   selectedNode,
@@ -11,124 +12,47 @@ const PropertiesPanel = ({
 }) => {
   if (!selectedNode || !node) return null;
 
-  const renderListEditor = (propName, list) => {
-    // Handle both legacy 'upgrade' and new 'upgrades' format
-    let items = [];
+  const getNodeList = (node, propName) => {
     if (propName === 'upgrades') {
-      if (Array.isArray(node.upgrades)) {
-        items = node.upgrades;
-      } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
-        items = [node.upgrade];
+      if (Array.isArray(node.upgrades)) return node.upgrades;
+      if (typeof node.upgrade === 'string' && node.upgrade !== '') {
+        return [node.upgrade];
       }
-    } else {
-      items = Array.isArray(list) ? list :
-             (typeof list === 'string' && list !== '') ? [list] :
-             [];
+      return [];
     }
-
-    // Get saved defs from localStorage
-    const savedDefs = JSON.parse(localStorage.getItem('savedDefs') || '{}');
-    const defType = propName === 'upgrades' ? 'TalentUpgradeDef' : 'AbilityDef';
-    const availableDefs = Object.keys(savedDefs[defType] || {});
-
-    return (
-      <div className="space-y-2">
-        {items.map((item, index) => (
-          <div key={index} className="flex gap-2 items-start">
-            <div className="flex-1">
-              <input
-                type="text"
-                value={item}
-                onChange={e => handleListItemChange(propName, index, e.target.value)}
-                className="w-full p-2 border rounded"
-                placeholder={`${propName} ${index + 1}`}
-              />
-            </div>
-            <button
-              onClick={() => handleListItemRemove(propName, index)}
-              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 h-10"
-            >
-              ×
-            </button>
-          </div>
-        ))}
-        <div className="space-y-2">
-          <button
-            onClick={() => handleListItemAdd(propName)}
-            className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Add Empty
-          </button>
-          {availableDefs.length > 0 && (
-            <DefSelector
-              defType="TalentUpgradeDef" // Adjust to match the correct defType
-              value={[]} // If you need a specific value here, make sure to set it
-              onChange={(newValue) => handleListItemAdd(propName, newValue)}
-              className="w-full p-2 border rounded"
-            />
-          )}
-        </div>
-      </div>
-    );
+  
+    const value = node[propName];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string' && value !== '') return [value];
+    return [];
   };
-
+  
   const handleListItemAdd = (propName, value = '') => {
-    let currentList = [];
-    if (propName === 'upgrades') {
-      if (Array.isArray(node.upgrades)) {
-        currentList = node.upgrades;
-      } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
-        currentList = [node.upgrade];
-        onUpdateProperty('upgrade', '');
-      }
-    } else {
-      currentList = Array.isArray(node[propName]) ? node[propName] :
-                   (typeof node[propName] === 'string' && node[propName] !== '') ? [node[propName]] :
-                   [];
+    const currentList = getNodeList(node, propName);
+    
+    if (propName === 'upgrades' && node.upgrade) {
+      onUpdateProperty('upgrade', '');
     }
+    
     onUpdateProperty(propName, [...currentList, value]);
   };
-
+  
   const handleListItemRemove = (propName, index) => {
-    let currentList = [];
-    if (propName === 'upgrades') {
-      if (Array.isArray(node.upgrades)) {
-        currentList = node.upgrades;
-      } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
-        currentList = [node.upgrade];
-        onUpdateProperty('upgrade', '');
-      }
-    } else {
-      currentList = Array.isArray(node[propName]) ? node[propName] :
-                   (typeof node[propName] === 'string' && node[propName] !== '') ? [node[propName]] :
-                   [];
-    }
+    const currentList = getNodeList(node, propName);
     const newList = [...currentList];
     newList.splice(index, 1);
     onUpdateProperty(propName, newList);
   };
-
+  
   const handleListItemChange = (propName, index, value) => {
-    let currentList = [];
-    if (propName === 'upgrades') {
-      if (Array.isArray(node.upgrades)) {
-        currentList = node.upgrades;
-      } else if (typeof node.upgrade === 'string' && node.upgrade !== '') {
-        currentList = [node.upgrade];
-        onUpdateProperty('upgrade', '');
-      }
-    } else {
-      currentList = Array.isArray(node[propName]) ? node[propName] :
-                   (typeof node[propName] === 'string' && node[propName] !== '') ? [node[propName]] :
-                   [];
-    }
+    const currentList = getNodeList(node, propName);
     const newList = [...currentList];
     newList[index] = value;
     onUpdateProperty(propName, newList);
   };
 
   return (
-    <div className="w-64 absolute left-4 top-4 bg-white rounded-lg shadow-lg p-4">
+    <div className="w-66 absolute left-4 top-24 bg-white rounded-lg shadow-lg p-4">
       <h3 className="font-bold mb-4">Properties</h3>
       <div className="space-y-4">
         <div>
@@ -137,6 +61,15 @@ const PropertiesPanel = ({
             type="text"
             value={node.label || ''}
             onChange={(e) => onUpdateProperty('label', e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Points</label>
+          <input
+            type="number"
+            value={node.points || 0}
+            onChange={(e) => onUpdateProperty('points', e.target.value)}
             className="w-full p-2 border rounded"
           />
         </div>
@@ -160,10 +93,26 @@ const PropertiesPanel = ({
             onChange={(e) => onUpdateProperty('path', e.target.value)}
             className="w-full p-2 border rounded"
           />
+        <DefSelector
+          defType="TalentPathDef"
+          onChange={(e) => 
+            { 
+              handleListItemAdd('', e) 
+              onUpdateProperty('path', e)
+            }
+          }
+        />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Upgrades</label>
-          {renderListEditor('upgrades', null)}
+          <ListEditor
+            node={node}
+            propName="upgrades"
+            list={null}
+            onItemChange={handleListItemChange}
+            onItemRemove={handleListItemRemove} 
+            onItemAdd={handleListItemAdd}
+          />
         </div>
         {node.type === 'Branch' && (
           <div>
@@ -188,6 +137,11 @@ const PropertiesPanel = ({
             ))}
           </div>
         )}
+
+        <DefSelector
+          defType="TalentDef"
+          onChange={(e) => handleListItemAdd('upgrades', e)}
+        />
       </div>
     </div>
   );

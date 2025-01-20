@@ -4,13 +4,14 @@ import Button from './Button';
 import { serializeDefToXml, handleXmlImport } from '../utils/xmlSerializer';
 import { renderPropertyEditor } from '../utils/renderProperties';
 
+
 const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef }) => {
   const [savedDefs, setSavedDefs] = useState(() => {
     const saved = localStorage.getItem('savedDefs');
     return saved ? JSON.parse(saved) : {};
   });
 
-  // And in DefEditor, add:
+  
   useEffect(() => {
     console.log("Saving to localStorage:", savedDefs);
     localStorage.setItem('savedDefs', JSON.stringify(savedDefs));

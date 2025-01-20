@@ -78,17 +78,3 @@ const renderListEditor = (handleListItemAdd, handleListItemChange, handleListIte
     ))}
   </div>
 );
-
-// Usage example:
-const ListEditorWrapper = ({ node, handleListItemAdd, handleListItemChange, handleListItemRemove }) => (
-  <div>
-    <label className="block text-sm font-medium mb-1">Upgrades</label>
-    {renderListEditor(
-      handleListItemAdd,
-      handleListItemChange,
-      handleListItemRemove,
-      'upgrade',
-      node?.upgrade // Using optional chaining here
-    )}
-  </div>
-);

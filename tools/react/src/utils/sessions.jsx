@@ -1,7 +1,10 @@
-export const saveSessionToFile = (nodes, paths) => {
+import Node from "../components/Node";
+
+export const saveSessionToFile = (nodes, paths, treeName = "TREE_CHANGEME") => {
   const sessionData = {
     nodes,
     paths,
+    treeName,
     timestamp: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
@@ -15,7 +18,7 @@ export const saveSessionToFile = (nodes, paths) => {
   URL.revokeObjectURL(url);
 };
 
-// Instead of taking setNodes/setPaths, return the new state
+
 export const loadSessionFromFile = async (file) => {
   if (!file) return null;
 
@@ -31,34 +34,20 @@ export const loadSessionFromFile = async (file) => {
   }
 };
 
-// Return default state instead of setting it directly
 export const clearSession = (setNodes, setPaths, clearAll = false) => {
-  const initialSession = {
-    nodes: [{
-      id: 'start',
-      label: 'RootNode',
-      type: 'Start',
-      x: 850,
-      y: 650,
-      connections: [],
-      path: '',
-      upgrades: ['BasicParasiteMetabolism'],
-      branchPaths: []
-    }],
-    paths: []
-  };
-  const emptySession = {
-    nodes: [],
-    paths: []
-  };
-  if (clearAll)
-  {
-      setNodes(emptySession.nodes);
-      setPaths(emptySession.paths);
-  }
-  else
-  {
-      setNodes(initialSession.nodes);
-      setPaths(initialSession.paths);
-  }  
+    const initialSession = {
+      nodes: [new Node(null, "NewRootNode", 'Start')],
+      paths: []
+    };
+
+    if (clearAll)
+    {
+        setNodes([]);
+        setPaths([]);
+    }
+    else
+    {
+        setNodes(initialSession.nodes);
+        setPaths(initialSession.paths);
+    }
 };
