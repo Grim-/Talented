@@ -12,8 +12,15 @@ import NodeDisplay from './components/NodeDisplay';
 import CanvasInstructions from './components/CanvasInstructions';
 import { useLockBodyScroll } from "@uidotdev/usehooks";
 import ConnectionsDisplay from './components/ConnectionsDisplay';
+import TreePropertiesPanel from './components/TreePropertiesPanel';
 
-const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName }) => {
+const NodeEditor = ({ 
+  nodes, setNodes, 
+  paths, setPaths, 
+  treeName, setTreeName, 
+  treeSize, setTreeSize, 
+  treeDisplayStrategy, setTreeDisplay, 
+  pointStrategy, setTreePointStrategy }) => {
   useLockBodyScroll();
   //state
   const [referenceDefs, setReferenceDefs] = useState(() => {
@@ -249,7 +256,7 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           setPaths(data.paths);
         }}
         onImportXml={handleFileSelect}
-        onExportXml={() => exportToXml(nodes, paths, treeName)}
+        onExportXml={() => exportToXml(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy)}
         onClearSession={() => clearSession(setNodes, setPaths)}
         setTreeName={setTreeName}
       />
@@ -280,22 +287,16 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
         }}
       />
       {/* Header */}
-      <div className="w-80 absolute left-4 top-4 bg-white rounded-lg shadow-lg">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <div className="flex justify-between items-center space-x-4">
-            <h3 className="text-lg font-semibold text-gray-900">Properties</h3>
-            <input
-              type="text"
-              id="treeNameField"
-              placeholder="YourTalentTreeDefName"
-              className={`flex-1 rounded px-2 py-1 ${treeName ? 'bg-green-500 text-white placeholder-green-200' : 'bg-red-500 text-white placeholder-red-200'
-                }`}
-              value={treeName}
-              onChange={(e) => setTreeName(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
+      <TreePropertiesPanel
+        treeName={treeName}
+        setTreeName={setTreeName}
+        treeSize={treeSize}
+        setTreeSize={setTreeSize}
+        treeDisplayStrategy={treeDisplayStrategy}
+        setTreeDisplay={setTreeDisplay}
+        pointStrategy={pointStrategy}
+        setTreePointStrategy={setTreePointStrategy}
+      />
       {/* Properties Panel */}
       {selectedNode && (
         <PropertiesPanel
@@ -304,8 +305,6 @@ const NodeEditor = ({ nodes, setNodes, paths, setPaths, treeName, setTreeName })
           onUpdateProperty={(property, value) => updateNodeProperty(selectedNode, property, value)}
           onAddBranchPath={() => addBranchPath(selectedNode)}
           onUpdateBranchPath={(index, property, value) => updateBranchPath(selectedNode, index, property, value)}
-          treeName={treeName}
-          setTreeName={setTreeName}
         />
       )}
 

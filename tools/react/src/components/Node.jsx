@@ -24,7 +24,6 @@ export class Node {
         this.branchPaths = [];
         this.upgrades = [];
         this.descriptionString = '';
-        this.points = 1;
         this.levelRequired = 0;
     }
 
@@ -76,7 +75,7 @@ export class Node {
                         <div
                             className="text-sm font-medium mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded"
                         >
-                            {this.label + '  (' + this.points + ')'}
+                            {this.label}
                             {this.descriptionString}                 
                         </div>
                         <div

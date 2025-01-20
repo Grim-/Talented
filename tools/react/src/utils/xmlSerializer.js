@@ -102,31 +102,49 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
   event.target.value = '';
 };
 
-export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
+export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, config = DefTypeConfig) => {
   let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
+  
+  // Generate the three main sections
+  xml += exportTalentTree(nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula);
+  xml += exportPaths(paths, config);
+  xml += exportNodes(nodes, config);
+  
+  xml += '</Defs>';
+  return xml;
+};
 
-  // Add TalentTreeDef node
-  xml += '  <Talented.TalentTreeDef>\n';
+// Function to export the talent tree definition
+const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula) => {
+  let xml = '<Talented.TalentTreeDef>\n';
   xml += `    <defName>${treeName || 'GIVE_ME_A_PROPER_NAME'}</defName>\n`;
-  xml += '    <dimensions>(450, 790)</dimensions>\n';
+  xml += `    <dimensions>(${treeSize.width} , ${treeSize.height})</dimensions>\n`;
+  
+  // Add root nodes
   xml += '    <nodes>\n';
-  // Find and add root nodes
   nodes.filter(node => node.type === 'Start')
        .forEach(node => {
     xml += `      <li>${node.id}</li>\n`;
   });
   xml += '    </nodes>\n';
+  
+  // Add available paths
   xml += '    <availablePaths>\n';
-  // Add all paths
   paths?.forEach(path => {
     xml += `      <li>${path.name}</li>\n`;
   });
   xml += '    </availablePaths>\n';
-  xml += '    <displayStrategy>VerticalStrategy</displayStrategy>\n';
-  xml += '    <talentPointFormula>PerLevel</talentPointFormula>\n';
+  
+  xml += `    <displayStrategy>${treeDisplayStrat}</displayStrategy>\n`;
+  xml += `    <talentPointFormula>${treePointsFormula}</talentPointFormula>\n`;
   xml += '  </Talented.TalentTreeDef>\n\n';
+  
+  return xml;
+};
 
-  // Export paths
+// Function to export path definitions
+const exportPaths = (paths, config) => {
+  let xml = '';
   paths?.forEach(path => {
     const pathDefType = getFullDefName(config.PATH);
     xml += `  <${pathDefType}>\n`;
@@ -134,8 +152,12 @@ export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
     xml += `    <pathDescription>${path.description}</pathDescription>\n`;
     xml += `  </${pathDefType}>\n\n`;
   });
+  return xml;
+};
 
-  // Export nodes
+// Function to export node definitions
+const exportNodes = (nodes, config) => {
+  let xml = '';
   nodes.forEach(node => {
     const defType = node.upgrade ? getFullDefName(config.NODE) :
                    node.dimensions ? getFullDefName(config.TREE) :
@@ -150,16 +172,16 @@ export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
       xml += `    <position>(${Math.round(node.x/50)},${Math.round(node.y/50)})</position>\n`;
     }
 
-    xml += '    <pointCost>'+ (node.points === undefined ? 0 :  Math.max(0, Math.min(node.points, 100))) +'</pointCost>\n';
-
     if (node.type) xml += `    <type>${node.type}</type>\n`;
+    
     if (node.upgrades) {
-          xml += `    <upgrades>\n`;
-          node.upgrades.forEach((item, i) => {
-            xml += `      <li>${item}</li>\n`;
-          });
-          xml += `    </upgrades>\n`;
+      xml += `    <upgrades>\n`;
+      node.upgrades.forEach((item) => {
+        xml += `      <li>${item}</li>\n`;
+      });
+      xml += `    </upgrades>\n`;
     }
+    
     if (node.path) xml += `    <path>${node.path}</path>\n`;
 
     if (node.connections?.length > 0) {
@@ -186,8 +208,6 @@ export const exportToXml = (nodes, paths, treeName, config = DefTypeConfig) => {
     }
     xml += `  </${defType}>\n\n`;
   });
-
-  xml += '</Defs>';
   return xml;
 };
 

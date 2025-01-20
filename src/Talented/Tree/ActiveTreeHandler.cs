@@ -18,7 +18,7 @@ namespace Talented
 
         protected override UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node)
         {
-            if (node.type != NodeType.Start && !HasSelectedAPath())
+            if (node.type != NodeType.Start && !HasSelectedAPath() && TreeDef.availablePaths.Count > 0)
             {
                 return UnlockResult.Failed(UpgradeUnlockError.ExclusivePath,
                     "Talented.Tree.Error.MustSelectPath".Translate());

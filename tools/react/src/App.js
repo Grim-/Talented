@@ -10,8 +10,11 @@ function App() {
   const [nodes, setNodes] = useState([new Node(null, "ROOT", 'Start', 400, 100)]);
   const [paths, setPaths] = useState([]);
   const [treeName, setTreeName] = useState('');
+  const [treeSize, setTreeSize] = useState({width : 600, height : 400});
+  const [treeDisplayStrategy, setTreeDisplay] = useState('FixedPosition');
+  const [pointStrategy, setTreePointStrategy] = useState('PerLevel');
 
-  // Lift def editor state up
+
   const [selectedType, setSelectedType] = useState(null);
   const [currentDef, setCurrentDef] = useState(null);
 
@@ -50,6 +53,12 @@ function App() {
             setPaths={setPaths}
             treeName={treeName}
             setTreeName={setTreeName}
+            treeSize={treeSize}
+            setTreeSize={setTreeSize}
+            treeDisplayStrategy={treeDisplayStrategy}
+            setTreeDisplay={setTreeDisplay}
+            pointStrategy={pointStrategy}
+            setTreePointStrategy={setTreePointStrategy}
           />
         ) : (
           <DefEditor

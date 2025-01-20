@@ -88,7 +88,7 @@ namespace Talented
 
         private void AutoUnlockAvailableNodes()
         {
-            if (!HasChosenPath)
+            if (!HasChosenPath && TreeDef.availablePaths.Count > 0)
             {
                 Log.Message("Talented.Tree.Log.NoPathChosen".Translate(treeDef.defName));
                 return;
