@@ -1,7 +1,7 @@
 {
   "name": "Talented Tree Framework Web UI",
   "version": "0.1.0",
-  "homepage": ".",
+  "homepage": "https://grim-.github.io/Talented/",
   "private": true,
   "dependencies": {
     "@uidotdev/usehooks": "^2.4.1",
