@@ -17,7 +17,7 @@ function App() {
   const [treeHandler, setTreeHandler] = useState('ActiveTreeHandler');
 
   return (
-    <Router basename="/Talented">
+    <Router basename="/">
       <div className="App">
         <div className="bg-white border-b p-4">
           <div className="flex gap-2">
