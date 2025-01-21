@@ -41,8 +41,8 @@ const TreePropertiesPanel = ({
   ];
 
   const handlerOptions = [
-    { value: "Talented.ActiveTreeHandler", label: "Active", description: "Users manually select and purchase talents and progression paths." },
-    { value: "Talented.PassiveTreeHandler", label: "Passive", description: "Talents are automatically purchased in sequence once path is selected." },
+    { value: "Talented.ActiveTreeHandler", label: "Active", description: "For abilities that need to be manually activated" },
+    { value: "Talented.PassiveTreeHandler", label: "Passive", description: "For abilities that apply their effects automatically" },
     { value: "custom", label: "Custom", description: "Define your own custom talent handler" }
   ];
 
@@ -63,7 +63,66 @@ const TreePropertiesPanel = ({
       
       <div className={`${isExpanded ? 'block' : 'hidden'}`}>
         <div className="p-3 space-y-4">
-          {/* Previous input fields remain the same */}
+          {/* Talent Tree Name */}
+          <div className="space-y-1">
+            <label htmlFor="treeName" className={labelClasses}>
+              Talent Tree Definition Name
+              <HelpCircle 
+                size={14} 
+                className="text-gray-400 cursor-help"
+                data-tooltip-id="tree-name-tip"
+              />
+              <Tooltip id="tree-name-tip">
+                Unique identifier for your talent tree
+              </Tooltip>
+            </label>
+            <input
+              type="text"
+              id="treeName"
+              value={treeName}
+              onChange={(e) => setTreeName(e.target.value)}
+              className={`${inputClasses} ${
+                treeName 
+                  ? 'bg-green-50 border-green-500' 
+                  : 'bg-red-50 border-red-500'
+              }`}
+              placeholder="Enter tree name..."
+            />
+          </div>
+
+          {/* Tree Window Size */}
+          <div className="space-y-1">
+            <label className={labelClasses}>
+              Tree Window Size
+              <HelpCircle 
+                size={14} 
+                className="text-gray-400 cursor-help"
+                data-tooltip-id="window-size-tip"
+              />
+              <Tooltip id="window-size-tip">
+                Set the dimensions of your talent tree window
+              </Tooltip>
+            </label>
+            <div className="flex space-x-2">
+              <input
+                type="number"
+                placeholder="Width"
+                value={treeSize?.width || ''}
+                onChange={(e) => setTreeSize(prev => ({...prev, width: parseInt(e.target.value)}))}
+                className={inputClasses}
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Height"
+                value={treeSize?.height || ''}
+                onChange={(e) => setTreeSize(prev => ({...prev, height: parseInt(e.target.value)}))}
+                className={inputClasses}
+                min="0"
+              />
+            </div>
+          </div>
+
           {/* Tree Handler Type */}
           <div className="space-y-1 relative">
             <label className={labelClasses}>
@@ -73,9 +132,7 @@ const TreePropertiesPanel = ({
                 className="text-gray-400 cursor-help"
                 data-tooltip-id="handler-tip"
               />
-              <Tooltip 
-                id="handler-tip"            
-              >
+              <Tooltip id="handler-tip">
                 Determines how talents are processed and applied
               </Tooltip>
             </label>
