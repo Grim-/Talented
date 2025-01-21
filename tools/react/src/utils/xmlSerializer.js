@@ -131,7 +131,7 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, tr
   let xml = '<Talented.TalentTreeDef>\n';
   xml += `    <defName>${treeName || 'GIVE_ME_A_PROPER_NAME'}</defName>\n`;
   xml += `    <dimensions>(${treeSize.width} , ${treeSize.height})</dimensions>\n`;
-  xml += `    <handlerClass>Talented.${treeHandler}</handlerClass>\n`;
+  xml += `    <handlerClass>${treeHandler}</handlerClass>\n`;
   // Add root nodes
   xml += '    <nodes>\n';
   nodes.filter(node => node.type === 'Start')
