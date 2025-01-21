@@ -44,18 +44,19 @@ function App() {
           </div>
         </div>
         <div className="p-4">
-          <Routes>
-            <Route path="/:exampleName" element={
-              <ExampleLoader
-                setNodes={setNodes}
-                setPaths={setPaths}
-                setTreeName={setTreeName}
-                setTreeSize={setTreeSize}
-                setTreeDisplay={setTreeDisplay}
-                setTreePointStrategy={setTreePointStrategy}
-              />
-            } />
-          </Routes>
+        <Routes>
+          <Route path="/" element={null} /> 
+          <Route path="/:exampleName" element={
+            <ExampleLoader
+              setNodes={setNodes}
+              setPaths={setPaths}
+              setTreeName={setTreeName}
+              setTreeSize={setTreeSize}
+              setTreeDisplay={setTreeDisplay}
+              setTreePointStrategy={setTreePointStrategy}
+            />
+          } />
+        </Routes>
           {activeTab === 'nodes' ? (
             <NodeEditor
               nodes={nodes}
