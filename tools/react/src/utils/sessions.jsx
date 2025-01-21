@@ -1,17 +1,24 @@
 import Node from "../components/Node";
 
-export const saveSessionToFile = (nodes, paths, treeName = "TREE_CHANGEME") => {
+
+//TODO :: FIX SESSION SAVE AND LOAD
+
+export const saveSessionToFile = (nodes, paths, treeName = "TalentTreeDef_CHANGEME", treeSize, treeDisplay, treePointStrategy, treeHandler) => {
   const sessionData = {
     nodes,
     paths,
     treeName,
+    treeSize,
+    treeDisplay,
+    treePointStrategy,
+    treeHandler,
     timestamp: new Date().toISOString()
   };
   const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `node-editor-session-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `${treeName}_${new Date().toISOString().slice(0,10)}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -27,7 +34,12 @@ export const loadSessionFromFile = async (file) => {
     const sessionData = JSON.parse(text);
     return {
       nodes: sessionData.nodes,
-      paths: sessionData.paths
+      paths: sessionData.paths,
+      treeName: sessionData.treeName,
+      treeSize:sessionData.treeSize,
+      treeDisplay:sessionData.treeDisplay,
+      treePointStrategy:sessionData.treePointStrategy,
+      treeHandler:sessionData.treeHandler
     };
   } catch (e) {
     throw new Error('Error loading session file: ' + e.message);

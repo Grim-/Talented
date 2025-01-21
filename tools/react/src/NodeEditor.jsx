@@ -265,10 +265,9 @@ const NodeEditor = ({
       <Toolbar
         treeName={treeName || ''}
         onAddNode={addNewNode}
-        onSaveSession={(e) => saveSessionToFile(nodes, paths)}
+        onSaveSession={(e) => saveSessionToFile(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
         onLoadSession={async (data) => {
-          setNodes(data.nodes);
-          setPaths(data.paths);
+          loadSessionFromFile(data);
         }}
         onImportXml={handleFileSelect}
         onExportXml={() => exportToXml(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
