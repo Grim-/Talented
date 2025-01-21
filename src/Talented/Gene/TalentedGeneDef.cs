@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using System.Collections.Generic;
+using Verse;
 
 namespace Talented
 {
@@ -8,6 +9,7 @@ namespace Talented
 
         public string TabLabel = "Talents";
         public TalentTreeDef MainTreeDef;
+        public List<TalentTreeDef> TalentTrees;
         public TalentTreeDef SecondaryTreeDef;
         public ExperienceFormulaDef experienceFormula;
         public ExperienceGainSettings experienceGainSettings;

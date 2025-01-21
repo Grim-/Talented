@@ -48,6 +48,8 @@ namespace Talented
             }
         }
 
+        protected Dictionary<string, BaseTreeHandler> treeHandlers = new Dictionary<string, BaseTreeHandler>();
+
         public bool HasCustomBackground => !String.IsNullOrEmpty(TalentedGeneDef.geneListBackgroundTexturePath);
 
         public float XPForNextLevel => MaxExperienceForLevel(currentLevel);
@@ -67,7 +69,7 @@ namespace Talented
                 return;
             }
 
-            if (talentedDef.MainTreeDef == null || talentedDef.SecondaryTreeDef == null)
+            if (talentedDef.TalentTrees == null || talentedDef.TalentTrees.Count == 0)
             {
                 Log.Error($"Gene_TalentBase: Missing tree definitions for gene {def.defName}");
                 return;
@@ -82,12 +84,6 @@ namespace Talented
 
             InitializeTrees();
 
-            if (activeTree == null || passiveTree == null)
-            {
-                Log.Error($"Gene_TalentBase: Failed to initialize trees for gene {def.defName}");
-                return;
-            }
-
             if (talentedDef.experienceGainSettings != null)
             {
                 experienceHandler = new ExperienceHandler(this);
@@ -97,7 +93,50 @@ namespace Talented
                 Log.Warning($"Gene_TalentBase: No experience settings defined for gene {def.defName}");
             }
         }
+        protected virtual void InitializeTrees()
+        {
+            if (pawn == null)
+                throw new ArgumentNullException(nameof(pawn), "Pawn cannot be null when initializing trees");
 
+            if (TalentedGeneDef.TalentTrees == null || !TalentedGeneDef.TalentTrees.Any())
+                throw new InvalidOperationException("No tree definitions found");
+
+            foreach (var treeDef in TalentedGeneDef.TalentTrees)
+            {
+                if (treeDef == null)
+                {
+                    Log.Error($"Gene_TalentBase: Null tree definition found in {def.defName}");
+                    continue;
+                }
+
+                try
+                {
+                    if (!treeHandlers.ContainsKey(treeDef.defName))
+                    {
+                        BaseTreeHandler handler;
+                        if (treeDef.handlerClass != null)
+                        {
+                            handler = (BaseTreeHandler)Activator.CreateInstance(treeDef.handlerClass,
+                                new object[] { pawn, this, treeDef });
+                        }
+                        else
+                        {
+                            handler = new ActiveTreeHandler(pawn, this, treeDef);
+                        }
+
+                        treeHandlers.Add(treeDef.defName, handler);
+                    }
+                    else
+                    {
+                        Log.Error($"Gene_TalentBase: Cannot have two TalentTreeDefs with the same defName in the TalentTrees list.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Gene_TalentBase: Failed to initialize tree handler for {treeDef.defName}. Exception: {ex}");
+                }
+            }
+        }
         public override void PostRemove()
         {
             base.PostRemove();
@@ -112,11 +151,6 @@ namespace Talented
             return (level + 1) * BaseExperience;
         }
 
-        protected virtual void InitializeTrees()
-        {
-            activeTree = new ActiveTreeHandler(pawn, this, TalentedGeneDef.MainTreeDef);
-            passiveTree = new PassiveTreeHandler(pawn, this, TalentedGeneDef.SecondaryTreeDef);
-        }
         public virtual void OnExperienceGained(float amount, string source)
         {
 
@@ -161,8 +195,11 @@ namespace Talented
             int newLevel = Math.Min(oldLevel + levels, MaxLevel);
             currentLevel = newLevel;
 
-            passiveTree?.OnLevelUp(oldLevel, currentLevel);
-            activeTree?.OnLevelUp(oldLevel, currentLevel);
+            foreach (var item in treeHandlers.Values)
+            {
+                item?.OnLevelUp(oldLevel, currentLevel);
+            }
+
             OnLevelGained(oldLevel, currentLevel);
 
             Messages.Message($"{pawn.Label} gained {levels} level{(levels > 1 ? "s" : "")} (level = {currentLevel})",
@@ -204,15 +241,23 @@ namespace Talented
             }
         }
 
+   
+ 
+
+        public BaseTreeHandler GetTreeHandler(string treeDefName)
+        {
+            return treeHandlers.TryGetValue(treeDefName, out var handler) ? handler : null;
+        }
+
         public virtual IEnumerable<TreeInstanceData> AvailableTrees()
         {
-            if (TalentedGeneDef?.MainTreeDef != null && activeTree != null)
+            foreach (var pair in treeHandlers)
             {
-                yield return new TreeInstanceData(TalentedGeneDef.MainTreeDef, activeTree, TalentedGeneDef.MainTreeDef.label);
-            }
-            if (TalentedGeneDef?.SecondaryTreeDef != null && passiveTree != null)
-            {
-                yield return new TreeInstanceData(TalentedGeneDef.SecondaryTreeDef, passiveTree, TalentedGeneDef.SecondaryTreeDef.label);
+                var treeDef = TalentedGeneDef.TalentTrees.FirstOrDefault(t => t.defName == pair.Key);
+                if (treeDef != null)
+                {
+                    yield return new TreeInstanceData(treeDef, pair.Value, treeDef.label);
+                }
             }
         }
 

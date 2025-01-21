@@ -3,6 +3,8 @@ import { BadgeHelp, ChevronDown, ChevronUp, SquareMousePointer } from 'lucide-re
 import Button from './Button';
 import DefSelector from './DefRefSelector';
 import ListEditor from './PropertiesList';
+import TagGrid from './TagGrid';
+import PathInput from './PathInput';
 
 const PropertiesPanel = ({
   selectedNode,
@@ -10,7 +12,7 @@ const PropertiesPanel = ({
   onUpdateProperty
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
+  const [showExclusivePaths, setShowExclusivePaths] = useState(false);
   if (!selectedNode || !node) return null;
 
   const getNodeList = (node, propName) => {
@@ -53,7 +55,7 @@ const PropertiesPanel = ({
   return (
     <div className="w-80 bg-white rounded-lg shadow-lg">
       <div 
-        className="px-3 py-2 border-b border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+        className="px-3 py-2 border-b border-gray-200 flex m-1 justify-between items-center cursor-pointer hover:bg-gray-50"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <SquareMousePointer size={20} />
@@ -141,19 +143,66 @@ const PropertiesPanel = ({
               </div>
             </label>
             <div className="space-y-1">
-              <input
-                type="text"
-                value={node.path || ''}
-                onChange={(e) => onUpdateProperty('path', e.target.value)}
-                className="w-full p-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            <PathInput 
+                value={node.path}
+                onChange={(value) => onUpdateProperty('path', value)}
+                color={node.path}
               />
-              <DefSelector
-                defType="TalentPathDef"
-                onChange={(e) => {
-                  handleListItemAdd('', e);
-                  onUpdateProperty('path', e);
-                }}
-              />
+
+              {node.path === '' && (
+                  <DefSelector
+                  defType="TalentPathDef"
+                  value={node.path}  // Add this line
+                  onChange={(value) => {
+                    onUpdateProperty('path', value);  // Just update the path directly
+                  }}
+                />
+              )}
+              {node.path && (
+                    <>
+                      {/* Path Description */}
+                      <div className="text-sm text-gray-600">
+                        {node.descriptionString || 'No description available'}
+                      </div>
+                      
+                      {/* Exclusive Paths Section */}
+                      <div>
+                        <button
+                          onClick={() => setShowExclusivePaths(!showExclusivePaths)}
+                          className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                        >
+                          {showExclusivePaths ? 'Hide' : 'Show'} Exclusive Paths
+                          {showExclusivePaths ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                        </button>
+                        
+                        {showExclusivePaths && (
+                          <div className="mt-2">
+                            <TagGrid
+                              node={node}
+                              propName="exclusiveWith"
+                              list={() => {
+                                // Retrieve saved definitions from localStorage
+                                const savedDefs = JSON.parse(localStorage.getItem('savedDefs') || '{}');
+                                const defsOfType = savedDefs['TalentPathDef'] || {};
+                                
+                                // Ensure node.path exists
+                                if (!node.path) return [];
+
+                                // Retrieve the definition for the selected path
+                                const selectedPathDef = defsOfType[node.path];
+
+                                // If no definition or no exclusiveWith list, return an empty array
+                                if (!selectedPathDef || !selectedPathDef.exclusiveWith) return [];
+
+                                // Return the exclusiveWith list
+                                return selectedPathDef.exclusiveWith.filter((exclusivePath) => defsOfType[exclusivePath]);
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
             </div>
           </div>
         </div>

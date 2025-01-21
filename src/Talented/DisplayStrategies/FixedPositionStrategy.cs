@@ -29,7 +29,6 @@ namespace Talented
                 return new Dictionary<TalentTreeNodeDef, Rect>();
 
             var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
-
             int minX = int.MaxValue;
             int maxX = int.MinValue;
             int minZ = int.MaxValue;
@@ -39,28 +38,20 @@ namespace Talented
             {
                 if (node.hide || !node.MeetsVisibilityRequirements(null))
                     continue;
-
                 minX = Mathf.Min(minX, node.position.x);
                 maxX = Mathf.Max(maxX, node.position.x);
                 minZ = Mathf.Min(minZ, node.position.z);
                 maxZ = Mathf.Max(maxZ, node.position.z);
             }
 
-
             float gridWidth = maxX - minX + 1;
             float gridHeight = maxZ - minZ + 1;
-
             float availableWidth = availableSpace.width - (2 * MARGIN);
             float availableHeight = availableSpace.height - (2 * MARGIN);
 
-            // Calculate the maximum possible siz
-            float maxHorizontalSize = availableWidth / gridWidth;
-            float maxVerticalSize = availableHeight / gridHeight;
-            float effectiveNodeSize = Mathf.Min(nodeSize, Mathf.Min(maxHorizontalSize, maxVerticalSize));
-
-            // scaling factors
-            float xScale = (availableWidth - effectiveNodeSize) / Mathf.Max(1, gridWidth - 1);
-            float yScale = (availableHeight - effectiveNodeSize) / Mathf.Max(1, gridHeight - 1);
+            // scaling factors for positions only
+            float xScale = (availableWidth - nodeSize) / Mathf.Max(1, gridWidth - 1);
+            float yScale = (availableHeight - nodeSize) / Mathf.Max(1, gridHeight - 1);
 
             // Position each node
             foreach (var node in nodes)
@@ -74,10 +65,10 @@ namespace Talented
                     (node.position.z - minZ) / (float)(gridHeight - 1) : 0.5f;
 
                 // Calculate actual position within available space
-                float x = availableSpace.x + MARGIN + (normalizedX * (availableWidth - effectiveNodeSize));
-                float y = availableSpace.y + MARGIN + (normalizedZ * (availableHeight - effectiveNodeSize));
+                float x = availableSpace.x + MARGIN + (normalizedX * (availableWidth - nodeSize));
+                float y = availableSpace.y + MARGIN + (normalizedZ * (availableHeight - nodeSize));
 
-                nodePositions[node] = new Rect(x, y, effectiveNodeSize, effectiveNodeSize);
+                nodePositions[node] = new Rect(x, y, nodeSize, nodeSize);
             }
 
             return nodePositions;

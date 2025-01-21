@@ -5,17 +5,19 @@ const TreePropertiesPanel = ({
   treeName, setTreeName,
   treeSize, setTreeSize,
   treeDisplayStrategy, setTreeDisplay,
-  pointStrategy, setTreePointStrategy
+  pointStrategy, setTreePointStrategy,
+  treeHandler, setTreeHandler
 }) => {
   const [customDisplayStrategy, setCustomDisplayStrategy] = useState(false);
   const [customPointFormula, setCustomPointFormula] = useState(false);
+  const [customTreeHandler, setCustomTreeHandler] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   
   const inputClasses = "w-full p-1.5 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-sm";
   const labelClasses = "text-xs font-medium text-gray-700";
   
   return (
-    <div className="w-80 bg-white rounded-lg shadow-lg">
+    <div className="w-80 bg-white rounded-lg shadow-lg m-1">
       <div 
         className="px-3 py-2 border-b border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-50"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -78,6 +80,40 @@ const TreePropertiesPanel = ({
                   min="0"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Tree Handler/Type */}
+          <div className="space-y-1">
+            <label htmlFor="pointFormula" className={labelClasses}>
+              Talent Handler Type
+            </label>
+            <div className="space-y-1">
+              <select
+                id="treeHandlerType"
+                value={customTreeHandler ? 'custom' : treeHandler}
+                onChange={(e) => {
+                  const isCustom = e.target.value === 'custom';
+                  setCustomTreeHandler(isCustom);
+                  if (!isCustom) {
+                    setTreeHandler(e.target.value);
+                  }
+                }}
+                className={inputClasses}
+              >
+                <option value="Talented.ActiveTreeHandler">Active</option>
+                <option value="Talented.PassiveTreeHandler">Passive</option>
+                <option value="YourNameSpace.YourHandler">Custom</option>
+              </select>
+              {customPointFormula && (
+                <input
+                  type="text"
+                  placeholder="Enter custom formula..."
+                  value={pointStrategy}
+                  onChange={(e) => setTreeHandler(e.target.value)}
+                  className={inputClasses}
+                />
+              )}
             </div>
           </div>
 

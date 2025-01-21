@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
 import NodeEditor from './NodeEditor';
-import DefEditor from './components/DefEditor';
+import DefManager from './components/DefManager';  // Changed from DefEditor
 import Button from './components/Button';
 import { Node } from './components/Node';
 
-
 function App() {
   const [activeTab, setActiveTab] = useState('nodes');
-  const [nodes, setNodes] = useState([new Node(null, "ROOT", 'Start', 400, 100)]);
+  const [nodes, setNodes] = useState([new Node(Node.NewId(), "Root", 'Start', 0, 0, 150, 80)]);
   const [paths, setPaths] = useState([]);
   const [treeName, setTreeName] = useState('');
-  const [treeSize, setTreeSize] = useState({width : 600, height : 400});
+  const [treeSize, setTreeSize] = useState({width: 600, height: 400});
   const [treeDisplayStrategy, setTreeDisplay] = useState('FixedPosition');
   const [pointStrategy, setTreePointStrategy] = useState('PerLevel');
-
-
-  const [selectedType, setSelectedType] = useState(null);
-  const [currentDef, setCurrentDef] = useState(null);
+  const [treeHandler, setTreeHandler] = useState('ActiveTreeHandler');
 
   return (
     <div className="App">
@@ -59,16 +55,11 @@ function App() {
             setTreeDisplay={setTreeDisplay}
             pointStrategy={pointStrategy}
             setTreePointStrategy={setTreePointStrategy}
+            treeHandler={treeHandler}
+            setTreeHandler={setTreeHandler}
           />
         ) : (
-          <DefEditor
-            selectedType={selectedType}
-            setSelectedType={setSelectedType}
-            currentDef={currentDef}
-            setCurrentDef={setCurrentDef}
-            treeName={treeName}
-            setTreeName={setTreeName}
-          />
+          <DefManager /> 
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Node } from './Node';
 
 const NodeDisplay = ({ 
@@ -9,8 +9,28 @@ const NodeDisplay = ({
   handleNodeSelect, 
   startConnection, 
   setNodes,
-  copyToClipboard 
+  copyToClipboard,
+  onContextMenuClick
 }) => {
+  const [expandedNodes, setExpandedNodes] = useState(new Set());
+
+  const handleToggleExpand = (nodeId) => {
+    setExpandedNodes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(nodeId)) {
+        newSet.delete(nodeId);
+      } else {
+        newSet.add(nodeId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleNodeClick = (e, nodeId) => {
+    e.stopPropagation();
+    handleNodeSelect(nodeId, e);
+  };
+
   return (
     <div>
       {nodes.map(nodeData => {
@@ -40,11 +60,18 @@ const NodeDisplay = ({
           node.render({
             selected: selectedNode === node.id,
             connecting: connecting === node.id,
-            onMouseDown: (e) => handleMouseDown(e, node.id),
-            onClick: (e) => handleNodeSelect(node.id, e),
+            onMouseDown: (e) => {
+              if (e.target.tagName.toLowerCase() !== 'input') {
+                handleMouseDown(e, node.id);
+              }
+            },
+            onClick: (e) => handleNodeClick(e, node.id),
+            onContextMenu: (e) => onContextMenuClick(e, node.id),
             onStartConnection: (id) => startConnection(id),
             onDelete: (id) => setNodes(nodes.filter(n => n.id !== id)),
-            onCopyProperty: copyToClipboard
+            onCopyProperty: copyToClipboard,
+            expanded: expandedNodes.has(node.id),
+            onToggleExpand: handleToggleExpand
           }),
           { key: node.id }
         );

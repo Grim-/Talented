@@ -138,11 +138,6 @@ namespace Talented
                    progress >= node.upgrades.Count;
         }
 
-        //public UnlockResult CanUnlockNode(UpgradeTreeNodeDef node)
-        //{
-        //    return ValidateUnlock(node);
-        //}
-
         public int GetNodeProgress(TalentTreeNodeDef node)
         {
             return nodeProgress.TryGetValue(node, out int progress) ? progress : 0;

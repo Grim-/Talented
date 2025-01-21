@@ -7,7 +7,8 @@ export const ListEditor = ({
     list, 
     onItemChange, 
     onItemRemove, 
-    onItemAdd 
+    onItemAdd,
+    defType = "TalentDef" 
 }) => {
   const items = propName === 'upgrades' ? 
     (Array.isArray(node.upgrades) ? node.upgrades :
@@ -46,8 +47,8 @@ export const ListEditor = ({
       <div className="flex space-x-2 pt-1">
         <div className="flex-1">
           <DefSelector
-            defType="TalentDef"
-            onChange={(e) => onItemAdd('upgrades', e)}
+            defType={defType}
+            onChange={(e) => onItemAdd(propName, e)}
           />
         </div>
         <button

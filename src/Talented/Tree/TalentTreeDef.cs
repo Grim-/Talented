@@ -10,7 +10,7 @@ namespace Talented
         public string treeName = "A Talent Tree";
         public List<TalentTreeNodeDef> nodes;
         public IntVec2 dimensions;
-        public Type handlerClass;
+        public Type handlerClass = typeof(ActiveTreeHandler);
         public TalentTreeSkinDef skin;
         public List<TalentPathDef> availablePaths;
         public TreeDisplayStrategyDef displayStrategy;

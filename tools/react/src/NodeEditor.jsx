@@ -3,7 +3,7 @@ import Modal from './components/Modal';
 import Button from './components/Button';
 import Node from './components/Node';
 import PropertiesPanel from './components/PropertiesPanel'
-import { saveDef, loadDefs } from './utils/storage';
+import { saveDef, loadDefs } from './utils/StorageUtils';
 import { importFromXml, exportToXml, serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
 import { saveSessionToFile, loadSessionFromFile, clearSession } from './utils/sessions';
 import { Toolbar } from './components/Toolbar';
@@ -13,6 +13,7 @@ import CanvasInstructions from './components/CanvasInstructions';
 import { useLockBodyScroll } from "@uidotdev/usehooks";
 import ConnectionsDisplay from './components/ConnectionsDisplay';
 import TreePropertiesPanel from './components/TreePropertiesPanel';
+import PathPanel from './components/PathPanel';
 
 const NodeEditor = ({ 
   nodes, setNodes, 
@@ -20,7 +21,9 @@ const NodeEditor = ({
   treeName, setTreeName, 
   treeSize, setTreeSize, 
   treeDisplayStrategy, setTreeDisplay, 
-  pointStrategy, setTreePointStrategy }) => {
+  pointStrategy, setTreePointStrategy,
+  treeHandler, setTreeHandler
+ }) => {
   useLockBodyScroll();
   //state
   const [referenceDefs, setReferenceDefs] = useState(() => {
@@ -109,12 +112,19 @@ const NodeEditor = ({
       alert(e.message);
     }
   };
-
+  const handleCanvasClick = (e) => {
+    if (e.target.id === 'mainCanvas') {
+      setSelectedNode(null);
+      setConnecting(null);
+    }
+  };
 
   const handleMouseDown = (e, nodeId) => {
     if (e.target.tagName.toLowerCase() === 'input') return;
-
+    
     const node = nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    
     setDraggingNode(nodeId);
     setDraggingOffset({
       x: e.clientX - node.x,
@@ -124,6 +134,7 @@ const NodeEditor = ({
 
   const handleMouseMove = (e) => {
     if (draggingNode) {
+      e.preventDefault();
       setNodes(nodes.map(node => {
         if (node.id === draggingNode) {
           return {
@@ -136,9 +147,10 @@ const NodeEditor = ({
       }));
     }
   };
-
   const handleMouseUp = () => {
-    setDraggingNode(null);
+    if (draggingNode) {
+      setDraggingNode(null);
+    }
   };
 
   const handleNodeSelect = (nodeId, e) => {
@@ -216,12 +228,14 @@ const NodeEditor = ({
     });
   };
 
-  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 600, y = 100, width = 150, height = 80) => {
+  const addNewNode = (id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 130, height = 80) => {
     const newID = Node.NewId();
     setNodes([...nodes, new Node(id == null ? newID : id, label, type, x, y, width, height)]);
     setSelectedNode(newID);
   };
-
+   const onNodeStateChange = () => {
+      this.forceUpdate();
+  }
   const contextMenuHandlers = {
     handleAddNode: (type) => {
       addNewNode(null, "New Node", type, contextMenu.x - 75, contextMenu.y - 40);
@@ -243,6 +257,7 @@ const NodeEditor = ({
 
   return (
     <div
+      id="mainContent"
       className="w-full h-screen bg-gray-100 relative p-4"
       onContextMenu={handleContextMenu}
     >
@@ -256,7 +271,7 @@ const NodeEditor = ({
           setPaths(data.paths);
         }}
         onImportXml={handleFileSelect}
-        onExportXml={() => exportToXml(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy)}
+        onExportXml={() => exportToXml(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
         onClearSession={() => clearSession(setNodes, setPaths)}
         setTreeName={setTreeName}
       />
@@ -296,6 +311,8 @@ const NodeEditor = ({
         setTreeDisplay={setTreeDisplay}
         pointStrategy={pointStrategy}
         setTreePointStrategy={setTreePointStrategy}
+        treeHandler={treeHandler}
+        setTreeHandler={setTreeHandler}
       />
       {/* Properties Panel */}
       {selectedNode && (
@@ -305,25 +322,34 @@ const NodeEditor = ({
           onUpdateProperty={(property, value) => updateNodeProperty(selectedNode, property, value)}
           onAddBranchPath={() => addBranchPath(selectedNode)}
           onUpdateBranchPath={(index, property, value) => updateBranchPath(selectedNode, index, property, value)}
+          paths={paths}
+          setPaths={setPaths}
         />
       )}
 
+      {paths !== undefined && (
+        <PathPanel 
+        paths={paths}
+        setPaths={setPaths}
+        nodes={nodes}
+      />
+      )}
+      
       {/* Main canvas area */}
       <div
         className="w-full h-full"
+        id="mainCanvas"
+        onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
         <CanvasInstructions nodes={nodes} />
-        {/* Connection lines */}
         <ConnectionsDisplay
           nodes={nodes}
           connecting={connecting}
           draggingNode={draggingNode}
           onDeleteConnection={handleDeleteConnection}
         />
-
-        {/* Nodes */}
         <NodeDisplay
           nodes={nodes}
           selectedNode={selectedNode}

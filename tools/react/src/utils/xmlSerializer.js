@@ -102,24 +102,36 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
   event.target.value = '';
 };
 
-export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, config = DefTypeConfig) => {
+export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
+  // Collect all unique paths used in nodes
+  const usedPaths = new Set(nodes.map(node => node.path).filter(Boolean));
+  const allPaths = [...paths];
+  
+  // Add any paths used in nodes but not in paths array
+  usedPaths.forEach(pathName => {
+    if (!paths.find(p => p.name === pathName)) {
+      allPaths.push({
+        name: pathName,
+        description: '',
+        exclusiveWith: []
+      });
+    }
+  });
+
   let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
-  
-  // Generate the three main sections
-  xml += exportTalentTree(nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula);
-  xml += exportPaths(paths, config);
-  xml += exportNodes(nodes, config);
-  
+  xml += exportTalentTree(nodes, allPaths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler);
+  xml += exportPaths(allPaths, config);
+  xml += exportNodes(nodes, treeSize, config);
   xml += '</Defs>';
   return xml;
 };
 
 // Function to export the talent tree definition
-const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula) => {
+const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler) => {
   let xml = '<Talented.TalentTreeDef>\n';
   xml += `    <defName>${treeName || 'GIVE_ME_A_PROPER_NAME'}</defName>\n`;
   xml += `    <dimensions>(${treeSize.width} , ${treeSize.height})</dimensions>\n`;
-  
+  xml += `    <handlerClass>Talented.${treeHandler}</handlerClass>\n`;
   // Add root nodes
   xml += '    <nodes>\n';
   nodes.filter(node => node.type === 'Start')
@@ -134,7 +146,7 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, tr
     xml += `      <li>${path.name}</li>\n`;
   });
   xml += '    </availablePaths>\n';
-  
+
   xml += `    <displayStrategy>${treeDisplayStrat}</displayStrategy>\n`;
   xml += `    <talentPointFormula>${treePointsFormula}</talentPointFormula>\n`;
   xml += '  </Talented.TalentTreeDef>\n\n';
@@ -142,21 +154,79 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, tr
   return xml;
 };
 
-// Function to export path definitions
+const validateAndFixPaths = (paths) => {
+  // Create a deep copy to avoid mutating the original paths
+  const validatedPaths = JSON.parse(JSON.stringify(paths));
+  
+  // For each path
+  validatedPaths.forEach(pathA => {
+    // Initialize exclusivePaths array if it doesn't exist
+    if (!pathA.exclusivePaths) {
+      pathA.exclusivePaths = [];
+    }
+
+    // Check each exclusive path
+    pathA.exclusivePaths.forEach(exclusiveName => {
+      // Find the corresponding path
+      const pathB = validatedPaths.find(p => p.name === exclusiveName);
+      
+      if (pathB) {
+        // Initialize exclusivePaths array if it doesn't exist for pathB
+        if (!pathB.exclusivePaths) {
+          pathB.exclusivePaths = [];
+        }
+        
+        // If pathA is not in pathB's exclusive list, add it
+        if (!pathB.exclusivePaths.includes(pathA.name)) {
+          pathB.exclusivePaths.push(pathA.name);
+        }
+      }
+    });
+  });
+
+  return validatedPaths;
+};
+
+
 const exportPaths = (paths, config) => {
+  const validatedPaths = validateAndFixPaths(paths);
+  
   let xml = '';
-  paths?.forEach(path => {
-    const pathDefType = getFullDefName(config.PATH);
-    xml += `  <${pathDefType}>\n`;
+  validatedPaths.forEach(path => {
+    xml += '<Talented.TalentPathDef>\n';
     xml += `    <defName>${path.name}</defName>\n`;
     xml += `    <pathDescription>${path.description}</pathDescription>\n`;
-    xml += `  </${pathDefType}>\n\n`;
+    xml += `    <exclusiveWith>\n`;
+
+    if (path.exclusivePaths && path.exclusivePaths.length > 0) {
+      path.exclusivePaths.forEach(exclusivePath => {
+        xml += `      <li>${exclusivePath}</li>\n`;
+      });
+    }
+
+    xml += `    </exclusiveWith>\n`;
+    xml += `  </Talented.TalentPathDef>\n\n`;
   });
   return xml;
 };
 
-// Function to export node definitions
-const exportNodes = (nodes, config) => {
+
+const calculateScaledPosition = (node, treeSize) => {
+  const canvasDiv = document.getElementById('mainCanvas');
+  const canvasWidth = canvasDiv.clientWidth;
+  const canvasHeight = canvasDiv.clientHeight;
+  
+  const scaleX = treeSize.width / canvasWidth;
+  const scaleY = treeSize.height / canvasHeight;
+  
+  const scaledX = Math.round(node.x * scaleX);
+  const scaledY = Math.round(node.y * scaleY);
+  
+  return `(${scaledX},${scaledY})`;
+};
+
+
+const exportNodes = (nodes, treeSize, config) => {
   let xml = '';
   nodes.forEach(node => {
     const defType = node.upgrade ? getFullDefName(config.NODE) :
@@ -169,8 +239,9 @@ const exportNodes = (nodes, config) => {
     if (node.label) xml += `    <label>${node.label}</label>\n`;
 
     if (node.x !== undefined) {
-      xml += `    <position>(${Math.round(node.x/50)},${Math.round(node.y/50)})</position>\n`;
+      xml += `    <position>${calculateScaledPosition(node, treeSize)}</position>\n`;
     }
+
 
     if (node.type) xml += `    <type>${node.type}</type>\n`;
     
@@ -223,11 +294,13 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
 
     Array.from(xmlDoc.getElementsByTagName(pathDefType)).forEach(pathDef => {
       paths.push({
-        id: pathDef.getElementsByTagName("defName")[0].textContent,
+        id : pathDef.getElementsByTagName("defName")[0].textContent,
         name: pathDef.getElementsByTagName("defName")[0].textContent,
-        description: pathDef.getElementsByTagName("pathDescription")[0]?.textContent || ''
+        description: pathDef.getElementsByTagName("pathDescription")[0]?.textContent || '',
+        exclusiveWith: Array.from(pathDef.getElementsByTagName("exclusiveWith")[0]?.getElementsByTagName("li") || [])
+          .map(li => li.textContent)
       });
-    });
+    })
 
     Array.from(xmlDoc.getElementsByTagName(nodeDefType)).forEach(nodeDef => {
       const position = nodeDef.getElementsByTagName("position")[0]?.textContent || "(0,0)";

@@ -3,18 +3,18 @@ import { EditableDefTypes, DefStructures } from '../DefTypes';
 import Button from './Button';
 import { serializeDefToXml, handleXmlImport } from '../utils/xmlSerializer';
 import { renderPropertyEditor } from '../utils/renderProperties';
-
+import { StorageUtils } from '../utils/StorageUtils';
 
 const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef }) => {
   const [savedDefs, setSavedDefs] = useState(() => {
-    const saved = localStorage.getItem('savedDefs');
-    return saved ? JSON.parse(saved) : {};
+    return StorageUtils.getSavedDefs();
   });
 
-  
   useEffect(() => {
+    Object.entries(savedDefs).forEach(([defType, defs]) => {
+      StorageUtils.saveDefsOfType(defType, defs);
+    });
     console.log("Saving to localStorage:", savedDefs);
-    localStorage.setItem('savedDefs', JSON.stringify(savedDefs));
   }, [savedDefs]);
 
   const handleTypeChange = (type) => {
@@ -262,7 +262,7 @@ const DefEditor = ({ selectedType, setSelectedType, currentDef, setCurrentDef })
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `defs-${new Date().toISOString().slice(0, 10)}.xml`;
+    a.download = `TalentAndPathDefs.xml`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
