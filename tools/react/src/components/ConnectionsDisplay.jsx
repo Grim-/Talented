@@ -1,20 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const ConnectionLines = ({ nodes, connecting, draggingNode, onDeleteConnection }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const svgRef = useRef(null);
+  const containerRef = useRef(null);
   
   useEffect(() => {
     const handleMouseMove = (e) => {
-      // Get position relative to the SVG container
-      const svg = document.getElementById('mainContent');
-      if (svg) {
-        const rect = svg.getBoundingClientRect();
+      if (containerRef.current) {
+        // Get the scroll position of the container
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const scrollLeft = containerRef.current.scrollLeft;
+        const scrollTop = containerRef.current.scrollTop;
+        
+        // Calculate mouse position relative to the scrolled container
         setMousePos({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
+          x: (e.clientX - containerRect.left) + scrollLeft,
+          y: (e.clientY - containerRect.top) + scrollTop
         });
       }
     };
+
+    const container = document.getElementById('mainContent');
+    if (container) {
+      containerRef.current = container;
+    }
 
     if (connecting && !draggingNode) {
       window.addEventListener('mousemove', handleMouseMove);
@@ -28,38 +38,78 @@ const ConnectionLines = ({ nodes, connecting, draggingNode, onDeleteConnection }
     onDeleteConnection(sourceId, targetId);
   };
 
-  // Calculate connection points on the edges of nodes instead of center
+  // Calculate connection points on the edges of nodes
   const getConnectionPoints = (source, target) => {
-    const sourceWidth = source.width || 150;
-    const sourceHeight = source.height || 50;
-    const targetWidth = target.width || 150;
-    const targetHeight = target.height || 50;
+    const sourceCenter = {
+      x: source.x + source.width / 2,
+      y: source.y + source.height / 2
+    };
+    
+    const targetCenter = {
+      x: target.x + target.width / 2,
+      y: target.y + target.height / 2
+    };
 
-    // Calculate center points
-    const sourceX = source.x + sourceWidth / 2;
-    const sourceY = source.y + sourceHeight / 2;
-    const targetX = target.x + targetWidth / 2;
-    const targetY = target.y + targetHeight / 2;
-
-    // Calculate angle between nodes
-    const angle = Math.atan2(targetY - sourceY, targetX - sourceX);
+    // Calculate angle between centers
+    const angle = Math.atan2(
+      targetCenter.y - sourceCenter.y,
+      targetCenter.x - sourceCenter.x
+    );
 
     // Calculate intersection points with node boundaries
-    const sourceIntersect = {
-      x: sourceX + Math.cos(angle) * sourceWidth / 2,
-      y: sourceY + Math.sin(angle) * sourceHeight / 2
+    const sourcePoint = {
+      x: sourceCenter.x + Math.cos(angle) * (source.width / 2),
+      y: sourceCenter.y + Math.sin(angle) * (source.height / 2)
     };
 
-    const targetIntersect = {
-      x: targetX - Math.cos(angle) * targetWidth / 2,
-      y: targetY - Math.sin(angle) * targetHeight / 2
+    const targetPoint = {
+      x: targetCenter.x - Math.cos(angle) * (target.width / 2),
+      y: targetCenter.y - Math.sin(angle) * (target.height / 2)
     };
 
-    return { source: sourceIntersect, target: targetIntersect };
+    return { source: sourcePoint, target: targetPoint };
+  };
+
+  // Handle the preview connection line
+  const renderPreviewLine = () => {
+    if (!connecting) return null;
+
+    const sourceNode = nodes.find(n => n.id === connecting);
+    if (!sourceNode) return null;
+
+    const sourceX = sourceNode.x + sourceNode.width / 2;
+    const sourceY = sourceNode.y + sourceNode.height / 2;
+
+    let targetX = mousePos.x;
+    let targetY = mousePos.y;
+
+    if (draggingNode) {
+      const targetNode = nodes.find(n => n.id === draggingNode);
+      if (targetNode) {
+        targetX = targetNode.x + targetNode.width / 2;
+        targetY = targetNode.y + targetNode.height / 2;
+      }
+    }
+
+    return (
+      <line
+        x1={sourceX}
+        y1={sourceY}
+        x2={targetX}
+        y2={targetY}
+        stroke="blue"
+        strokeWidth="2"
+        strokeDasharray="5,5"
+        markerEnd="url(#arrowhead)"
+      />
+    );
   };
 
   return (
-    <svg className="w-full h-full absolute top-0 left-0 pointer-events-none">
+    <svg 
+      ref={svgRef}
+      className="w-full h-full absolute top-0 left-0 pointer-events-none"
+    >
       <defs>
         <marker
           id="arrowhead"
@@ -92,7 +142,6 @@ const ConnectionLines = ({ nodes, connecting, draggingNode, onDeleteConnection }
           
           return (
             <g key={`${node.id}-${targetId}`} className="pointer-events-auto">
-              {/* Invisible wider line for easier clicking */}
               <line
                 x1={points.source.x}
                 y1={points.source.y}
@@ -103,7 +152,6 @@ const ConnectionLines = ({ nodes, connecting, draggingNode, onDeleteConnection }
                 className="cursor-pointer"
                 onContextMenu={(e) => handleLineClick(node.id, targetId, e)}
               />
-              {/* Visible line with arrow */}
               <line
                 x1={points.source.x}
                 y1={points.source.y}
@@ -119,22 +167,8 @@ const ConnectionLines = ({ nodes, connecting, draggingNode, onDeleteConnection }
           );
         })
       )}
-      {connecting && (
-        <line
-          x1={nodes.find(n => n.id === connecting)?.x + (nodes.find(n => n.id === connecting)?.width || 150) / 2 || 0}
-          y1={nodes.find(n => n.id === connecting)?.y + (nodes.find(n => n.id === connecting)?.height || 50) / 2 || 0}
-          x2={draggingNode 
-            ? nodes.find(n => n.id === draggingNode)?.x + (nodes.find(n => n.id === draggingNode)?.width || 150) / 2 
-            : mousePos.x}
-          y2={draggingNode 
-            ? nodes.find(n => n.id === draggingNode)?.y + (nodes.find(n => n.id === draggingNode)?.height || 50) / 2 
-            : mousePos.y}
-          stroke="blue"
-          strokeWidth="2"
-          strokeDasharray="5,5"
-          markerEnd="url(#arrowhead)"
-        />
-      )}
+      
+      {renderPreviewLine()}
     </svg>
   );
 };

@@ -1,92 +1,102 @@
 import React, { useState } from 'react';
-import { ArrowLeftRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { HelpCircle, X, ArrowLeftRight } from 'lucide-react';
 
 const CanvasInstructions = ({ nodes }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <div className="fixed bottom-4 right-4">
-      <div className={`bg-white/5 rounded-lg shadow-lg transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[80vh] overflow-y-auto' : 'max-h-12 overflow-hidden'}`}>
-        {/* Header - Always visible */}
-        <div 
-          className="flex justify-between items-center p-4 cursor-pointer pointer-events-auto bg-white/5 hover:bg-white/10 transition-colors"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          <h2 className="text-2xl font-semibold text-gray-900">Getting Started</h2>
-          {isExpanded ? (
-            <ChevronDown className="text-gray-700" size={24} />
-          ) : (
-            <ChevronUp className="text-gray-700" size={24} />
-          )}
-        </div>
+    <>
+      {/* Toggle Button */}
+      <button
+        onClick={() => setIsVisible(!isVisible)}
+        className="fixed right-4 top-32 bg-gray-800 p-2 rounded-md shadow-md hover:bg-gray-700 transition-colors border border-gray-700 z-50"
+        title="Getting Started Guide"
+      >
+        <HelpCircle size={20} className="text-gray-300" />
+      </button>
 
-        {/* Content - Collapsible */}
-        <div className="p-8 pt-2">
-          {/* Basic Actions */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3 text-gray-800">Basic Actions</h3>
-            <ul className="space-y-2">
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Set a unique name for your TalentTreeDef in the properties panel</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>You must have at least one Start node.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Right-click anywhere to add a new node</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Left-click a node to select and edit its properties in the properties panel</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Drag nodes to reposition them</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <ArrowLeftRight className="text-gray-700" size={20} />
-                <span>Click the connect button to draw connections between nodes</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Right-click a connection to delete it</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Define your Trees nodes, their connections and upgrades.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Export the resulting XML into your mods `Defs` folder</span>
-              </li>
-            </ul>
+      {/* Instructions Panel */}
+      {isVisible && (
+        <div className="fixed right-4 top-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-50 w-96 max-h-[70vh] flex flex-col">
+          <div className="flex justify-between items-center p-3 border-b border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-300">Getting Started</h2>
+            <button
+              onClick={() => setIsVisible(false)}
+              className="text-gray-400 hover:text-gray-300"
+            >
+              <X size={16} />
+            </button>
           </div>
 
-          {/* Advanced Features */}
-          <div>
-            <h3 className="text-lg font-medium mb-3 text-gray-800">Working with Defs</h3>
-            <ul className="space-y-2">
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Use the Def Editor tab to import your custom TalentDef and TalentPath Defs</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Import TalentTreeNodeDefs and TalentPathDefs to visualize them on screen</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-blue-500">➤</span>
-                <span>Export your talent tree arrangement as XML for use with <a href="https://github.com/Grim-/Talented/wiki" className="text-blue-500 hover:underline pointer-events-auto" target="_blank" rel="noopener noreferrer">Talented</a></span>
-              </li>
-            </ul>
+          <div className="overflow-y-auto p-4">
+            {/* Basic Actions */}
+            <div className="mb-6">
+              <h3 className="text-md font-medium mb-3 text-gray-300">Basic Actions</h3>
+              <ul className="space-y-2">
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Set a unique name for your TalentTreeDef in the properties panel</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">You must have at least one Start node.</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Right-click anywhere to add a new node</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Left-click a node to select and edit its properties</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Drag nodes to reposition them</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <div className="flex items-center space-x-2">
+                    <ArrowLeftRight className="text-gray-300" size={16} />
+                    <span className="text-gray-300">Click the connect button to draw connections</span>
+                  </div>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Right-click a connection to delete it</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Define your Trees nodes, their connections and upgrades.</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Export the resulting XML into your mods `Defs` folder</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Working with Defs */}
+            <div>
+              <h3 className="text-md font-medium mb-3 text-gray-300">Working with Defs</h3>
+              <ul className="space-y-2">
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Use the Def Editor tab to import your custom TalentDef and TalentPath Defs</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Import TalentTreeNodeDefs and TalentPathDefs to visualize them</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-blue-400 flex-shrink-0">➤</span>
+                  <span className="text-gray-300">Export your talent tree arrangement as XML for use with <a href="https://github.com/Grim-/Talented/wiki" className="text-blue-400 hover:text-blue-300 hover:underline pointer-events-auto" target="_blank" rel="noopener noreferrer">Talented</a></span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

@@ -14,6 +14,8 @@ import { useLockBodyScroll } from "@uidotdev/usehooks";
 import ConnectionsDisplay from './components/ConnectionsDisplay';
 import TreePropertiesPanel from './components/TreePropertiesPanel';
 import PathPanel from './components/PathPanel';
+import TreeSizePreview from './components/TreeSizePreview';
+import Minimap from './components/Minimap';
 
 const NodeEditor = ({ 
   nodes, setNodes, 
@@ -256,9 +258,9 @@ const NodeEditor = ({
   };
 
   return (
-    <div
+<div
       id="mainContent"
-      className="w-full h-screen bg-gray-100 relative p-4"
+      className="w-full h-screen bg-gray-600 border-b border-gray-700 relative p-4"
       onContextMenu={handleContextMenu}
     >
       {/* Top toolbar */}
@@ -266,8 +268,16 @@ const NodeEditor = ({
         treeName={treeName || ''}
         onAddNode={addNewNode}
         onSaveSession={(e) => saveSessionToFile(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
-        onLoadSession={async (data) => {
-          loadSessionFromFile(data);
+        onLoadSession={(data) => {
+          clearSession(setNodes, setPaths, true);
+          const session = loadSessionFromFile(data);
+          setNodes(session.nodes);
+          setPaths(session.paths);
+          setTreeName(session.treeName);
+          setTreeSize(session.treeSize);
+          setTreeDisplay(session.treeDisplay);
+          setTreePointStrategy(session.treePointStrategy);
+          setTreeHandler(session.treeHandler);
         }}
         onImportXml={handleFileSelect}
         onExportXml={() => exportToXml(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
@@ -300,6 +310,7 @@ const NodeEditor = ({
           }
         }}
       />
+      
       {/* Header */}
       <TreePropertiesPanel
         treeName={treeName}
@@ -328,12 +339,16 @@ const NodeEditor = ({
 
       {paths !== undefined && (
         <PathPanel 
-        paths={paths}
-        setPaths={setPaths}
-        nodes={nodes}
+          paths={paths}
+          setPaths={setPaths}
+          nodes={nodes}
       />
       )}
-      
+        <TreeSizePreview 
+          width={treeSize?.width} 
+          height={treeSize?.height}
+          nodes={nodes}
+        />
       {/* Main canvas area */}
       <div
         className="w-full h-full"
@@ -359,12 +374,14 @@ const NodeEditor = ({
           setNodes={setNodes}
           copyToClipboard={copyToClipboard}
           onContextMenuClick={handleNodeContextMenu}
+          gameWidth={treeSize.x}
+          gameHeight={treeSize.y}
         />
       </div>
 
       {/* Export Modal */}
       <Modal isOpen={showExport} onClose={() => setShowExport(false)}>
-        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto max-h-96">
+        <pre className="bg-gray-900 p-4 rounded-lg overflow-auto max-h-96">
           {exportedXml}
         </pre>
       </Modal>

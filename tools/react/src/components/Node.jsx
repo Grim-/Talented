@@ -2,6 +2,7 @@ import React from 'react';
 import Button from './Button';
 import { ArrowLeftRight, Trash, ChevronDown, ChevronUp } from 'lucide-react';
 import NodeProperties from './NodePropertiesDisplay';
+import { Tooltip } from 'react-tooltip';
 
 export class Node {
     constructor(id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 350, height = 100) {
@@ -26,6 +27,7 @@ export class Node {
         this.upgrades = [];
         this.descriptionString = '';
         this.levelRequired = 0;
+        this.canDrag = true;
     }
 
     static NewId = () => {
@@ -40,24 +42,27 @@ export class Node {
     }
 
     static getBackGroundClass = (type) => {
-        let backgroundClass = 'bg-white';
+        let backgroundClass = 'bg-gray-700';
         if(type === 'Start') {
-            backgroundClass = 'bg-green-100';
+            backgroundClass = 'bg-green-700';
         }
         else if(type === 'Branch') {
-            backgroundClass = 'bg-yellow-100';
-        }
-        else {
-            backgroundClass = 'bg-white';
+            backgroundClass = 'bg-yellow-700';
         }
         return backgroundClass;
     };
 
     render({selected, connecting, onMouseDown, onClick, onStartConnection, onDelete, onCopyProperty, onContextMenuClick, expanded, onToggleExpand}) {
+        const tooltipId = `node-tooltip-${this.id}`;
+        const upgradesText = this.upgrades && this.upgrades.length > 0 
+            ? `Upgrades: \r\n ${this.upgrades.join(', ')}` 
+            : 'No upgrades selected';
+
         return (
             <div
                 className={`absolute p-2 rounded-lg shadow-lg cursor-move transition-all duration-200
                     ${Node.getBackGroundClass(this.type)}
+                    text-gray-300
                     ${selected ? 'ring-2 ring-blue-500' : ''}
                     ${connecting ? 'ring-2 ring-blue-300' : ''}`}
                 style={{
@@ -73,37 +78,52 @@ export class Node {
             >
                 <div className="flex flex-col h-full">
                     <div className="flex justify-between items-center mb-2">
-                        <div className="text-sm font-medium">{this.label}</div>
+                        <div 
+                            className="text-sm font-medium flex items-center"
+                            data-tooltip-id={tooltipId}
+                            data-tooltip-content={upgradesText}
+                        >
+                            {this.label}
+                            {this.upgrades && this.upgrades.length > 0 && (
+                                <span className="ml-1 inline-flex items-center justify-center w-4 h-4 text-xs bg-blue-900 text-blue-200 rounded-full">
+                                    {this.upgrades.length}
+                                </span>
+                            )}
+                        </div>
+                        <Tooltip
+                            id={tooltipId}
+                            place="top"
+                            className="max-w-xs bg-gray-900 text-gray-300 text-sm rounded px-2 py-1"
+                        />
                         <button 
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onToggleExpand(this.id);
                             }}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-gray-700 rounded"
                         >
                             {expanded ? 
-                                <ChevronUp size={16} /> : 
-                                <ChevronDown size={16} />
+                                <ChevronUp size={16} className="text-gray-300" /> : 
+                                <ChevronDown size={16} className="text-gray-300" />
                             }
                         </button>
                     </div>
 
                     {this.path && (
-                    <div
-                        className="text-xs text-gray-500 mb-2 cursor-pointer hover:bg-gray-100 px-1 rounded truncate"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onCopyProperty(this.path, 'path');
-                        }}
-                        title="Click to copy path"
-                    >
-                        Path: {this.path}
-                    </div>
-
+                        <div
+                            className="text-xs text-gray-400 mb-2 cursor-pointer hover:bg-gray-700 px-1 rounded truncate"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onCopyProperty(this.path, 'path');
+                            }}
+                            title="Click to copy path"
+                        >
+                            Path: {this.path}
+                        </div>
                     )}
 
                     {expanded && (
-                        <div className="flex-1 overflow-y-auto mb-2">
+                        <div className="flex-1 overflow-y-auto mb-2 text-gray-300">
                             <NodeProperties node={this} />
                         </div>
                     )}
@@ -115,7 +135,7 @@ export class Node {
                                 e.stopPropagation();
                                 onStartConnection(this.id);
                             }}
-                            className="bg-blue-500 text-white"
+                            className="bg-blue-600 text-white hover:bg-blue-700"
                         >
                             <ArrowLeftRight size={20}/>
                         </Button>
@@ -125,7 +145,7 @@ export class Node {
                                 e.stopPropagation();
                                 onDelete(this.id);
                             }}
-                            className="bg-red-500 text-white"
+                            className="bg-red-600 text-white hover:bg-red-700"
                         >
                             <Trash size={20}/>
                         </Button>

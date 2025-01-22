@@ -110,17 +110,17 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
   };
 
   return (
-    <div className="w-80 bg-white rounded-lg shadow-lg">
+    <div className="w-80 bg-gray-800 rounded-lg shadow-lg">
       <div 
-        className="px-3 py-2 border-b border-gray-200 m-1 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+        className="px-3 py-2 border-b border-gray-700 m-1 flex justify-between items-center cursor-pointer hover:bg-gray-700"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <GitBranch size={20} />
-        <h2 className="text-sm font-semibold text-gray-900">Paths</h2>
+        <GitBranch size={20} className="text-gray-300" />
+        <h2 className="text-sm font-semibold text-gray-300">Paths</h2>
         {isExpanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
+          <ChevronUp className="h-4 w-4 text-gray-400" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          <ChevronDown className="h-4 w-4 text-gray-400" />
         )}
       </div>
 
@@ -128,7 +128,7 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
         <div className="p-3 space-y-3">
           <button
             onClick={addPath}
-            className="w-full p-2 flex items-center justify-center gap-2 text-sm text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md border border-green-200"
+            className="w-full p-2 flex items-center justify-center gap-2 text-sm text-green-400 hover:text-green-300 hover:bg-green-900 rounded-md border border-green-700"
           >
             <Plus className="h-4 w-4" /> Add New Path
           </button>
@@ -137,17 +137,17 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
             <button
               onClick={prevPath}
               disabled={currentIndex === 0}
-              className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 text-gray-400 hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-400">
               {allPaths.length > 0 ? `${currentIndex + 1} / ${allPaths.length}` : '0 / 0'}
             </span>
             <button
               onClick={nextPath}
               disabled={currentIndex === allPaths.length - 1}
-              className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 text-gray-400 hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -163,8 +163,9 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
 
                 return (
                   <div className={`space-y-2 p-3 border rounded-md ${
-                    isFromTalentPathDef ? 'bg-blue-50' : 
-                    isUsedByNode && !isInPathsList ? 'bg-gray-50' : ''
+                    isFromTalentPathDef ? 'bg-blue-900 border-blue-700' : 
+                    isUsedByNode && !isInPathsList ? 'bg-gray-700 border-gray-600' : 
+                    'border-gray-700'
                   }`}>
                     <div className="flex items-center gap-2">
                       <input
@@ -172,7 +173,7 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
                         value={path.name || ''}
                         onChange={(e) => updatePath(currentIndex, 'name', e.target.value)}
                         placeholder="Path Name"
-                        className="flex-1 p-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-1 p-1.5 text-sm bg-gray-700 border border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-300 placeholder-gray-500 disabled:bg-gray-800"
                         disabled={!isInPathsList || isFromTalentPathDef}
                       />
                       <div className="flex items-center gap-1">
@@ -180,13 +181,13 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
                           type="color"
                           value={path.color || '#000000'}
                           onChange={(e) => updatePath(currentIndex, 'color', e.target.value)}
-                          className="h-8 w-8 rounded border border-gray-300"
+                          className="h-8 w-8 rounded border border-gray-600 bg-gray-700"
                           disabled={!isInPathsList || isFromTalentPathDef}
                         />
                         {isInPathsList && !isFromTalentPathDef && (
                           <button
                             onClick={() => removePath(currentIndex)}
-                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                            className="p-1 text-red-400 hover:text-red-300 hover:bg-red-900 rounded"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -199,14 +200,14 @@ const PathPanel = ({ paths, setPaths, nodes }) => {
                       onChange={(e) => updatePath(currentIndex, 'description', e.target.value)}
                       placeholder="Path Description"
                       rows={2}
-                      className="w-full p-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full p-1.5 text-sm bg-gray-700 border border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-300 placeholder-gray-500 disabled:bg-gray-800"
                       disabled={!isInPathsList || isFromTalentPathDef}
                     />
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         <div className="flex items-center gap-1">
-                          Exclusive With <BadgeHelp className="h-4 w-4" />
+                          Exclusive With <BadgeHelp className="h-4 w-4 text-gray-400" />
                         </div>
                       </label>
                       <ListEditor

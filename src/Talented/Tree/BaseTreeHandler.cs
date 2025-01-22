@@ -444,9 +444,57 @@ namespace Talented
         }
 
 
+
+        private Texture2D _PointsText;
+        private Texture2D PointsText
+        {
+            get
+            {
+                if (_PointsText == null)
+                {
+                    _PointsText = ContentFinder<Texture2D>.Get("UI/Tree/Points", true);
+                }
+
+                return _PointsText;
+            }
+        }
+
+
         public virtual void DrawToolBar(Rect rect)
         {
- 
+            // Background with gradient-like edge effect
+            Color darkBackground = new Color(0.15f, 0.15f, 0.15f, 0.85f);
+            Widgets.DrawBoxSolid(rect, darkBackground);
+
+            // Draw subtle dark edges instead of a solid border
+            Color darkEdge = new Color(0.1f, 0.1f, 0.1f, 0.3f);
+            Widgets.DrawBoxSolid(new Rect(rect.x, rect.y, rect.width, 1f), darkEdge);
+            Widgets.DrawBoxSolid(new Rect(rect.x, rect.yMax - 1f, rect.width, 1f), darkEdge);
+
+            // Contract the inner content area
+            rect = rect.ContractedBy(6f);
+            float currentX = rect.x;
+
+            // Label with clean styling
+            string label = "Talented.Tree.UI.AvailablePoints".Translate(this.treeDef.treeName, availablePoints);
+            GameFont oldFont = Text.Font;
+            Text.Font = GameFont.Small;
+            Vector2 labelSize = Text.CalcSize(label);
+
+            // Draw the actual label
+            Rect labelRect = new Rect(currentX, rect.y + (rect.height - labelSize.y) / 2f, labelSize.x, labelSize.y);
+            GUI.color = availablePoints > 0 ? new Color(0.9f, 0.9f, 0.2f) : Color.white;
+            Widgets.Label(labelRect, label);
+            GUI.color = Color.white;
+
+            // Optional: Add hover tooltip
+            if (Mouse.IsOver(labelRect))
+            {
+               // string tooltipText = "Talented.Tree.UI.PointsTooltip".Translate();
+               // TooltipHandler.TipRegion(labelRect, tooltipText);
+            }
+
+            Text.Font = oldFont;
         }
 
         public virtual void ResetTree()

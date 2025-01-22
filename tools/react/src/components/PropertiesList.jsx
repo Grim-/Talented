@@ -29,12 +29,15 @@ export const ListEditor = ({
                 type="text"
                 value={item}
                 onChange={e => onItemChange(propName, index, e.target.value)}
-                className="flex-1 p-1.5 text-sm border rounded" 
+                className="flex-1 p-1.5 text-sm bg-gray-700 border border-gray-600 rounded 
+                  text-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                  placeholder-gray-500" 
                 placeholder={`${propName} ${index + 1}`}
               />
               <button
                 onClick={() => onItemRemove(propName, index)}
-                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 h-8"
+                className="px-2 py-1 bg-red-600 text-gray-200 rounded hover:bg-red-700 
+                  transition-colors h-8"
               >
                 ×
               </button>
@@ -53,7 +56,8 @@ export const ListEditor = ({
         </div>
         <button
           onClick={() => onItemAdd(propName)}
-          className="flex-1 p-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+          className="flex-1 p-1.5 bg-blue-600 text-gray-200 rounded hover:bg-blue-700 
+            transition-colors text-sm"
         >
           Add Empty
         </button>  

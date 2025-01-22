@@ -2,6 +2,21 @@ import Node from "../components/Node";
 
 
 //TODO :: FIX SESSION SAVE AND LOAD
+//TODO :: FIX PATH TEXT INPUT FIELD 
+//TODO :: SHOW EXCLUSIVE PATHS FOR SELECTED PATH
+//TODO :: FIX ROUTING FOR EXAMPLE
+
+export const loadSessionFromFile = (sessionData) => {
+  return {
+    nodes: sessionData.nodes,
+    paths: sessionData.paths,
+    treeName: sessionData.treeName,
+    treeSize: sessionData.treeSize,
+    treeDisplay: sessionData.treeDisplay,
+    treePointStrategy: sessionData.treePointStrategy,
+    treeHandler: sessionData.treeHandler
+  };
+};
 
 export const saveSessionToFile = (nodes, paths, treeName = "TalentTreeDef_CHANGEME", treeSize, treeDisplay, treePointStrategy, treeHandler) => {
   const sessionData = {
@@ -23,27 +38,6 @@ export const saveSessionToFile = (nodes, paths, treeName = "TalentTreeDef_CHANGE
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-};
-
-
-export const loadSessionFromFile = async (file) => {
-  if (!file) return null;
-
-  try {
-    const text = await file.text();
-    const sessionData = JSON.parse(text);
-    return {
-      nodes: sessionData.nodes,
-      paths: sessionData.paths,
-      treeName: sessionData.treeName,
-      treeSize:sessionData.treeSize,
-      treeDisplay:sessionData.treeDisplay,
-      treePointStrategy:sessionData.treePointStrategy,
-      treeHandler:sessionData.treeHandler
-    };
-  } catch (e) {
-    throw new Error('Error loading session file: ' + e.message);
-  }
 };
 
 export const clearSession = (setNodes, setPaths, clearAll = false) => {

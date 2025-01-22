@@ -94,12 +94,7 @@ namespace Talented
         public override void DrawToolBar(Rect rect)
         {
             base.DrawToolBar(rect);
-            rect = rect.ContractedBy(2);
-            float currentX = rect.x;
-            string label = "Talented.Tree.UI.AvailablePoints".Translate(this.treeDef.treeName, availablePoints);
-            Vector2 labelSize = Text.CalcSize(label);
-            Rect labelRect = new Rect(currentX, rect.y, labelSize.x, labelSize.y);
-            Widgets.Label(labelRect, label);
+
         }
 
         protected override void OnTalentPointsGained(int points)

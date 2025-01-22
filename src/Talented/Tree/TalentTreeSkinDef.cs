@@ -7,6 +7,7 @@ namespace Talented
     {
         // Background configuration
         public string backgroundTexturePath;
+        public ScaleMode backgroundScaleMode = ScaleMode.ScaleAndCrop;
         private string defaultbackgroundTexturePath = "UI/Tree/defaultbackground";
         public Color? backgroundColor;
 
@@ -58,13 +59,6 @@ namespace Talented
         public float pathLabelOffset = 25f;
         public GameFont labelFont = GameFont.Small;
         public Color labelColor = Color.white;
-
-        // Toolbar configuration
-        public float toolbarHeight = 80f;
-
-
-
-
 
         public static Texture2D LoadTexture(string customPath, string defaultPath, string textureType)
         {

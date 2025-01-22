@@ -22,6 +22,9 @@ namespace Talented
         protected override float Margin => skin != null ? skin.windowMargin : 0;
 
 
+        protected virtual float ToolBarHeight => 35f;
+        protected virtual float ToolBarPadding => 20f;
+
         private Vector2 WindowSize = new Vector2(450f, 800f);
         public override Vector2 InitialSize => WindowSize;
 
@@ -51,15 +54,25 @@ namespace Talented
                 return;
             }
 
-
+            doWindowBackground = false;
             parasiteGene = parasite;
             treeDef = tree;
-            this.WindowSize = new Vector2(this.treeDef.dimensions.x > 0 ? this.treeDef.dimensions.x : this.InitialSize.x, this.treeDef.dimensions.z > 0 ? this.treeDef.dimensions.z : this.InitialSize.y);
+
+            float heightMargin = ToolBarHeight + ToolBarPadding;
+            this.WindowSize = new Vector2(this.treeDef.dimensions.x > 0 ? this.treeDef.dimensions.x : this.InitialSize.x, this.treeDef.dimensions.z > 0 ? this.treeDef.dimensions.z + heightMargin : this.InitialSize.y + heightMargin);
             treeHandler = handler;
             allNodes = treeDef.GetAllNodes() ?? new List<TalentTreeNodeDef>();
             skin = tree.Skin;
 
             displayStrategy = (ITreeDisplayStrategy)Activator.CreateInstance(displayStrategyDef.strategyClass);
+
+
+            if (displayStrategy == null)
+            {
+                Log.Error("TalentTreeDisplayWindow: display strategy failed to be created.");
+                return;
+            }
+
 
             doCloseButton = false;
             doCloseX = true;
@@ -71,7 +84,7 @@ namespace Talented
         {
             DrawBackground(inRect);
 
-            Rect toolbarRect = new Rect(0f, 0f, inRect.width, skin.toolbarHeight);
+            Rect toolbarRect = new Rect(0f, 0f, inRect.width, ToolBarHeight);
             DrawToolbar(toolbarRect);
 
             nodePositions = displayStrategy.PositionNodes(allNodes, inRect, skin.nodeSize, skin.nodeSpacing);
@@ -81,8 +94,12 @@ namespace Talented
 
         private void DrawBackground(Rect inRect)
         {
-            GUI.color = Color.white;
-            GUI.DrawTexture(inRect, skin.BackgroundTexture, ScaleMode.ScaleAndCrop);
+            if (skin?.BackgroundTexture)
+            {
+                GUI.color = Color.white;
+                GUI.DrawTexture(inRect, skin.BackgroundTexture, skin.backgroundScaleMode);
+
+            }
         }
 
         private void DrawNodes()
@@ -476,7 +493,8 @@ namespace Talented
 
         private void DrawToolbar(Rect rect)
         {
-            Widgets.DrawMenuSection(rect);
+            //Widgets.DrawBoxSolidWithOutline(rect, Color.white * 0.2f, Color.white * 0.7f);
+            //Widgets.DrawMenuSection(rect);
             treeHandler?.DrawToolBar(rect);
         }
     }

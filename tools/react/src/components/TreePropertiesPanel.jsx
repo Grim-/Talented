@@ -4,9 +4,9 @@ import Select from 'react-select';
 import { Tooltip } from 'react-tooltip';
 
 const CustomOption = ({ innerProps, label, data }) => (
-  <div {...innerProps} className="px-3 py-2 hover:bg-gray-100 cursor-pointer">
+  <div {...innerProps} className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-gray-300">
     <div data-tooltip-id={`option-${data.value}`}>{label}</div>
-    <Tooltip id={`option-${data.value}`}>
+    <Tooltip id={`option-${data.value}`} className="bg-gray-800 text-gray-300">
       {data.description}
     </Tooltip>
   </div>
@@ -24,8 +24,40 @@ const TreePropertiesPanel = ({
   const [customPointFormula, setCustomPointFormula] = useState(false);
   const [customTreeHandler, setCustomTreeHandler] = useState(false);
   
-  const inputClasses = "w-full p-1.5 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-sm";
-  const labelClasses = "text-xs font-medium text-gray-700 flex items-center gap-1";
+  const inputClasses = "w-full p-1.5 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-sm bg-gray-800 border-gray-600 text-gray-300";
+  const labelClasses = "text-xs font-medium text-gray-300 flex items-center gap-1";
+
+  const customSelectStyles = {
+    control: (base) => ({
+      ...base,
+      background: '#1f2937',
+      borderColor: '#4b5563',
+      '&:hover': { borderColor: '#6b7280' },
+    }),
+    menu: (base) => ({
+      ...base,
+      background: '#1f2937',
+      border: '1px solid #4b5563',
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+      color: '#d1d5db',
+      '&:hover': { backgroundColor: '#374151' },
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: '#d1d5db',
+    }),
+    input: (base) => ({
+      ...base,
+      color: '#d1d5db',
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: '#9ca3af',
+    }),
+  };
 
   const displayOptions = [
     { value: "FixedPosition", label: "Manual Position", description: "Manually position each node in the talent tree" },
@@ -47,17 +79,17 @@ const TreePropertiesPanel = ({
   ];
 
   return (
-    <div className="w-80 bg-white rounded-lg shadow-lg m-1">
+    <div className="w-80 bg-gray-800 rounded-lg shadow-lg m-1 border border-gray-700">
       <div 
-        className="px-3 py-2 border-b border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+        className="px-3 py-2 border-b border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 text-gray-300"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <TreePine size={20} />
-        <h2 className="text-sm font-semibold text-gray-900">Tree Properties</h2>
+        <h2 className="text-sm font-semibold">Tree Properties</h2>
         {isExpanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
+          <ChevronUp className="h-4 w-4" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          <ChevronDown className="h-4 w-4" />
         )}
       </div>
       
@@ -72,7 +104,7 @@ const TreePropertiesPanel = ({
                 className="text-gray-400 cursor-help"
                 data-tooltip-id="tree-name-tip"
               />
-              <Tooltip id="tree-name-tip">
+              <Tooltip id="tree-name-tip" className="bg-gray-800 text-gray-300">
                 Unique identifier for your talent tree
               </Tooltip>
             </label>
@@ -83,8 +115,8 @@ const TreePropertiesPanel = ({
               onChange={(e) => setTreeName(e.target.value)}
               className={`${inputClasses} ${
                 treeName 
-                  ? 'bg-green-50 border-green-500' 
-                  : 'bg-red-50 border-red-500'
+                  ? 'bg-green-900 border-green-600' 
+                  : 'bg-red-900 border-red-600'
               }`}
               placeholder="Enter tree name..."
             />
@@ -99,7 +131,7 @@ const TreePropertiesPanel = ({
                 className="text-gray-400 cursor-help"
                 data-tooltip-id="window-size-tip"
               />
-              <Tooltip id="window-size-tip">
+              <Tooltip id="window-size-tip" className="bg-gray-800 text-gray-300">
                 Set the dimensions of your talent tree window
               </Tooltip>
             </label>
@@ -132,7 +164,7 @@ const TreePropertiesPanel = ({
                 className="text-gray-400 cursor-help"
                 data-tooltip-id="handler-tip"
               />
-              <Tooltip id="handler-tip">
+              <Tooltip id="handler-tip" className="bg-gray-800 text-gray-300">
                 Determines how talents are processed and applied
               </Tooltip>
             </label>
@@ -146,6 +178,7 @@ const TreePropertiesPanel = ({
               placeholder="Select handler type..."
               isSearchable
               components={{ Option: CustomOption }}
+              styles={customSelectStyles}
             />
             {customTreeHandler && (
               <input
@@ -167,7 +200,7 @@ const TreePropertiesPanel = ({
                 className="text-gray-400 cursor-help"
                 data-tooltip-id="display-tip"
               />
-              <Tooltip id="display-tip">
+              <Tooltip id="display-tip" className="bg-gray-800 text-gray-300">
                 Controls how the talent tree is visually laid out
               </Tooltip>
             </label>
@@ -181,6 +214,7 @@ const TreePropertiesPanel = ({
               placeholder="Select display strategy..."
               isSearchable
               components={{ Option: CustomOption }}
+              styles={customSelectStyles}
             />
             {customDisplayStrategy && (
               <input
@@ -202,7 +236,7 @@ const TreePropertiesPanel = ({
                 className="text-gray-400 cursor-help"
                 data-tooltip-id="formula-tip"
               />
-              <Tooltip id="formula-tip">
+              <Tooltip id="formula-tip" className="bg-gray-800 text-gray-300">
                 Defines how talent points are awarded as characters level up
               </Tooltip>
             </label>
@@ -216,6 +250,7 @@ const TreePropertiesPanel = ({
               placeholder="Select point formula..."
               isSearchable
               components={{ Option: CustomOption }}
+              styles={customSelectStyles}
             />
             {customPointFormula && (
               <input

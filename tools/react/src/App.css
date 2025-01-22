@@ -36,3 +36,219 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Base Theme Colors */
+:root {
+  --background-primary: #1f2937;   /* gray-800 - main UI backgrounds */
+  --background-secondary: #374151; /* gray-700 - panels and components */
+  --background-content: #4b5563;   /* gray-600 - main content area */
+  --background-input: #374151;     /* gray-700 - form inputs */
+  --background-hover: #4b5563;     /* gray-600 - hover states */
+  
+  --border-primary: #374151;       /* gray-700 */
+  --border-secondary: #4b5563;     /* gray-600 */
+  
+  --text-primary: #d1d5db;         /* gray-300 */
+  --text-secondary: #9ca3af;       /* gray-400 */
+  --text-disabled: #6b7280;        /* gray-500 */
+  
+  --accent-blue-bg: #1e3a8a;       /* blue-900 */
+  --accent-blue-border: #1d4ed8;   /* blue-700 */
+  --accent-blue-text: #60a5fa;     /* blue-400 */
+  
+  --accent-green-bg: #064e3b;      /* green-900 */
+  --accent-green-border: #047857;  /* green-700 */
+  --accent-green-text: #34d399;    /* green-400 */
+  
+  --accent-red-bg: #7f1d1d;        /* red-900 */
+  --accent-red-border: #b91c1c;    /* red-700 */
+  --accent-red-text: #f87171;      /* red-400 */
+}
+
+/* Layout & Containers */
+.app-background {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.main-content {
+  background-color: var(--background-content);
+  border-color: var(--border-primary);
+}
+
+.panel {
+  background-color: var(--background-primary);
+  border-color: var(--border-primary);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Form Elements */
+.input-base {
+  background-color: var(--background-input);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.input-base:focus {
+  outline: none;
+  ring: 1px var(--accent-blue-text);
+  border-color: var(--accent-blue-text);
+}
+
+.input-base:disabled {
+  background-color: var(--background-primary);
+  opacity: 0.75;
+}
+
+.input-base::placeholder {
+  color: var(--text-disabled);
+}
+
+/* Nodes */
+.node {
+  background-color: var(--background-primary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.node-selected {
+  ring: 2px var(--accent-blue-text);
+}
+
+.node-connecting {
+  ring: 2px var(--accent-blue-text);
+  opacity: 0.8;
+}
+
+.node-start {
+  background-color: var(--accent-green-bg);
+}
+
+.node-branch {
+  background-color: var(--accent-blue-bg);
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 150ms;
+}
+
+.btn-primary {
+  background-color: var(--accent-blue-bg);
+  color: var(--text-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-blue-border);
+}
+
+.btn-danger {
+  background-color: var(--accent-red-bg);
+  color: var(--text-primary);
+}
+
+.btn-danger:hover {
+  background-color: var(--accent-red-border);
+}
+
+.btn-success {
+  background-color: var(--accent-green-bg);
+  color: var(--text-primary);
+}
+
+.btn-success:hover {
+  background-color: var(--accent-green-border);
+}
+
+/* Navigation & Controls */
+.nav-button {
+  color: var(--text-secondary);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.nav-button:hover {
+  color: var(--text-primary);
+  background-color: var(--background-hover);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Utility Classes */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.border-primary {
+  border-color: var(--border-primary);
+}
+
+.border-secondary {
+  border-color: var(--border-secondary);
+}
+
+/* Transitions */
+.transition-base {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Lists & Grids */
+.list-container {
+  max-height: 8rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.grid-container {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--background-secondary);
+  border-radius: 0.375rem;
+}
+
+/* Tooltips */
+.tooltip {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-disabled);
+}

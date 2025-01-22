@@ -55,7 +55,7 @@ const NodeDisplay = ({
         node.y = nodeData.y;
         node.width = nodeData.width;
         node.height = nodeData.height;
-        
+
         return React.cloneElement(
           node.render({
             selected: selectedNode === node.id,

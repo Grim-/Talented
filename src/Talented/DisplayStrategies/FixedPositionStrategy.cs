@@ -1,22 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Talented
 {
-    /// <summary>
-    /// A tree display strategy that positions nodes at their exact IntVec2 coordinates,
-    /// scaling the positions to fit within the available space.
-    /// </summary>
     public class FixedPositionStrategy : ITreeDisplayStrategy
     {
-        private float MARGIN = 20f;
+        private readonly float margin;
+        private readonly float viewportPadding;
+        private readonly bool maintainAspectRatio;
+
         public FixedPositionStrategy()
         {
 
         }
-        public FixedPositionStrategy(float margin = 20f)
+
+        public FixedPositionStrategy(float margin = 20f, float viewportPadding = 0.1f, bool maintainAspectRatio = true)
         {
-            this.MARGIN = margin;
+            this.margin = margin;
+            this.viewportPadding = viewportPadding;
+            this.maintainAspectRatio = maintainAspectRatio;
         }
 
         public Dictionary<TalentTreeNodeDef, Rect> PositionNodes(
@@ -28,45 +31,57 @@ namespace Talented
             if (nodes == null || nodes.Count == 0)
                 return new Dictionary<TalentTreeNodeDef, Rect>();
 
-            var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
-            int minX = int.MaxValue;
-            int maxX = int.MinValue;
-            int minZ = int.MaxValue;
-            int maxZ = int.MinValue;
+            float toolbarHeight = 35f;
 
-            foreach (var node in nodes)
+            // Create drawing space that accounts for toolbar and margins
+            Rect drawingSpace = new Rect(
+                availableSpace.x + margin,
+                availableSpace.y + toolbarHeight + margin,
+                availableSpace.width - (margin * 2),
+                availableSpace.height - toolbarHeight - (margin * 2)
+            );
+
+            var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
+            var bounds = CalculateGridBounds(nodes);
+
+            // Apply viewport padding
+            float paddedWidth = drawingSpace.width * (1f - viewportPadding * 2);
+            float paddedHeight = drawingSpace.height * (1f - viewportPadding * 2);
+            float paddingOffsetX = drawingSpace.x + (drawingSpace.width - paddedWidth) / 2;
+            float paddingOffsetY = drawingSpace.y + (drawingSpace.height - paddedHeight) / 2;
+
+            // Calculate scaling factors
+            float gridWidth = bounds.maxX - bounds.minX + 1;
+            float gridHeight = bounds.maxZ - bounds.minZ + 1;
+
+            float xScale = (paddedWidth - nodeSize) / Mathf.Max(1, gridWidth - 1);
+            float yScale = (paddedHeight - nodeSize) / Mathf.Max(1, gridHeight - 1);
+
+            // Maintain aspect ratio if needed
+            if (maintainAspectRatio)
             {
-                if (node.hide || !node.MeetsVisibilityRequirements(null))
-                    continue;
-                minX = Mathf.Min(minX, node.position.x);
-                maxX = Mathf.Max(maxX, node.position.x);
-                minZ = Mathf.Min(minZ, node.position.z);
-                maxZ = Mathf.Max(maxZ, node.position.z);
+                float scale = Mathf.Min(xScale, yScale);
+                xScale = yScale = scale;
             }
 
-            float gridWidth = maxX - minX + 1;
-            float gridHeight = maxZ - minZ + 1;
-            float availableWidth = availableSpace.width - (2 * MARGIN);
-            float availableHeight = availableSpace.height - (2 * MARGIN);
+            // Calculate total dimensions and center offset
+            float totalWidth = (gridWidth - 1) * xScale + nodeSize;
+            float totalHeight = (gridHeight - 1) * yScale + nodeSize;
+            float centerOffsetX = paddingOffsetX + (paddedWidth - totalWidth) / 2f;
+            float centerOffsetY = paddingOffsetY + (paddedHeight - totalHeight) / 2f;
 
-            // scaling factors for positions only
-            float xScale = (availableWidth - nodeSize) / Mathf.Max(1, gridWidth - 1);
-            float yScale = (availableHeight - nodeSize) / Mathf.Max(1, gridHeight - 1);
-
-            // Position each node
             foreach (var node in nodes)
             {
                 if (node.hide || !node.MeetsVisibilityRequirements(null))
                     continue;
 
                 float normalizedX = gridWidth > 1 ?
-                    (node.position.x - minX) / (float)(gridWidth - 1) : 0.5f;
+                    (node.position.x - bounds.minX) / (float)(gridWidth - 1) : 0.5f;
                 float normalizedZ = gridHeight > 1 ?
-                    (node.position.z - minZ) / (float)(gridHeight - 1) : 0.5f;
+                    (node.position.z - bounds.minZ) / (float)(gridHeight - 1) : 0.5f;
 
-                // Calculate actual position within available space
-                float x = availableSpace.x + MARGIN + (normalizedX * (availableWidth - nodeSize));
-                float y = availableSpace.y + MARGIN + (normalizedZ * (availableHeight - nodeSize));
+                float x = centerOffsetX + (normalizedX * (totalWidth - nodeSize));
+                float y = centerOffsetY + (normalizedZ * (totalHeight - nodeSize));
 
                 nodePositions[node] = new Rect(x, y, nodeSize, nodeSize);
             }
@@ -74,9 +89,28 @@ namespace Talented
             return nodePositions;
         }
 
+        private (int minX, int maxX, int minZ, int maxZ) CalculateGridBounds(List<TalentTreeNodeDef> nodes)
+        {
+            int minX = int.MaxValue, maxX = int.MinValue;
+            int minZ = int.MaxValue, maxZ = int.MinValue;
+
+            foreach (var node in nodes)
+            {
+                if (node.hide || !node.MeetsVisibilityRequirements(null))
+                    continue;
+
+                minX = Mathf.Min(minX, node.position.x);
+                maxX = Mathf.Max(maxX, node.position.x);
+                minZ = Mathf.Min(minZ, node.position.z);
+                maxZ = Mathf.Max(maxZ, node.position.z);
+            }
+
+            return (minX, maxX, minZ, maxZ);
+        }
+
         public void DrawToolBar(Rect toolbarRect)
         {
-           
+            // Implement if needed
         }
     }
 }

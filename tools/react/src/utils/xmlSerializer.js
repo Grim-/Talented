@@ -103,41 +103,57 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
 };
 
 export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
-  // Collect all unique paths used in nodes
-  const usedPaths = new Set(nodes.map(node => node.path).filter(Boolean));
-  const allPaths = [...paths];
-  
-  // Add any paths used in nodes but not in paths array
-  usedPaths.forEach(pathName => {
-    if (!paths.find(p => p.name === pathName)) {
-      allPaths.push({
-        name: pathName,
-        description: '',
-        exclusiveWith: []
-      });
-    }
-  });
+  try {
+    // Reset export state at the start
+    exportState.idMapping = null;
+    
+    // Collect all unique paths used in nodes
+    const usedPaths = new Set(nodes.map(node => node.path).filter(Boolean));
+    const allPaths = [...paths];
+    
+    // Add any paths used in nodes but not in paths array
+    usedPaths.forEach(pathName => {
+      if (!paths.find(p => p.name === pathName)) {
+        allPaths.push({
+          name: pathName,
+          description: '',
+          exclusiveWith: []
+        });
+      }
+    });
 
-  let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
-  xml += exportTalentTree(nodes, allPaths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler);
-  xml += exportPaths(allPaths, config);
-  xml += exportNodes(nodes, treeSize, config);
-  xml += '</Defs>';
-  return xml;
+    let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
+    // Generate unique tree name if not provided
+    const uniqueTreeName = treeName || generateUniqueDefName('Tree');
+    xml += exportTalentTree(nodes, allPaths, uniqueTreeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler);
+    xml += exportPaths(allPaths, config);
+    xml += exportNodes(nodes, treeSize, config);
+    xml += '</Defs>';
+    return xml;
+  } catch (error) {
+    // Ensure export state is reset even if there's an error
+    exportState.idMapping = null;
+    throw error;
+  }
 };
 
-// Function to export the talent tree definition
 const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler) => {
-  let xml = '<Talented.TalentTreeDef>\n';
-  xml += `    <defName>${treeName || 'GIVE_ME_A_PROPER_NAME'}</defName>\n`;
-  xml += `    <dimensions>(${treeSize.width} , ${treeSize.height})</dimensions>\n`;
+  // Generate the ID mapping first since the tree export happens before node export
+  exportState.idMapping = createIdMapping(nodes);
+  
+  const fullDefType = getFullDefName(DefTypeConfig.TREE);
+  let xml = `  <${fullDefType}>\n`;
+  xml += `    <defName>${treeName}</defName>\n`;
+  xml += `    <dimensions>(${treeSize.width},${treeSize.height})</dimensions>\n`;
   xml += `    <handlerClass>${treeHandler}</handlerClass>\n`;
-  // Add root nodes
+  
+  // Add root nodes with updated IDs
   xml += '    <nodes>\n';
   nodes.filter(node => node.type === 'Start')
        .forEach(node => {
-    xml += `      <li>${node.id}</li>\n`;
-  });
+         const newId = exportState.idMapping.get(node.id);
+         xml += `      <li>${newId}</li>\n`;
+       });
   xml += '    </nodes>\n';
   
   // Add available paths
@@ -149,10 +165,11 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, tr
 
   xml += `    <displayStrategy>${treeDisplayStrat}</displayStrategy>\n`;
   xml += `    <talentPointFormula>${treePointsFormula}</talentPointFormula>\n`;
-  xml += '  </Talented.TalentTreeDef>\n\n';
+  xml += `  </${fullDefType}>\n\n`;
   
   return xml;
 };
+
 
 const validateAndFixPaths = (paths) => {
   // Create a deep copy to avoid mutating the original paths
@@ -212,7 +229,7 @@ const exportPaths = (paths, config) => {
 
 
 const calculateScaledPosition = (node, treeSize) => {
-  const canvasDiv = document.getElementById('mainCanvas');
+  const canvasDiv = document.getElementById('mainContent');
   const canvasWidth = canvasDiv.clientWidth;
   const canvasHeight = canvasDiv.clientHeight;
   
@@ -226,7 +243,49 @@ const calculateScaledPosition = (node, treeSize) => {
 };
 
 
+const generateUniqueDefName = (basePrefix) => {
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 10000);
+  return `${basePrefix}_${timestamp}_${random}`;
+};
+
+const createIdMapping = (nodes) => {
+  const mapping = new Map();
+  nodes.forEach(node => {
+    mapping.set(node.id, generateUniqueDefName('Node'));
+  });
+  return mapping;
+};
+
+const updateConnections = (connections, idMapping) => {
+  if (!connections || !connections.length) return [];
+  return connections.map(conn => idMapping.get(conn) || conn);
+};
+
+const updateBranchPaths = (branchPaths, idMapping) => {
+  if (!branchPaths || !branchPaths.length) return [];
+  
+  return branchPaths.map(branch => ({
+    path: branch.path,
+    nodes: branch.nodes.map(nodeId => idMapping.get(nodeId) || nodeId)
+  }));
+};
+
+// Create a shared state object to maintain ID mappings between exports
+const exportState = {
+  idMapping: null
+};
+
+
 const exportNodes = (nodes, treeSize, config) => {
+  // Use the existing ID mapping created during tree export
+  const idMapping = exportState.idMapping;
+  
+  if (!idMapping) {
+    console.error('Tree must be exported before nodes');
+    return '';
+  }
+  
   let xml = '';
   nodes.forEach(node => {
     const defType = node.upgrade ? getFullDefName(config.NODE) :
@@ -234,18 +293,19 @@ const exportNodes = (nodes, treeSize, config) => {
                    node.pointCost ? getFullDefName(config.UPGRADE) :
                    getFullDefName(config.NODE);
 
+    const newDefName = idMapping.get(node.id);
+    
     xml += `  <${defType}>\n`;
-    xml += `    <defName>${node.id}</defName>\n`;
+    xml += `    <defName>${newDefName}</defName>\n`;
     if (node.label) xml += `    <label>${node.label}</label>\n`;
-
+    
     if (node.x !== undefined) {
       xml += `    <position>${calculateScaledPosition(node, treeSize)}</position>\n`;
     }
 
-
     if (node.type) xml += `    <type>${node.type}</type>\n`;
     
-    if (node.upgrades) {
+    if (node.upgrades?.length > 0) {
       xml += `    <upgrades>\n`;
       node.upgrades.forEach((item) => {
         xml += `      <li>${item}</li>\n`;
@@ -255,17 +315,21 @@ const exportNodes = (nodes, treeSize, config) => {
     
     if (node.path) xml += `    <path>${node.path}</path>\n`;
 
-    if (node.connections?.length > 0) {
+    // Update connections with new IDs
+    const updatedConnections = updateConnections(node.connections, idMapping);
+    if (updatedConnections.length > 0) {
       xml += `    <connections>\n`;
-      node.connections.forEach(conn => {
+      updatedConnections.forEach(conn => {
         xml += `      <li>${conn}</li>\n`;
       });
       xml += `    </connections>\n`;
     }
 
-    if (node.branchPaths?.length > 0) {
+    // Update branchPaths with new IDs
+    const updatedBranchPaths = updateBranchPaths(node.branchPaths, idMapping);
+    if (updatedBranchPaths.length > 0) {
       xml += `    <branchPaths>\n`;
-      node.branchPaths.forEach(branch => {
+      updatedBranchPaths.forEach(branch => {
         xml += `      <li>\n`;
         xml += `        <path>${branch.path}</path>\n`;
         xml += `        <nodes>\n`;
@@ -277,8 +341,13 @@ const exportNodes = (nodes, treeSize, config) => {
       });
       xml += `    </branchPaths>\n`;
     }
+    
     xml += `  </${defType}>\n\n`;
   });
+  
+  // Clear the export state after we're done
+  exportState.idMapping = null;
+  
   return xml;
 };
 
