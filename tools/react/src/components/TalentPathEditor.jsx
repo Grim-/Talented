@@ -11,17 +11,60 @@ const TalentPathEditor = ({ currentDef, setCurrentDef }) => {
     const newExclusiveWith = currentDef.exclusiveWith || [];
     const index = newExclusiveWith.indexOf(pathName);
     
+    // Update current path's exclusivity
     if (index >= 0) {
       newExclusiveWith.splice(index, 1);
     } else {
       newExclusiveWith.push(pathName);
     }
 
-    setCurrentDef({
+    // Update current path
+    const updatedCurrentDef = {
       ...currentDef,
       exclusiveWith: newExclusiveWith
-    });
+    };
+    setCurrentDef(updatedCurrentDef);
+
+    // Update the other path's exclusivity
+    const otherPath = StorageUtils.getDefsOfType('TalentPathDef')[pathName];
+    if (otherPath) {
+      const otherExclusiveWith = otherPath.exclusiveWith || [];
+      const shouldBeExclusive = newExclusiveWith.includes(pathName);
+      
+      if (shouldBeExclusive && !otherExclusiveWith.includes(currentDef.defName)) {
+        // Add current path to other path's exclusivity list
+        otherPath.exclusiveWith = [...otherExclusiveWith, currentDef.defName];
+        StorageUtils.saveSingleDefOfType('TalentPathDef', pathName, otherPath);
+      } else if (!shouldBeExclusive && otherExclusiveWith.includes(currentDef.defName)) {
+        // Remove current path from other path's exclusivity list
+        otherPath.exclusiveWith = otherExclusiveWith.filter(name => name !== currentDef.defName);
+        StorageUtils.saveSingleDefOfType('TalentPathDef', pathName, otherPath);
+      }
+    }
   };
+  const CheckboxButton = ({ label, checked, onChange }) => (
+    <label className="relative group cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="sr-only peer"
+      />
+      <div className={`
+        w-full p-2 text-sm rounded
+        flex items-center justify-center
+        transition-all duration-200
+        border
+        ${checked 
+          ? 'bg-gray-600 border-gray-500 text-white' 
+          : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+        }
+        peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-1 peer-focus:ring-offset-gray-900
+      `}>
+        {label}
+      </div>
+    </label>
+  );
 
   return (
     <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
@@ -65,23 +108,22 @@ const TalentPathEditor = ({ currentDef, setCurrentDef }) => {
             onChange={e => setSearchTerm(e.target.value)}
             className="w-full p-2 border border-gray-600 rounded mb-2 text-sm bg-gray-700 text-gray-200"
           />
-          <div className="space-y-1 max-h-48 overflow-y-auto border border-gray-600 rounded p-2 bg-gray-800">
-            {allPaths
-              .filter(path => 
-                path.name !== currentDef.defName &&
-                path.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map(path => (
-                <label key={path.name} className="flex items-center gap-2 text-sm text-gray-200">
-                  <input
-                    type="checkbox"
+          <div className="max-h-64 overflow-y-auto border border-gray-600 rounded p-2 bg-gray-800">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {allPaths
+                .filter(path => 
+                  path.name !== currentDef.defName &&
+                  path.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map(path => (
+                  <CheckboxButton
+                    key={path.name}
+                    label={path.name}
                     checked={(currentDef.exclusiveWith || []).includes(path.name)}
                     onChange={() => handleExclusiveWithChange(path.name)}
-                    className="rounded border-gray-600 bg-gray-700"
                   />
-                  {path.name}
-                </label>
-              ))}
+                ))}
+            </div>
           </div>
         </div>
 

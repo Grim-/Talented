@@ -28,7 +28,7 @@ export const Toolbar = ({
 
   return (
     <>
-      <div className="absolute top-4 right-4 space-x-2">
+      <div className="fixed top-20 right-4 space-x-2">
         <Button
           onClick={() => document.getElementById('sessionLoad').click()}
           className="bg-green-500 text-white"

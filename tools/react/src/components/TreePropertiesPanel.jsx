@@ -79,190 +79,192 @@ const TreePropertiesPanel = ({
   ];
 
   return (
-    <div className="w-80 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-      <div 
-        className="px-3 py-2 border-b border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 text-gray-300"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <TreePine size={20} />
-        <h2 className="text-sm font-semibold">Tree Properties</h2>
-        {isExpanded ? (
-          <ChevronUp className="h-4 w-4" />
-        ) : (
-          <ChevronDown className="h-4 w-4" />
-        )}
-      </div>
-      
-      <div className="p-3 border-b border-gray-700">
-        <div className="space-y-1">
-          <label htmlFor="treeName" className={labelClasses}>
-            Talent Tree Definition Name
-            <HelpCircle 
-              size={14} 
-              className="text-gray-400 cursor-help"
-              data-tooltip-id="tree-name-tip"
-            />
-            <Tooltip id="tree-name-tip" className="bg-gray-800 text-gray-300">
-              Unique identifier for your talent tree
-            </Tooltip>
-          </label>
-          <input
-            type="text"
-            id="treeName"
-            value={treeName}
-            onChange={(e) => setTreeName(e.target.value)}
-            className={`${inputClasses} ${
-              treeName 
-                ? 'bg-green-900 border-green-600' 
-                : 'bg-red-900 border-red-600'
-            }`}
-            placeholder="Enter tree name..."
-          />
+    <div className="ww">
+      <div className="w-80 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+        <div 
+          className="px-3 py-2 border-b border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 text-gray-300"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <TreePine size={20} />
+          <h2 className="text-sm font-semibold">Tree Properties</h2>
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </div>
-      </div>
- 
-      <div className={`${isExpanded ? 'block' : 'hidden'}`}>
-        <div className="p-3 space-y-4">
+        
+        <div className="p-3 border-b border-gray-700">
           <div className="space-y-1">
-            <label className={labelClasses}>
-              Tree Window Size
+            <label htmlFor="treeName" className={labelClasses}>
+              Talent Tree Definition Name
               <HelpCircle 
                 size={14} 
                 className="text-gray-400 cursor-help"
-                data-tooltip-id="window-size-tip"
+                data-tooltip-id="tree-name-tip"
               />
-              <Tooltip id="window-size-tip" className="bg-gray-800 text-gray-300">
-                Set the dimensions of your talent tree window
+              <Tooltip id="tree-name-tip" className="bg-gray-800 text-gray-300">
+                Unique identifier for your talent tree
               </Tooltip>
             </label>
-            <div className="flex space-x-2">
-              <input
-                type="number"
-                placeholder="Width"
-                value={treeSize?.width || ''}
-                onChange={(e) => setTreeSize(prev => ({...prev, width: parseInt(e.target.value)}))}
-                className={inputClasses}
-                min="0"
-              />
-              <input
-                type="number"
-                placeholder="Height"
-                value={treeSize?.height || ''}
-                onChange={(e) => setTreeSize(prev => ({...prev, height: parseInt(e.target.value)}))}
-                className={inputClasses}
-                min="0"
-              />
+            <input
+              type="text"
+              id="treeName"
+              value={treeName}
+              onChange={(e) => setTreeName(e.target.value)}
+              className={`${inputClasses} ${
+                treeName 
+                  ? 'bg-green-900 border-green-600' 
+                  : 'bg-red-900 border-red-600'
+              }`}
+              placeholder="Enter tree name..."
+            />
+          </div>
+        </div>
+   
+        <div className={`${isExpanded ? 'block' : 'hidden'}`}>
+          <div className="p-3 space-y-4">
+            <div className="space-y-1">
+              <label className={labelClasses}>
+                Tree Window Size
+                <HelpCircle 
+                  size={14} 
+                  className="text-gray-400 cursor-help"
+                  data-tooltip-id="window-size-tip"
+                />
+                <Tooltip id="window-size-tip" className="bg-gray-800 text-gray-300">
+                  Set the dimensions of your talent tree window
+                </Tooltip>
+              </label>
+              <div className="flex space-x-2">
+                <input
+                  type="number"
+                  placeholder="Width"
+                  value={treeSize?.width || ''}
+                  onChange={(e) => setTreeSize(prev => ({...prev, width: parseInt(e.target.value)}))}
+                  className={inputClasses}
+                  min="0"
+                />
+                <input
+                  type="number"
+                  placeholder="Height"
+                  value={treeSize?.height || ''}
+                  onChange={(e) => setTreeSize(prev => ({...prev, height: parseInt(e.target.value)}))}
+                  className={inputClasses}
+                  min="0"
+                />
+              </div>
             </div>
-          </div>
- 
-          <div className="space-y-1 relative">
-            <label className={labelClasses}>
-              Talent Handler Type
-              <HelpCircle 
-                size={14} 
-                className="text-gray-400 cursor-help"
-                data-tooltip-id="handler-tip"
+   
+            <div className="space-y-1 relative">
+              <label className={labelClasses}>
+                Talent Handler Type
+                <HelpCircle 
+                  size={14} 
+                  className="text-gray-400 cursor-help"
+                  data-tooltip-id="handler-tip"
+                />
+                <Tooltip id="handler-tip" className="bg-gray-800 text-gray-300">
+                  Determines how talents are processed and applied
+                </Tooltip>
+              </label>
+              <Select
+                options={handlerOptions}
+                value={handlerOptions.find(opt => opt.value === treeHandler) || null}
+                onChange={(selected) => {
+                  setCustomTreeHandler(selected.value === 'custom');
+                  setTreeHandler(selected.value);
+                }}
+                placeholder="Select handler type..."
+                isSearchable
+                components={{ Option: CustomOption }}
+                styles={customSelectStyles}
               />
-              <Tooltip id="handler-tip" className="bg-gray-800 text-gray-300">
-                Determines how talents are processed and applied
-              </Tooltip>
-            </label>
-            <Select
-              options={handlerOptions}
-              value={handlerOptions.find(opt => opt.value === treeHandler) || null}
-              onChange={(selected) => {
-                setCustomTreeHandler(selected.value === 'custom');
-                setTreeHandler(selected.value);
-              }}
-              placeholder="Select handler type..."
-              isSearchable
-              components={{ Option: CustomOption }}
-              styles={customSelectStyles}
-            />
-            {customTreeHandler && (
-              <input
-                type="text"
-                placeholder="Enter custom handler..."
-                value={treeHandler}
-                onChange={(e) => setTreeHandler(e.target.value)}
-                className={inputClasses}
+              {customTreeHandler && (
+                <input
+                  type="text"
+                  placeholder="Enter custom handler..."
+                  value={treeHandler}
+                  onChange={(e) => setTreeHandler(e.target.value)}
+                  className={inputClasses}
+                />
+              )}
+            </div>
+   
+            <div className="space-y-1 relative">
+              <label className={labelClasses}>
+                Tree Display Strategy
+                <HelpCircle 
+                  size={14} 
+                  className="text-gray-400 cursor-help"
+                  data-tooltip-id="display-tip"
+                />
+                <Tooltip id="display-tip" className="bg-gray-800 text-gray-300">
+                  Controls how the talent tree is visually laid out
+                </Tooltip>
+              </label>
+              <Select
+                options={displayOptions}
+                value={displayOptions.find(opt => opt.value === treeDisplayStrategy) || null}
+                onChange={(selected) => {
+                  setCustomDisplayStrategy(selected.value === 'custom');
+                  setTreeDisplay(selected.value);
+                }}
+                placeholder="Select display strategy..."
+                isSearchable
+                components={{ Option: CustomOption }}
+                styles={customSelectStyles}
               />
-            )}
-          </div>
- 
-          <div className="space-y-1 relative">
-            <label className={labelClasses}>
-              Tree Display Strategy
-              <HelpCircle 
-                size={14} 
-                className="text-gray-400 cursor-help"
-                data-tooltip-id="display-tip"
+              {customDisplayStrategy && (
+                <input
+                  type="text"
+                  placeholder="Enter custom strategy..."
+                  value={treeDisplayStrategy}
+                  onChange={(e) => setTreeDisplay(e.target.value)}
+                  className={inputClasses}
+                />
+              )}
+            </div>
+   
+            <div className="space-y-1 relative">
+              <label className={labelClasses}>
+                Talent Point Formula
+                <HelpCircle 
+                  size={14} 
+                  className="text-gray-400 cursor-help"
+                  data-tooltip-id="formula-tip"
+                />
+                <Tooltip id="formula-tip" className="bg-gray-800 text-gray-300">
+                  Defines how talent points are awarded as characters level up
+                </Tooltip>
+              </label>
+              <Select
+                options={pointOptions}
+                value={pointOptions.find(opt => opt.value === pointStrategy) || null}
+                onChange={(selected) => {
+                  setCustomPointFormula(selected.value === 'custom');
+                  setTreePointStrategy(selected.value);
+                }}
+                placeholder="Select point formula..."
+                isSearchable
+                components={{ Option: CustomOption }}
+                styles={customSelectStyles}
               />
-              <Tooltip id="display-tip" className="bg-gray-800 text-gray-300">
-                Controls how the talent tree is visually laid out
-              </Tooltip>
-            </label>
-            <Select
-              options={displayOptions}
-              value={displayOptions.find(opt => opt.value === treeDisplayStrategy) || null}
-              onChange={(selected) => {
-                setCustomDisplayStrategy(selected.value === 'custom');
-                setTreeDisplay(selected.value);
-              }}
-              placeholder="Select display strategy..."
-              isSearchable
-              components={{ Option: CustomOption }}
-              styles={customSelectStyles}
-            />
-            {customDisplayStrategy && (
-              <input
-                type="text"
-                placeholder="Enter custom strategy..."
-                value={treeDisplayStrategy}
-                onChange={(e) => setTreeDisplay(e.target.value)}
-                className={inputClasses}
-              />
-            )}
-          </div>
- 
-          <div className="space-y-1 relative">
-            <label className={labelClasses}>
-              Talent Point Formula
-              <HelpCircle 
-                size={14} 
-                className="text-gray-400 cursor-help"
-                data-tooltip-id="formula-tip"
-              />
-              <Tooltip id="formula-tip" className="bg-gray-800 text-gray-300">
-                Defines how talent points are awarded as characters level up
-              </Tooltip>
-            </label>
-            <Select
-              options={pointOptions}
-              value={pointOptions.find(opt => opt.value === pointStrategy) || null}
-              onChange={(selected) => {
-                setCustomPointFormula(selected.value === 'custom');
-                setTreePointStrategy(selected.value);
-              }}
-              placeholder="Select point formula..."
-              isSearchable
-              components={{ Option: CustomOption }}
-              styles={customSelectStyles}
-            />
-            {customPointFormula && (
-              <input
-                type="text"
-                placeholder="Enter custom formula..."
-                value={pointStrategy}
-                onChange={(e) => setTreePointStrategy(e.target.value)}
-                className={inputClasses}
-              />
-            )}
+              {customPointFormula && (
+                <input
+                  type="text"
+                  placeholder="Enter custom formula..."
+                  value={pointStrategy}
+                  onChange={(e) => setTreePointStrategy(e.target.value)}
+                  className={inputClasses}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
- );
+  );
 };
 
 export default TreePropertiesPanel;

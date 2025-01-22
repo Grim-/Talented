@@ -16,6 +16,9 @@ import TreePropertiesPanel from './components/TreePropertiesPanel';
 import PathPanel from './components/PathPanel';
 import TreeSizePreview from './components/TreeSizePreview';
 import Minimap from './components/Minimap';
+import CanvasSettings from './components/CanvasSettings';
+import GridOverlay from './components/GridOverlay';
+
 
 const NodeEditor = ({ 
   nodes, setNodes, 
@@ -33,6 +36,7 @@ const NodeEditor = ({
     const savedDefs = localStorage.getItem('nodeEditorReferenceDefs');
     return savedDefs ? JSON.parse(savedDefs) : [];
   });
+
   const [draggingNode, setDraggingNode] = useState(null);
   const [draggingOffset, setDraggingOffset] = useState({ x: 0, y: 0 });
   const [connecting, setConnecting] = useState(null);
@@ -48,6 +52,17 @@ const NodeEditor = ({
     nodeId: null
   });
 
+  const [canvasSettings, setCanvasSettings] = useState({
+    lockToGrid: false,
+    hierarchyMove: false
+  });
+
+  const handleSettingChange = (setting, value) => {
+    setCanvasSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }));
+  };
   const handleContextMenu = (e) => {
     e.preventDefault();
     setContextMenu({
@@ -126,7 +141,7 @@ const NodeEditor = ({
     
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return;
-    
+    e.preventDefault();
     setDraggingNode(nodeId);
     setDraggingOffset({
       x: e.clientX - node.x,
@@ -135,19 +150,96 @@ const NodeEditor = ({
   };
 
   const handleMouseMove = (e) => {
-    if (draggingNode) {
-      e.preventDefault();
-      setNodes(nodes.map(node => {
-        if (node.id === draggingNode) {
-          return {
-            ...node,
-            x: e.clientX - draggingOffset.x,
-            y: e.clientY - draggingOffset.y
-          };
-        }
-        return node;
-      }));
+    if (!draggingNode) return;
+    
+    e.preventDefault();
+    
+    // Find the node being dragged
+    const draggedNode = nodes.find(n => n.id === draggingNode);
+    if (!draggedNode) return;
+  
+    // Calculate new position
+    let newX = e.clientX - draggingOffset.x;
+    let newY = e.clientY - draggingOffset.y;
+  
+    // Ensure we have valid numbers
+    if (isNaN(newX) || isNaN(newY)) {
+      newX = draggedNode.x;
+      newY = draggedNode.y;
     }
+  
+    // Apply grid snapping if enabled
+    if (canvasSettings.lockToGrid) {
+      const gridSize = canvasSettings.gridSize || 20;
+      newX = Math.round(newX / gridSize) * gridSize;
+      newY = Math.round(newY / gridSize) * gridSize;
+    }
+  
+    // If not doing hierarchy movement, just update the dragged node
+    if (!canvasSettings.hierarchyMove) {
+      setNodes(nodes.map(node => 
+        node.id === draggingNode 
+          ? { ...node, x: newX, y: newY }
+          : node
+      ));
+      return;
+    }
+  
+    // For hierarchy movement, we need to track all affected nodes
+    const processedNodes = new Set();
+    const updates = new Map();
+  
+    // Calculate initial delta
+    const deltaX = newX - draggedNode.x;
+    const deltaY = newY - draggedNode.y;
+  
+    // Recursive function to collect all nodes that need updating
+    const collectConnectedNodes = (nodeId, dx, dy) => {
+      if (processedNodes.has(nodeId)) return;
+      processedNodes.add(nodeId);
+  
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node) return;
+  
+      const newPos = {
+        x: node.x + dx,
+        y: node.y + dy
+      };
+  
+      // Ensure positions are valid numbers
+      if (!isNaN(newPos.x) && !isNaN(newPos.y)) {
+        updates.set(nodeId, newPos);
+      }
+  
+      // Process all connected nodes
+      node.connections.forEach(connectedId => {
+        if (!processedNodes.has(connectedId)) {
+          collectConnectedNodes(connectedId, dx, dy);
+        }
+      });
+    };
+  
+    // Start with the dragged node
+    updates.set(draggingNode, { x: newX, y: newY });
+    processedNodes.add(draggingNode);
+  
+    // Collect all connected nodes that need to move
+    draggedNode.connections.forEach(connectedId => {
+      collectConnectedNodes(connectedId, deltaX, deltaY);
+    });
+  
+    // Update all nodes in a single operation
+    setNodes(nodes.map(node => {
+      const newPos = updates.get(node.id);
+      if (newPos) {
+        return {
+          ...node,
+          x: newPos.x,
+          y: newPos.y
+        };
+      }
+      return node;
+    }));
   };
   const handleMouseUp = () => {
     if (draggingNode) {
@@ -358,6 +450,10 @@ const NodeEditor = ({
         onMouseUp={handleMouseUp}
       >
         <CanvasInstructions nodes={nodes} />
+        <CanvasSettings 
+          onSettingChange={handleSettingChange}
+          initialSettings={canvasSettings}
+        />
         <ConnectionsDisplay
           nodes={nodes}
           connecting={connecting}
@@ -376,6 +472,10 @@ const NodeEditor = ({
           onContextMenuClick={handleNodeContextMenu}
           gameWidth={treeSize.x}
           gameHeight={treeSize.y}
+        />
+                <GridOverlay 
+          enabled={canvasSettings.lockToGrid}
+          gridSize={canvasSettings.gridSize || 20}
         />
       </div>
 

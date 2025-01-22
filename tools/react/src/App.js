@@ -19,30 +19,31 @@ function App() {
   return (
     <Router basename="/">
       <div className="App bg-gray-900 min-h-screen">
-        <div className="bg-gray-800 border-b border-gray-700 p-4">
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setActiveTab('nodes')}
-              className={`${activeTab === 'nodes' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-gray-300'}`}
-            >
-              Node Editor
-            </Button>
-            <Button
-              onClick={() => setActiveTab('defs')}
-              className={`${activeTab === 'defs' ? 'bg-red-500 text-white' : 'bg-gray-700 text-gray-300'}`}
-            >
-              Def Editor
-            </Button>
-            <a 
-              href="https://github.com/Grim-/Talented/wiki"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block rounded-md px-4 py-2 font-medium bg-gray-700 text-gray-300 hover:bg-green-600"
-            >
-              The Wiki
-            </a>
+          {/* Added sticky, top-0, and z-10 classes */}
+          <div className="sticky top-0 z-20 bg-gray-800 border-b border-gray-700 p-4">
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setActiveTab('nodes')}
+                className={`${activeTab === 'nodes' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+              >
+                Node Editor
+              </Button>
+              <Button
+                onClick={() => setActiveTab('defs')}
+                className={`${activeTab === 'defs' ? 'bg-red-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+              >
+                Def Editor
+              </Button>
+              <a 
+                href="https://github.com/Grim-/Talented/wiki"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block rounded-md px-4 py-2 font-medium bg-gray-700 text-gray-300 hover:bg-green-600"
+              >
+                The Wiki
+              </a>
+            </div>
           </div>
-        </div>
         <div className="p-4 text-gray-300">
           <Routes>
             <Route path="/" element={null} /> 
