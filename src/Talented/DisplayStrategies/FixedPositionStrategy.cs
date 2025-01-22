@@ -48,7 +48,7 @@ namespace Talented
 
             // Apply viewport padding
             float paddedWidth = drawingSpace.width * (1f - viewportPadding * 2);
-            float paddedHeight = drawingSpace.height * (1f - viewportPadding * 2);
+            float paddedHeight = drawingSpace.height * (1f - viewportPadding * 2)  + 30f;
             float paddingOffsetX = drawingSpace.x + (drawingSpace.width - paddedWidth) / 2;
             float paddingOffsetY = drawingSpace.y + (drawingSpace.height - paddedHeight) / 2;
 

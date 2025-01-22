@@ -148,11 +148,12 @@ namespace Talented
 
                 DrawNodeIconBG(node, nodeRect);
                 DrawNodeIcon(node, treeHandler, nodeRect);
-                DrawNodeBadge(node, nodeRect);
+         
                 HandleNodeClick(nodeRect, node, canUnlockResult);
 
                 if (Mouse.IsOver(nodeRect))
                 {
+                    DrawNodeBadge(node, nodeRect, currentProgress);
                     DrawDescription(nodeRect, node, currentProgress);
                 }
             }
@@ -171,20 +172,50 @@ namespace Talented
             }
         }
 
-        private void DrawNodeBadge(TalentTreeNodeDef node, Rect nodeRect)
+        private void DrawNodeBadge(TalentTreeNodeDef node, Rect nodeRect, int currentProgress)
         {
             int progress = treeHandler.GetNodeProgress(node);
-            string label = $"{progress}/{node.upgrades.Count}";
+            string label = "";
+
+            if (currentProgress > 0)
+            {
+                var currentUpgrade = node.upgrades[currentProgress - 1];
+                label = $"{currentUpgrade.label}  {progress}/{node.upgrades.Count}";
+            }
+            else
+            {
+                label = $"{node.GetUpgradeLabel(progress)}  {progress}/{node.upgrades.Count}";
+            }
 
             Vector2 labelSize = Text.CalcSize(label);
 
-            float xPos = nodeRect.x + (nodeRect.width - labelSize.x) / 2; 
-            float yPos = nodeRect.y - labelSize.y - 2f;
+            // Add padding to the label
+            float padding = 4f;
+            float xPos = nodeRect.x + (nodeRect.width - (labelSize.x + padding * 2)) / 2;
+            float yPos = nodeRect.y - (labelSize.y + padding * 2) - 2f;
 
-            Rect badgeRect = new Rect(xPos, yPos, labelSize.x, labelSize.y);
+            // Create badge rectangle with padding
+            Rect badgeRect = new Rect(xPos, yPos, labelSize.x + padding * 2, labelSize.y + padding * 2);
 
-            Widgets.Label(badgeRect, label);
+            // Optional: Draw a background for the badge
+            Widgets.DrawBoxSolid(badgeRect, new Color(0, 0, 0, 0.5f)); // Semi-transparent black background
+
+            // Draw border (optional)
+            Widgets.DrawBox(badgeRect, 1, null);
+
+            // Draw label
+            Text.Font = GameFont.Small;
+            Rect labelRect = new Rect(
+                badgeRect.x + padding,
+                badgeRect.y + padding,
+                labelSize.x,
+                labelSize.y
+            );
+            Widgets.Label(labelRect, label);
+
+            Text.Font = GameFont.Small;
         }
+
         private void HandleNodeClick(Rect nodeRect, TalentTreeNodeDef node, UnlockResult canUnlockResult)
         {
             if (!Widgets.ButtonInvisible(nodeRect))

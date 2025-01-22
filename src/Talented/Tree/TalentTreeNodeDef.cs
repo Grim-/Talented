@@ -60,10 +60,18 @@ namespace Talented
 
             return 0;
         }
+        public string GetUpgradeLabel(int upgradeIndex)
+        {
+            if (HasUpgrade(upgradeIndex))
+            {
+                return GetUpgrade(upgradeIndex).label;
+            }
 
+            return "Unamed Node";
+        }
         public bool HasUpgrade(int upgradeIndex)
         {
-            if (upgradeIndex < 0 || upgradeIndex > upgrades.Count)
+            if (upgradeIndex < 0 || upgradeIndex >= upgrades.Count)
             {
                 return false;
             }
@@ -71,7 +79,7 @@ namespace Talented
         }
         public TalentDef GetUpgrade(int upgradeIndex)
         {
-            if (upgradeIndex < 0 || upgradeIndex > upgrades.Count)
+            if (upgradeIndex < 0 || upgradeIndex >= upgrades.Count)
             {
                 return null;
             }
