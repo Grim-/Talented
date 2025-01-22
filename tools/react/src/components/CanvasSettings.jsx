@@ -6,7 +6,7 @@ const CanvasSettings = ({ onSettingChange, initialSettings = {} }) => {
   const [settings, setSettings] = useState({
     lockToGrid: initialSettings.lockToGrid || false,
     hierarchyMove: initialSettings.hierarchyMove || false,
-    gridSize: initialSettings.gridSize || 20
+    gridSize: initialSettings.gridSize || 35
   });
 
   const handleSettingChange = (setting, value) => {
@@ -23,7 +23,7 @@ const CanvasSettings = ({ onSettingChange, initialSettings = {} }) => {
   };
 
   const handleGridSizeChange = (e) => {
-    const value = parseInt(e.target.value) || 20;
+    const value = parseInt(e.target.value) || 35;
     const clampedValue = Math.max(5, Math.min(100, value));
     handleSettingChange('gridSize', clampedValue);
   };

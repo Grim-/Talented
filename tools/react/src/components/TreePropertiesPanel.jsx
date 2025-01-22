@@ -80,7 +80,7 @@ const TreePropertiesPanel = ({
 
   return (
     <div className="ww">
-      <div className="w-80 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+      <div className="w-80 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-50">
         <div 
           className="px-3 py-2 border-b border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 text-gray-300"
           onClick={() => setIsExpanded(!isExpanded)}

@@ -16,18 +16,18 @@ const GridOverlay = ({ enabled, gridSize = 20 }) => {
         }
       }
     };
-
+  
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
+  }, [gridSize]);
 
   if (!enabled) return null;
 
   return (
     <svg
       ref={containerRef}
-      className="absolute top-0 left-0 pointer-events-none -z-5"
+      className="absolute top-0 left-0 pointer-events-none -z-8"
       width={dimensions.width}
       height={dimensions.height}
       xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +42,7 @@ const GridOverlay = ({ enabled, gridSize = 20 }) => {
           <path
             d={`M ${gridSize} 0 L 0 0 0 ${gridSize}`}
             fill="none"
-            stroke="rgba(255, 255, 255, 0.1)"
+            stroke="rgba(255, 255, 255, 0.4)"
             strokeWidth="0.5"
           />
         </pattern>
