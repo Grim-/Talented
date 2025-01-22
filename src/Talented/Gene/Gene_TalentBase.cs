@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -121,6 +122,7 @@ namespace Talented
                         }
                         else
                         {
+                            Log.Error($"Gene_TalentBase: Cannot find handlerClass for {treeDef.defName} TalentTreeDef. Defaulting to ActiveTreeHandler.");
                             handler = new ActiveTreeHandler(pawn, this, treeDef);
                         }
 
@@ -205,27 +207,6 @@ namespace Talented
             Messages.Message($"{pawn.Label} gained {levels} level{(levels > 1 ? "s" : "")} (level = {currentLevel})",
                 MessageTypeDefOf.PositiveEvent);
         }
-
-        public virtual void OpenPassiveTree()
-        {
-            if (TalentedGeneDef?.SecondaryTreeDef != null)
-            {
-                var window = new TalentTreeDisplayWindow(this, TalentedGeneDef.SecondaryTreeDef, passiveTree,
-                    TalentedGeneDef.SecondaryTreeDef.displayStrategy);
-                Find.WindowStack.Add(window);
-            }
-        }
-
-        public virtual void OpenActiveTree()
-        {
-            if (TalentedGeneDef?.MainTreeDef != null)
-            {
-                var window = new TalentTreeDisplayWindow(this, TalentedGeneDef.MainTreeDef, activeTree,
-                    TalentedGeneDef.MainTreeDef.displayStrategy);
-                Find.WindowStack.Add(window);
-            }
-        }
-
 
         public struct TreeInstanceData
         {

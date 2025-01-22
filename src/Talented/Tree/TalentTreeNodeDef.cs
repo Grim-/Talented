@@ -13,6 +13,8 @@ namespace Talented
         public TalentPathDef path;
         public List<BranchPathData> branchPaths;
 
+        public List<NodeUnlockRuleDef> unlockRules;
+
         public bool sequential = false;
         public bool hide = false;
         public List<TalentDef> prerequisitesToShow;

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { BadgeHelp, ChevronDown, ChevronUp, SquareMousePointer } from 'lucide-react';
+import { BadgeHelp, ChevronDown, ChevronUp, SquareMousePointer, Trash } from 'lucide-react';
 import Button from './Button';
 import DefSelector from './DefRefSelector';
 import ListEditor from './PropertiesList';
 import TagGrid from './TagGrid';
 import PathInput from './PathInput';
+
 
 const PropertiesPanel = ({
   selectedNode,
@@ -194,6 +195,57 @@ const PropertiesPanel = ({
                     )}
                   </div>
                 </>
+              )}
+
+{node.type === 'Branch' && (
+                <div className="pt-2 border-t border-gray-700">
+                  <label className="block text-xs font-medium text-gray-300 mb-2">
+                    <div className="flex items-center gap-1">
+                      Branch Paths <BadgeHelp className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </label>
+                  <div className="space-y-2">
+                    {(node.branchPaths || []).map((branchPath, index) => (
+                      <div key={index} className="bg-gray-700 rounded-md p-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <DefSelector
+                            defType="TalentPathDef"
+                            value={branchPath.path || ''}
+                            onChange={(value) => {
+                              const newBranchPaths = [...(node.branchPaths || [])];
+                              newBranchPaths[index] = {
+                                ...branchPath,
+                                path: value
+                              };
+                              onUpdateProperty('branchPaths', newBranchPaths);
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              const newBranchPaths = [...(node.branchPaths || [])];
+                              newBranchPaths.splice(index, 1);
+                              onUpdateProperty('branchPaths', newBranchPaths);
+                            }}
+                            className="bg-red-600 hover:bg-red-700 p-1"
+                          >
+                            <Trash size={16} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const newBranchPaths = [...(node.branchPaths || []), { path: '', nodes: [] }];
+                        onUpdateProperty('branchPaths', newBranchPaths);
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      Add Branch Path
+                    </Button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

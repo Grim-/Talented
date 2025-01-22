@@ -145,7 +145,7 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, tr
   let xml = `  <${fullDefType}>\n`;
   xml += `    <defName>${treeName}</defName>\n`;
   xml += `    <dimensions>(${treeSize.width},${treeSize.height})</dimensions>\n`;
-  xml += `    <handlerClass>${treeHandler}</handlerClass>\n`;
+  xml += `    <handlerClass>${getFullDefName(treeHandler)}</handlerClass>\n`;
   
   // Add root nodes with updated IDs
   xml += '    <nodes>\n';
@@ -178,8 +178,8 @@ const validateAndFixPaths = (paths) => {
   // For each path
   validatedPaths.forEach(pathA => {
     // Initialize exclusivePaths array if it doesn't exist
-    if (!pathA.exclusivePaths) {
-      pathA.exclusivePaths = [];
+    if (!pathA.exclusiveWith) {
+      pathA.exclusiveWith = [];
     }
 
     // Check each exclusive path
@@ -215,8 +215,8 @@ const exportPaths = (paths, config) => {
     xml += `    <pathDescription>${path.description}</pathDescription>\n`;
     xml += `    <exclusiveWith>\n`;
 
-    if (path.exclusivePaths && path.exclusivePaths.length > 0) {
-      path.exclusivePaths.forEach(exclusivePath => {
+    if (path.exclusiveWith && path.exclusiveWith.length > 0) {
+      path.exclusiveWith.forEach(exclusivePath => {
         xml += `      <li>${exclusivePath}</li>\n`;
       });
     }

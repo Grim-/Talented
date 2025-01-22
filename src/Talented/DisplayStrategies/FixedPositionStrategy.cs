@@ -12,7 +12,9 @@ namespace Talented
 
         public FixedPositionStrategy()
         {
-
+            margin = 20f;
+            viewportPadding = 0.1f;
+            maintainAspectRatio = true;
         }
 
         public FixedPositionStrategy(float margin = 20f, float viewportPadding = 0.1f, bool maintainAspectRatio = true)
@@ -50,12 +52,26 @@ namespace Talented
             float paddingOffsetX = drawingSpace.x + (drawingSpace.width - paddedWidth) / 2;
             float paddingOffsetY = drawingSpace.y + (drawingSpace.height - paddedHeight) / 2;
 
-            // Calculate scaling factors
+            // Calculate grid dimensions
             float gridWidth = bounds.maxX - bounds.minX + 1;
             float gridHeight = bounds.maxZ - bounds.minZ + 1;
 
-            float xScale = (paddedWidth - nodeSize) / Mathf.Max(1, gridWidth - 1);
-            float yScale = (paddedHeight - nodeSize) / Mathf.Max(1, gridHeight - 1);
+            // Base scale starts at the spacing value to match web app spacing
+            float xScale = spacing;
+            float yScale = spacing;
+
+            float requiredWidth = (gridWidth - 1) * spacing;
+            float requiredHeight = (gridHeight - 1) * spacing;
+
+            if (requiredWidth > paddedWidth - nodeSize)
+            {
+                xScale = (paddedWidth - nodeSize) / (float)(gridWidth - 1);
+            }
+
+            if (requiredHeight > paddedHeight - nodeSize)
+            {
+                yScale = (paddedHeight - nodeSize) / (float)(gridHeight - 1);
+            }
 
             // Maintain aspect ratio if needed
             if (maintainAspectRatio)
