@@ -5,7 +5,7 @@
       <defName>PsychicStealthUpgrade</defName>
       <label>Psychic Stealth</label>
       <description>Uses psychic energy to enhance stealth capabilities.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <hediffEffects>
           <li>
               <hediffDef>PsychicStealth</hediffDef>

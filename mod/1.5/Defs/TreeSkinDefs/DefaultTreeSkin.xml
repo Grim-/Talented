@@ -6,25 +6,27 @@
   <description>Default visual style for upgrade trees</description>
 
   <!-- Background configuration -->
-  <backgroundTexturePath>UI/Tree/defaultbackground</backgroundTexturePath>
+  <backgroundTexturePath>SymbioteBG</backgroundTexturePath>
   <backgroundColor>(1, 1, 1)</backgroundColor>
+  <backgroundScaleMode>StretchToFill</backgroundScaleMode>
 
   <windowMargin>0</windowMargin>
-  <treeListbackgroundScaleMode>StretchToFill</treeListbackgroundScaleMode>
+  <treeListbackgroundScaleMode>ScaleToFit</treeListbackgroundScaleMode>
 
   <!-- Scale modes
       StretchToFill,
       ScaleAndCrop,
       ScaleToFit
     -->
+
   <!-- Node appearance -->
-  <nodeTexturePath>UI/Tree/defaultNode</nodeTexturePath>
-  <nodeSize>60</nodeSize>
-  <nodeSpacing>10</nodeSpacing>
+  <nodeTexturePath>UI/Tree/node</nodeTexturePath>
+  <nodeSize>50</nodeSize>
+  <nodeSpacing>5</nodeSpacing>
 
   <!-- Connection appearance -->
-  <defaultConnectionTexturePath>UI/Tree/defaultconnection</defaultConnectionTexturePath>
-  <connectionThickness>1.5</connectionThickness>
+  <connectionTexturePath>UI/Tree/connection_lineglow</connectionTexturePath>
+  <connectionThickness>2</connectionThickness>
   <showConnectionArrows>true</showConnectionArrows>
   <arrowSize>10</arrowSize>
 
@@ -42,12 +44,9 @@
   <inactiveConnectionColor>(0.5, 0.5, 0.5, 0.3)</inactiveConnectionColor>
 
   <!-- Text configuration -->
-  <labelOffset>5</labelOffset>
+  <labelOffset>-5</labelOffset>
   <pathLabelOffset>25</pathLabelOffset>
-  <labelFont>Small</labelFont>
+  <labelFont>Medium</labelFont>
   <labelColor>(1, 1, 1)</labelColor>
-
-    <!-- Toolbar configuration -->
-    <toolbarHeight>35</toolbarHeight>
 </Talented.TalentTreeSkinDef>
 </Defs>

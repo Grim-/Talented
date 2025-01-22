@@ -6,8 +6,9 @@
       <label>Talent Gene</label>
       <description>A gene with talent tree mechanics.</description>
       <!-- Tree Configuration -->
-      <MainTreeDef>GenericUpgradeTree</MainTreeDef>
-      <SecondaryTreeDef>GenericUpgradeTree</SecondaryTreeDef>
+      <TalentTrees>
+        <li>TestTree</li>
+      </TalentTrees>
 
       <!-- Experience System -->
       <experienceFormula>Basic_LinearXP</experienceFormula>

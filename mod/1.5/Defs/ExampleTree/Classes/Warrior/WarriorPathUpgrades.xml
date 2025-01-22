@@ -5,7 +5,7 @@
       <defName>WarriorStrengthUpgrade</defName>
       <label>Warrior's Might</label>
       <description>Enhances physical strength through parasitic muscle enhancement.</description>
-      <parasiteLevelRequired>3</parasiteLevelRequired>
+      <levelRequired>3</levelRequired>
       <statEffects>
           <li>
               <statDef>MeleeWeapon_DamageMultiplier</statDef>
@@ -25,7 +25,7 @@
       <defName>BattleFuryUpgrade</defName>
       <label>Battle Fury</label>
       <description>Grants the ability to enter a fury state, temporarily boosting combat capabilities.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <abilityEffects>
           <li>
               <abilities>
@@ -68,7 +68,7 @@
       <defName>ArmoredHideUpgrade</defName>
       <label>Armored Hide</label>
       <description>Develops hardened skin plates that provide natural armor protection.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <hediffEffects>
           <li>
               <hediffDef>ArmoredHide</hediffDef>

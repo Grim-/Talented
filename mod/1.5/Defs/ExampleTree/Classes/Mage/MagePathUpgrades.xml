@@ -6,7 +6,7 @@
       <defName>PsychicAmplificationUpgrade</defName>
       <label>Psychic Amplification</label>
       <description>Enhances psychic sensitivity through parasitic neural modifications.</description>
-      <parasiteLevelRequired>3</parasiteLevelRequired>
+      <levelRequired>3</levelRequired>
       <statEffects>
           <li>
               <statDef>PsychicSensitivity</statDef>
@@ -21,7 +21,7 @@
       <defName>PsyBurstUpgrade</defName>
       <label>Psy Burst</label>
       <description>Grants the ability to release a concentrated burst of psychic energy.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <abilityEffects>
           <li>
               <abilities>
@@ -54,7 +54,7 @@
       <defName>PsychicResonanceUpgrade</defName>
       <label>Psychic Resonance</label>
       <description>Develops enhanced psychic energy regeneration capabilities.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <hediffEffects>
           <li>
               <hediffDef>PsychicResonance</hediffDef>

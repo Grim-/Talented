@@ -5,7 +5,7 @@
       <defName>MentalFortificationUpgrade</defName>
       <label>Mental Fortification</label>
       <description>Strengthens both mind and body through parasitic enhancement.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <hediffEffects>
           <li>
               <hediffDef>MentalFortification</hediffDef>

@@ -6,7 +6,7 @@
       <defName>SwiftMovementUpgrade</defName>
       <label>Swift Movement</label>
       <description>Enhances movement capabilities through parasitic muscle enhancement.</description>
-      <parasiteLevelRequired>3</parasiteLevelRequired>
+      <levelRequired>3</levelRequired>
       <statEffects>
           <li>
               <statDef>MoveSpeed</statDef>
@@ -26,7 +26,7 @@
       <defName>ShadowStrikeUpgrade</defName>
       <label>Shadow Strike</label>
       <description>Grants the ability to briefly become invisible and perform a powerful strike.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <abilityEffects>
           <li>
               <abilities>
@@ -68,7 +68,7 @@
       <defName>EnhancedReflexesUpgrade</defName>
       <label>Enhanced Reflexes</label>
       <description>Develops improved neural pathways for better reflexes and coordination.</description>
-      <parasiteLevelRequired>4</parasiteLevelRequired>
+      <levelRequired>4</levelRequired>
       <hediffEffects>
           <li>
               <hediffDef>EnhancedReflexes</hediffDef>

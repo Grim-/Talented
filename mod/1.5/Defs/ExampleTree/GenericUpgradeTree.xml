@@ -2,6 +2,7 @@
 <Defs>
   <Talented.TalentTreeDef>
     <defName>GenericUpgradeTree</defName>
+    <treeName>Hero Tree</treeName>
     <dimensions>(450, 790)</dimensions>
     <nodes>
       <li>GenericTree_Root</li>
@@ -18,16 +19,28 @@
   <Talented.TalentPathDef>
     <defName>WarriorPath</defName>
     <pathDescription>Warrior path</pathDescription>
+    <exclusiveWith>
+      <li>MagePath</li>
+      <li>RoguePath</li>
+    </exclusiveWith>
   </Talented.TalentPathDef>
 
   <Talented.TalentPathDef>
     <defName>MagePath</defName>
     <pathDescription>Mage path</pathDescription>
+    <exclusiveWith>
+      <li>WarriorPath</li>
+      <li>RoguePath</li>
+    </exclusiveWith>
   </Talented.TalentPathDef>
 
   <Talented.TalentPathDef>
     <defName>RoguePath</defName>
     <pathDescription>Rogue path</pathDescription>
+    <exclusiveWith>
+      <li>WarriorPath</li>
+      <li>MagePath</li>
+    </exclusiveWith>
   </Talented.TalentPathDef>
 
   <Talented.TalentTreeNodeDef>
