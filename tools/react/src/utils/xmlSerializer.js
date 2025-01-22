@@ -183,19 +183,19 @@ const validateAndFixPaths = (paths) => {
     }
 
     // Check each exclusive path
-    pathA.exclusivePaths.forEach(exclusiveName => {
+    pathA.exclusiveWith.forEach(exclusiveName => {
       // Find the corresponding path
       const pathB = validatedPaths.find(p => p.name === exclusiveName);
       
       if (pathB) {
         // Initialize exclusivePaths array if it doesn't exist for pathB
-        if (!pathB.exclusivePaths) {
-          pathB.exclusivePaths = [];
+        if (!pathB.exclusiveWith) {
+          pathB.exclusiveWith = [];
         }
         
         // If pathA is not in pathB's exclusive list, add it
-        if (!pathB.exclusivePaths.includes(pathA.name)) {
-          pathB.exclusivePaths.push(pathA.name);
+        if (!pathB.exclusiveWith.includes(pathA.name)) {
+          pathB.exclusiveWith.push(pathA.name);
         }
       }
     });
