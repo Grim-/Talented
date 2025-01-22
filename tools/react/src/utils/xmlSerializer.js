@@ -1,3 +1,5 @@
+import { StorageUtils } from './StorageUtils';
+
 export const DefTypeConfig = {
   NODE: 'TalentTreeNodeDef',
   TREE: 'TalentTreeDef',
@@ -40,24 +42,26 @@ export const stripNamespace = (fullDefType) => {
 
 export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = DefTypeConfig) => {
   const files = event.target.files;
+  // Instead of creating a new object, start with all existing definitions
   let newDefs = { ...savedDefs };
 
   for (const file of Array.from(files)) {
     try {
       const text = await file.text();
       const xmlDoc = new DOMParser().parseFromString(text, "text/xml");
-
-      // Get ALL elements
       const allElements = xmlDoc.getElementsByTagName('*');
 
-      // Filter for our def types
       for (const element of Array.from(allElements)) {
         Object.values(config).forEach(defType => {
           const fullDefType = getFullDefName(defType);
-          // Check if this element matches our def type
           if (element.tagName === fullDefType) {
             const defName = element.getElementsByTagName("defName")[0]?.textContent;
             if (!defName) return;
+
+            // Initialize the defType object if it doesn't exist
+            if (!newDefs[defType]) {
+              newDefs[defType] = {};
+            }
 
             const def = { defName, type: defType };
             Array.from(element.children).forEach(child => {
@@ -83,10 +87,11 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
               }), {});
             });
 
-            // Console log to verify we found and processed the def
-            console.log("Found and processing def:", fullDefType, defName);
-
-            newDefs[defType] = { ...(newDefs[defType] || {}), [defName]: def };
+            // Merge new def with existing ones instead of replacing
+            newDefs[defType] = {
+              ...newDefs[defType],
+              [defName]: def
+            };
           }
         });
       }
@@ -96,12 +101,11 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
   }
 
   console.log("Current savedDefs:", savedDefs);
+  console.log("New merged defs:", newDefs);
   setSavedDefs(newDefs);
-  console.log("New savedDefs:", newDefs);
 
   event.target.value = '';
 };
-
 export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
   try {
     // Reset export state at the start
@@ -206,17 +210,59 @@ const validateAndFixPaths = (paths) => {
 
 
 const exportPaths = (paths, config) => {
+  // Get reference definitions first
+  const referenceDefs = JSON.parse(localStorage.getItem('nodeEditorReferenceDefs') || '[]');
+  
+  const getPathData = (path) => {
+    // First check reference defs
+    const referenceDef = referenceDefs.find(def => def.defName === path.name);
+    
+    if (referenceDef) {
+      // Make sure we get the exclusiveWith array, defaulting to empty array if not present
+      const exclusiveWith = Array.isArray(referenceDef.exclusiveWith) 
+        ? referenceDef.exclusiveWith 
+        : (referenceDef.properties?.exclusiveWith || []);
+        
+      return {
+        name: referenceDef.defName,
+        description: referenceDef.pathDescription || referenceDef.description || path.description || '',
+        exclusiveWith: exclusiveWith
+      };
+    }
+    
+    // Also check StorageUtils defs as fallback
+    const storedDef = StorageUtils.getSingleDef('TalentPathDef', path.name);
+    if (storedDef) {
+      const exclusiveWith = Array.isArray(storedDef.exclusiveWith) 
+        ? storedDef.exclusiveWith 
+        : (storedDef.properties?.exclusiveWith || []);
+        
+      return {
+        name: storedDef.defName,
+        description: storedDef.description || path.description || '',
+        exclusiveWith: exclusiveWith
+      };
+    }
+    
+    // If no defs found, use original path data
+    return path;
+  };
+
   const validatedPaths = validateAndFixPaths(paths);
   
   let xml = '';
   validatedPaths.forEach(path => {
+    const pathData = getPathData(path);
+    
     xml += '<Talented.TalentPathDef>\n';
-    xml += `    <defName>${path.name}</defName>\n`;
-    xml += `    <pathDescription>${path.description}</pathDescription>\n`;
+    xml += `    <defName>${pathData.name}</defName>\n`;
+    xml += `    <pathDescription>${pathData.description}</pathDescription>\n`;
     xml += `    <exclusiveWith>\n`;
 
-    if (path.exclusiveWith && path.exclusiveWith.length > 0) {
-      path.exclusiveWith.forEach(exclusivePath => {
+    // Make sure exclusiveWith is an array before trying to iterate
+    const exclusiveWith = Array.isArray(pathData.exclusiveWith) ? pathData.exclusiveWith : [];
+    if (exclusiveWith.length > 0) {
+      exclusiveWith.forEach(exclusivePath => {
         xml += `      <li>${exclusivePath}</li>\n`;
       });
     }
@@ -224,8 +270,10 @@ const exportPaths = (paths, config) => {
     xml += `    </exclusiveWith>\n`;
     xml += `  </Talented.TalentPathDef>\n\n`;
   });
+  
   return xml;
 };
+
 
 
 const calculateScaledPosition = (node, treeSize) => {

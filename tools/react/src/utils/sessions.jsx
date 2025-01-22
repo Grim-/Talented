@@ -1,14 +1,31 @@
 import Node from "../components/Node";
 
-
-//TODO :: FIX SESSION SAVE AND LOAD
-//TODO :: FIX PATH TEXT INPUT FIELD 
-//TODO :: SHOW EXCLUSIVE PATHS FOR SELECTED PATH
-//TODO :: FIX ROUTING FOR EXAMPLE
-
 export const loadSessionFromFile = (sessionData) => {
+  // Create new Node instances to ensure proper defaults
+  const nodes = sessionData.nodes.map(nodeData => {
+    const node = new Node(
+      nodeData.id,
+      nodeData.label,
+      nodeData.type,
+      nodeData.x,
+      nodeData.y
+    );
+    // Copy over additional properties
+    return {
+      ...node,
+      connections: nodeData.connections || [],
+      path: nodeData.path || '',
+      upgrade: nodeData.upgrade || '',
+      branchPaths: nodeData.branchPaths || [],
+      upgrades: nodeData.upgrades || [],
+      descriptionString: nodeData.descriptionString || '',
+      levelRequired: nodeData.levelRequired || 0,
+      canDrag: nodeData.canDrag !== undefined ? nodeData.canDrag : true
+    };
+  });
+
   return {
-    nodes: sessionData.nodes,
+    nodes,
     paths: sessionData.paths,
     treeName: sessionData.treeName,
     treeSize: sessionData.treeSize,
@@ -19,8 +36,11 @@ export const loadSessionFromFile = (sessionData) => {
 };
 
 export const saveSessionToFile = (nodes, paths, treeName = "TalentTreeDef_CHANGEME", treeSize, treeDisplay, treePointStrategy, treeHandler) => {
+  // Remove width and height from nodes before saving
+  const nodesToSave = nodes.map(({ width, height, ...nodeWithoutSize }) => nodeWithoutSize);
+
   const sessionData = {
-    nodes,
+    nodes: nodesToSave,
     paths,
     treeName,
     treeSize,
@@ -29,6 +49,7 @@ export const saveSessionToFile = (nodes, paths, treeName = "TalentTreeDef_CHANGE
     treeHandler,
     timestamp: new Date().toISOString()
   };
+
   const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -41,19 +62,29 @@ export const saveSessionToFile = (nodes, paths, treeName = "TalentTreeDef_CHANGE
 };
 
 export const clearSession = (setNodes, setPaths, clearAll = false) => {
-    const initialSession = {
-      nodes: [new Node(null, "NewRootNode", 'Start', 0, 0)],
-      paths: []
-    };
+  const initialNode = new Node(null, "NewRootNode", 'Start', 0, 0);
+  
+  const initialSession = {
+    nodes: [initialNode],
+    paths: []
+  };
 
-    if (clearAll)
-    {
-        setNodes([]);
-        setPaths([]);
-    }
-    else
-    {
-        setNodes(initialSession.nodes);
-        setPaths(initialSession.paths);
-    }
+  if (clearAll) {
+    setNodes([]);
+    setPaths([]);
+  } else {
+    setNodes(initialSession.nodes);
+    setPaths(initialSession.paths);
+  }
+};
+
+
+export const ensureNodeDimensions = (node) => {
+  if (node.width && node.height) return node;
+  const defaultNode = new Node();
+  return {
+    ...node,
+    width: defaultNode.width,
+    height: defaultNode.height
+  };
 };

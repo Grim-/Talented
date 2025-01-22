@@ -8,7 +8,16 @@ import { serializeDefToXml, handleXmlImport } from '../utils/xmlSerializer';
 const DefManager = () => {
   const [selectedType, setSelectedType] = useState(null);
   const [currentDef, setCurrentDef] = useState(null);
-  StorageUtils.migrateParasiteLevelToLevelRequired();
+  const [defsVersion, setDefsVersion] = useState(0);
+  const refreshDefs = () => {
+    setDefsVersion(v => v + 1);
+  };
+
+  const handleSaveDef = (type, defName, def) => {
+    StorageUtils.saveSingleDefOfType(type, defName, def);
+    refreshDefs();
+  };
+
   const handleTypeChange = (type) => {
     setSelectedType(type);
     setCurrentDef({
@@ -49,6 +58,7 @@ const DefManager = () => {
     if (currentDef?.defName === defName) {
       setCurrentDef(null);
     }
+    refreshDefs();
   };
 
   const exportToXml = () => {
@@ -74,6 +84,20 @@ const DefManager = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleFileChange = (e) => {
+    const allCurrentDefs = {};
+    defTypes.forEach(({ id }) => {
+      allCurrentDefs[id] = StorageUtils.getDefsOfType(id) || {};
+    });
+    
+    handleXmlImport(e, allCurrentDefs, (newDefs) => {
+      Object.entries(newDefs).forEach(([type, defs]) => {
+        StorageUtils.saveDefsOfType(type, defs);
+      });
+      refreshDefs();
+    });
+  };
+
   const defTypes = [
     { id: 'TalentDef', label: 'Talent Definition' },
     { id: 'TalentPathDef', label: 'Path Definition' }
@@ -82,7 +106,7 @@ const DefManager = () => {
   return (
     <div className="flex gap-4">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-50 p-4 rounded-lg">
+      <div className="w-64 bg-gray-600 p-4 rounded-lg">
         <div className="flex gap-2 mb-3">
           <Button
             onClick={() => document.getElementById('xmlImport').click()}
@@ -101,15 +125,15 @@ const DefManager = () => {
             type="file" 
             multiple 
             accept=".xml" 
-            onChange={e => handleXmlImport(e, StorageUtils)} 
+            onChange={handleFileChange} 
             className="hidden" 
           />
         </div>
 
-        <h2 className="font-semibold text-sm mb-2">Saved Definitions</h2>
+        <h2 className="font-semibold text-sm mb-2 text-white">Saved Definitions</h2>
         {defTypes.map(({ id, label }) => (
-          <div key={id} className="mb-2">
-            <h3 className="text-xs font-medium text-gray-600 mb-1">{label}</h3>
+          <div key={`${id}-${defsVersion}`} className="mb-2">
+            <h3 className="text-xs font-medium text-white mb-1">{label}</h3>
             {Object.entries(StorageUtils.getDefsOfType(id) || {}).map(([defName, def]) => (
               <div key={defName} className="flex items-center gap-1 text-xs">
                 <button
@@ -135,21 +159,29 @@ const DefManager = () => {
         <select
           value={selectedType || ''}
           onChange={e => handleTypeChange(e.target.value)}
-          className="w-full p-2 mb-3 border rounded text-sm"
+          className="w-full p-2 mb-3 border border-gray-600 rounded text-sm bg-gray-700 text-gray-200"
         >
-          <option value="">Select Definition Type</option>
+          <option value="" className="bg-gray-700">Select Definition Type</option>
           {defTypes.map(({ id, label }) => (
-            <option key={id} value={id}>{label}</option>
+            <option key={id} value={id} className="bg-gray-700">{label}</option>
           ))}
         </select>
 
         {selectedType && currentDef && (
           <>
             {selectedType === 'TalentDef' && (
-              <TalentDefEditor currentDef={currentDef} setCurrentDef={setCurrentDef} />
+              <TalentDefEditor 
+                currentDef={currentDef} 
+                setCurrentDef={setCurrentDef}
+                onSave={handleSaveDef}
+              />
             )}
             {selectedType === 'TalentPathDef' && (
-              <TalentPathEditor currentDef={currentDef} setCurrentDef={setCurrentDef} />
+              <TalentPathEditor 
+                currentDef={currentDef} 
+                setCurrentDef={setCurrentDef}
+                onSave={handleSaveDef}
+              />
             )}
           </>
         )}

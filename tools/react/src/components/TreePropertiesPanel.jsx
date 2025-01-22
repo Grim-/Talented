@@ -19,7 +19,7 @@ const TreePropertiesPanel = ({
   pointStrategy, setTreePointStrategy,
   treeHandler, setTreeHandler
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [customDisplayStrategy, setCustomDisplayStrategy] = useState(false);
   const [customPointFormula, setCustomPointFormula] = useState(false);
   const [customTreeHandler, setCustomTreeHandler] = useState(false);
@@ -79,7 +79,7 @@ const TreePropertiesPanel = ({
   ];
 
   return (
-    <div className="w-80 bg-gray-800 rounded-lg shadow-lg m-1 border border-gray-700">
+    <div className="w-80 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
       <div 
         className="px-3 py-2 border-b border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 text-gray-300"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -93,36 +93,36 @@ const TreePropertiesPanel = ({
         )}
       </div>
       
+      <div className="p-3 border-b border-gray-700">
+        <div className="space-y-1">
+          <label htmlFor="treeName" className={labelClasses}>
+            Talent Tree Definition Name
+            <HelpCircle 
+              size={14} 
+              className="text-gray-400 cursor-help"
+              data-tooltip-id="tree-name-tip"
+            />
+            <Tooltip id="tree-name-tip" className="bg-gray-800 text-gray-300">
+              Unique identifier for your talent tree
+            </Tooltip>
+          </label>
+          <input
+            type="text"
+            id="treeName"
+            value={treeName}
+            onChange={(e) => setTreeName(e.target.value)}
+            className={`${inputClasses} ${
+              treeName 
+                ? 'bg-green-900 border-green-600' 
+                : 'bg-red-900 border-red-600'
+            }`}
+            placeholder="Enter tree name..."
+          />
+        </div>
+      </div>
+ 
       <div className={`${isExpanded ? 'block' : 'hidden'}`}>
         <div className="p-3 space-y-4">
-          {/* Talent Tree Name */}
-          <div className="space-y-1">
-            <label htmlFor="treeName" className={labelClasses}>
-              Talent Tree Definition Name
-              <HelpCircle 
-                size={14} 
-                className="text-gray-400 cursor-help"
-                data-tooltip-id="tree-name-tip"
-              />
-              <Tooltip id="tree-name-tip" className="bg-gray-800 text-gray-300">
-                Unique identifier for your talent tree
-              </Tooltip>
-            </label>
-            <input
-              type="text"
-              id="treeName"
-              value={treeName}
-              onChange={(e) => setTreeName(e.target.value)}
-              className={`${inputClasses} ${
-                treeName 
-                  ? 'bg-green-900 border-green-600' 
-                  : 'bg-red-900 border-red-600'
-              }`}
-              placeholder="Enter tree name..."
-            />
-          </div>
-
-          {/* Tree Window Size */}
           <div className="space-y-1">
             <label className={labelClasses}>
               Tree Window Size
@@ -154,8 +154,7 @@ const TreePropertiesPanel = ({
               />
             </div>
           </div>
-
-          {/* Tree Handler Type */}
+ 
           <div className="space-y-1 relative">
             <label className={labelClasses}>
               Talent Handler Type
@@ -190,8 +189,7 @@ const TreePropertiesPanel = ({
               />
             )}
           </div>
-
-          {/* Display Strategy */}
+ 
           <div className="space-y-1 relative">
             <label className={labelClasses}>
               Tree Display Strategy
@@ -226,8 +224,7 @@ const TreePropertiesPanel = ({
               />
             )}
           </div>
-
-          {/* Point Formula */}
+ 
           <div className="space-y-1 relative">
             <label className={labelClasses}>
               Talent Point Formula
@@ -265,7 +262,7 @@ const TreePropertiesPanel = ({
         </div>
       </div>
     </div>
-  );
+ );
 };
 
 export default TreePropertiesPanel;

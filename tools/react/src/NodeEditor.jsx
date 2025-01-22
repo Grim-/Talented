@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from './components/Modal';
 import Button from './components/Button';
 import Node from './components/Node';
-import PropertiesPanel from './components/PropertiesPanel'
+import NodePropertiesPanel from './components/NodePropertiesPanel'
 import { saveDef, loadDefs } from './utils/StorageUtils';
 import { importFromXml, exportToXml, serializeDefToXml, serializeProperty } from './utils/xmlSerializer';
 import { saveSessionToFile, loadSessionFromFile, clearSession } from './utils/sessions';
@@ -26,7 +26,7 @@ const NodeEditor = ({
   pointStrategy, setTreePointStrategy,
   treeHandler, setTreeHandler
  }) => {
-  useLockBodyScroll();
+  //useLockBodyScroll();
   //state
   const [referenceDefs, setReferenceDefs] = useState(() => {
 
@@ -326,7 +326,7 @@ const NodeEditor = ({
       />
       {/* Properties Panel */}
       {selectedNode && (
-        <PropertiesPanel
+        <NodePropertiesPanel
           selectedNode={selectedNode}
           node={nodes.find(n => n.id === selectedNode)}
           onUpdateProperty={(property, value) => updateNodeProperty(selectedNode, property, value)}

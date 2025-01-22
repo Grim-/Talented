@@ -8,7 +8,7 @@ import ExampleLoader from './components/ExampleLoader';
 
 function App() {
   const [activeTab, setActiveTab] = useState('nodes');
-  const [nodes, setNodes] = useState([new Node(Node.NewId(), "Root", 'Start', 0, 0, 150, 80)]);
+  const [nodes, setNodes] = useState([new Node(Node.NewId(), "Root", 'Start')]);
   const [paths, setPaths] = useState([]);
   const [treeName, setTreeName] = useState('');
   const [treeSize, setTreeSize] = useState({width: 600, height: 400});

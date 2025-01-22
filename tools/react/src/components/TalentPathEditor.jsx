@@ -24,60 +24,60 @@ const TalentPathEditor = ({ currentDef, setCurrentDef }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg">
+    <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
       <div className="grid gap-3">
         <div>
-          <label className="block text-xs font-medium mb-1">Path Name</label>
+          <label className="block text-xs font-medium mb-1 text-gray-300">Path Name</label>
           <input
             type="text"
             value={currentDef.defName || ''}
             onChange={e => setCurrentDef({ ...currentDef, defName: e.target.value })}
-            className="w-full p-1.5 text-sm border rounded"
+            className="w-full p-1.5 text-sm border border-gray-600 rounded bg-gray-700 text-gray-200"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium mb-1">Description</label>
+          <label className="block text-xs font-medium mb-1 text-gray-300">Description</label>
           <textarea
             value={currentDef.description || ''}
             onChange={e => setCurrentDef({ ...currentDef, description: e.target.value })}
-            className="w-full p-1.5 text-sm border rounded"
+            className="w-full p-1.5 text-sm border border-gray-600 rounded bg-gray-700 text-gray-200"
             rows={3}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium mb-1">Color</label>
+          <label className="block text-xs font-medium mb-1 text-gray-300">Color</label>
           <input
             type="color"
             value={currentDef.color || '#000000'}
             onChange={e => setCurrentDef({ ...currentDef, color: e.target.value })}
-            className="w-full h-10 p-1 border rounded"
+            className="w-full h-10 p-1 border border-gray-600 rounded bg-gray-700"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium mb-1">Exclusive With</label>
+          <label className="block text-xs font-medium mb-1 text-gray-300">Exclusive With</label>
           <input
             type="text"
             placeholder="Search paths..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full p-2 border rounded mb-2 text-sm"
+            className="w-full p-2 border border-gray-600 rounded mb-2 text-sm bg-gray-700 text-gray-200"
           />
-          <div className="space-y-1 max-h-48 overflow-y-auto border rounded p-2 bg-white">
+          <div className="space-y-1 max-h-48 overflow-y-auto border border-gray-600 rounded p-2 bg-gray-800">
             {allPaths
               .filter(path => 
                 path.name !== currentDef.defName &&
                 path.name.toLowerCase().includes(searchTerm.toLowerCase())
               )
               .map(path => (
-                <label key={path.name} className="flex items-center gap-2 text-sm">
+                <label key={path.name} className="flex items-center gap-2 text-sm text-gray-200">
                   <input
                     type="checkbox"
                     checked={(currentDef.exclusiveWith || []).includes(path.name)}
                     onChange={() => handleExclusiveWithChange(path.name)}
-                    className="rounded"
+                    className="rounded border-gray-600 bg-gray-700"
                   />
                   {path.name}
                 </label>
@@ -87,7 +87,7 @@ const TalentPathEditor = ({ currentDef, setCurrentDef }) => {
 
         <Button
           onClick={() => StorageUtils.saveSingleDefOfType('TalentPathDef', currentDef.defName, currentDef)}
-          className="w-full bg-green-500 hover:bg-green-600 text-white mt-2"
+          className="w-full bg-green-600 hover:bg-green-700 text-gray-200 mt-2"
         >
           Save Path Definition
         </Button>

@@ -4,7 +4,7 @@ import ListEditor from './PropertiesList';
 import { StorageUtils } from '../utils/StorageUtils';
 
 const PathPanel = ({ paths, setPaths, nodes }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [allPaths, setAllPaths] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 

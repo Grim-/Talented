@@ -7,7 +7,7 @@ import TagGrid from './TagGrid';
 import PathInput from './PathInput';
 
 
-const PropertiesPanel = ({
+const NodePropertiesPanel = ({
   selectedNode,
   node,
   onUpdateProperty
@@ -150,6 +150,44 @@ const PropertiesPanel = ({
                 color={node.path}
               />
 
+{node.path && node.path !== '' && (() => {
+                const savedDefs = JSON.parse(localStorage.getItem('savedDefs') || '{}');
+                const defsOfType = savedDefs['TalentPathDef'] || {};
+                const pathExists = Object.keys(defsOfType).includes(node.path);
+                
+                if (!pathExists) {
+                  return (
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const newDef = {
+                          defName: node.path,
+                          type: 'TalentPathDef',
+                          properties: {
+                            name: node.path,
+                            description: '',
+                            exclusiveWith: []
+                          }
+                        };
+                        
+                        const updatedDefs = {
+                          ...savedDefs,
+                          TalentPathDef: {
+                            ...defsOfType,
+                            [node.path]: newDef
+                          }
+                        };
+                        localStorage.setItem('savedDefs', JSON.stringify(updatedDefs));
+                      }}
+                      className="mt-2 w-full bg-green-600 hover:bg-green-700"
+                    >
+                      Save Custom Path to Definitions
+                    </Button>
+                  );
+                }
+                return null;
+              })()}
+
               {node.path === '' && (
                 <DefSelector
                   defType="TalentPathDef"
@@ -197,7 +235,7 @@ const PropertiesPanel = ({
                 </>
               )}
 
-{node.type === 'Branch' && (
+              {node.type === 'Branch' && (
                 <div className="pt-2 border-t border-gray-700">
                   <label className="block text-xs font-medium text-gray-300 mb-2">
                     <div className="flex items-center gap-1">
@@ -255,4 +293,4 @@ const PropertiesPanel = ({
   );
 };
 
-export default PropertiesPanel;
+export default NodePropertiesPanel;

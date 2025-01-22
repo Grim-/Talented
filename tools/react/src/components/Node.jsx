@@ -5,7 +5,7 @@ import NodeProperties from './NodePropertiesDisplay';
 import { Tooltip } from 'react-tooltip';
 
 export class Node {
-    constructor(id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 350, height = 100) {
+    constructor(id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 120, height = 70) {
         this.id = id == null ? `node_${Date.now()}` : id;
         this.label = label;
         this.type = type;
@@ -19,7 +19,7 @@ export class Node {
         }
 
         this.width = width;
-        this.height = height + 25;
+        this.height = height;
         this.connections = [];
         this.path = '';
         this.upgrade = '';
@@ -62,14 +62,39 @@ export class Node {
     };
 
     render({selected, connecting, onMouseDown, onClick, onStartConnection, onDelete, onCopyProperty, onContextMenuClick, expanded, onToggleExpand}) {
-        const tooltipId = `node-tooltip-${this.id}`;
-        const upgradesText = this.upgrades && this.upgrades.length > 0 
-            ? `Upgrades: \r\n ${this.upgrades.join(', ')}` 
-            : 'No upgrades selected';
+        const tooltipId = `node-tooltip-${this.id}-multiline`;
+        const upgradesText = () => {
+            const parts = [];
+            
+            // Add upgrades section if exists
+            if (this.upgrades && this.upgrades.length > 0) {
+              parts.push(`
+                <div style="margin-bottom: 8px">
+                  <strong>Upgrades:</strong>
+                  <ul style="list-style-type: none; padding-left: 8px; margin: 4px 0">
+                    ${this.upgrades.map(upgrade => `<li>• ${upgrade}</li>`).join('')}
+                  </ul>
+                </div>
+              `);
+            } else {
+              parts.push('<div>No upgrades selected</div>');
+            }
+            
+            // Add path section if exists
+            if (this.path) {
+              parts.push(`
+                <div style="margin-top: 4px">
+                  <strong>Path:</strong> ${this.path}
+                </div>
+              `);
+            }
+            
+            return parts.join('');
+          };
 
         return (
                 <div
-                    className={`absolute p-2 rounded-lg shadow-lg cursor-move transition-all duration-200
+                    className={`absolute p-1 rounded-lg shadow-lg cursor-move transition-all duration-200
                         ${Node.getBackGroundClass(this.type)}
                         text-gray-300
                         ${selected ? 'ring-2 ring-blue-500' : ''}
@@ -77,8 +102,8 @@ export class Node {
                     style={{
                         left: `${this.x}px`,
                         top: `${this.y}px`,
-                        width: expanded ? `${this.width + 200}px` : `${this.width}px`,
-                        height: expanded ? `${this.height + 200}px` : `${this.height}px`,
+                        width: expanded ? `${this.width + 210}px` : `${this.width + 20}px`,
+                        height: expanded ? `${this.height + 210}px` : `${this.height}px`,
                         transition: 'height 0.2s ease-in-out'
                     }}
                     onMouseDown={(e) => {
@@ -96,12 +121,13 @@ export class Node {
                         this.clampToCanvas();
                     }}
                 >
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full pb-8">
                     <div className="flex justify-between items-center mb-2">
                         <div 
                             className="text-sm font-medium flex items-center"
                             data-tooltip-id={tooltipId}
-                            data-tooltip-content={upgradesText}
+                            data-tooltip-content={upgradesText()}
+                            data-tooltip-html={upgradesText()}
                         >
                             {this.label}
                             {this.upgrades && this.upgrades.length > 0 && (
@@ -114,6 +140,7 @@ export class Node {
                             id={tooltipId}
                             place="top"
                             className="max-w-xs bg-gray-900 text-gray-300 text-sm rounded px-2 py-1"
+
                         />
                         <button 
                             onClick={(e) => {
@@ -131,7 +158,7 @@ export class Node {
 
                     {this.path && (
                         <div
-                            className="text-xs text-gray-400 mb-2 cursor-pointer hover:bg-gray-700 px-1 rounded truncate"
+                            className="text-xs text-gray-400 mb-2 cursor-pointer hover:bg-gray-700 px-1 rounded text-center"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onCopyProperty(this.path, 'path');
@@ -148,7 +175,7 @@ export class Node {
                         </div>
                     )}
 
-                    <div className="flex flex-row justify-between mt-auto pt-2">
+                    <div className="absolute bottom-1 left-1 right-1 flex justify-between">
                         <Button
                             size="sm"
                             onClick={(e) => {
@@ -156,9 +183,9 @@ export class Node {
                                 onStartConnection(this.id);
                             }}
                             className="bg-blue-600 text-white hover:bg-blue-700"
-                        >
-                            <ArrowLeftRight size={20}/>
-                        </Button>
+                            iconSize={10}
+                            leadingIcon={ArrowLeftRight}
+                        />
                         <Button
                             size="sm"
                             onClick={(e) => {
@@ -166,9 +193,9 @@ export class Node {
                                 onDelete(this.id);
                             }}
                             className="bg-red-600 text-white hover:bg-red-700"
-                        >
-                            <Trash size={20}/>
-                        </Button>
+                            iconSize={10}
+                            leadingIcon={Trash}
+                        />
                     </div>
                 </div>
             </div>
