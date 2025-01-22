@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Talented/static/css/main.0c78f99c.css",
-    "main.js": "/Talented/static/js/main.79055e5f.js",
+    "main.js": "/Talented/static/js/main.620bdc12.js",
     "static/js/488.43a08033.chunk.js": "/Talented/static/js/488.43a08033.chunk.js",
     "index.html": "/Talented/index.html",
     "main.0c78f99c.css.map": "/Talented/static/css/main.0c78f99c.css.map",
-    "main.79055e5f.js.map": "/Talented/static/js/main.79055e5f.js.map",
+    "main.620bdc12.js.map": "/Talented/static/js/main.620bdc12.js.map",
     "488.43a08033.chunk.js.map": "/Talented/static/js/488.43a08033.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0c78f99c.css",
-    "static/js/main.79055e5f.js"
+    "static/js/main.620bdc12.js"
   ]
 }

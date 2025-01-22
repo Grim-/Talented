@@ -40,7 +40,16 @@ export class Node {
             this.y + this.height/2
         ];
     }
-
+    clampToCanvas() {
+        const canvas = document.getElementById('mainCanvas');
+        if (!canvas) return;
+    
+        const canvasRect = canvas.getBoundingClientRect();
+    
+        // Clamp the position so the node stays fully inside the canvas
+        this.x = Math.max(canvasRect.left, Math.min(this.x, canvasRect.right - this.width));
+        this.y = Math.max(canvasRect.top, Math.min(this.y, canvasRect.bottom - this.height));
+    }
     static getBackGroundClass = (type) => {
         let backgroundClass = 'bg-gray-700';
         if(type === 'Start') {
@@ -59,23 +68,34 @@ export class Node {
             : 'No upgrades selected';
 
         return (
-            <div
-                className={`absolute p-2 rounded-lg shadow-lg cursor-move transition-all duration-200
-                    ${Node.getBackGroundClass(this.type)}
-                    text-gray-300
-                    ${selected ? 'ring-2 ring-blue-500' : ''}
-                    ${connecting ? 'ring-2 ring-blue-300' : ''}`}
-                style={{
-                    left: this.x,
-                    top: this.y,
-                    width: expanded ? `${this.width + 200}px` : `${this.width}px`,
-                    height: expanded ? `${this.height + 200}px` : `${this.height}px`,
-                    transition: 'height 0.2s ease-in-out'
-                }}
-                onMouseDown={onMouseDown}
-                onClick={onClick}
-                onContextMenu={onContextMenuClick}
-            >
+                <div
+                    className={`absolute p-2 rounded-lg shadow-lg cursor-move transition-all duration-200
+                        ${Node.getBackGroundClass(this.type)}
+                        text-gray-300
+                        ${selected ? 'ring-2 ring-blue-500' : ''}
+                        ${connecting ? 'ring-2 ring-blue-300' : ''}`}
+                    style={{
+                        left: `${this.x}px`,
+                        top: `${this.y}px`,
+                        width: expanded ? `${this.width + 200}px` : `${this.width}px`,
+                        height: expanded ? `${this.height + 200}px` : `${this.height}px`,
+                        transition: 'height 0.2s ease-in-out'
+                    }}
+                    onMouseDown={(e) => {
+                        // Start drag or other interaction
+                        // Call clampToCanvas at the end of the interaction
+                        onMouseDown(e);
+                        this.clampToCanvas();
+                    }}
+                    onClick={(e) => {
+                        onClick(e);
+                        this.clampToCanvas();
+                    }}
+                    onContextMenu={(e) => {
+                        onContextMenuClick(e);
+                        this.clampToCanvas();
+                    }}
+                >
                 <div className="flex flex-col h-full">
                     <div className="flex justify-between items-center mb-2">
                         <div 
