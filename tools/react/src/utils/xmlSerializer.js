@@ -125,16 +125,13 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
 
   event.target.value = '';
 };
-export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
+export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
   try {
-    // Reset export state at the start
     exportState.idMapping = null;
     
-    // Collect all unique paths used in nodes
     const usedPaths = new Set(nodes.map(node => node.path).filter(Boolean));
     const allPaths = [...paths];
-    
-    // Add any paths used in nodes but not in paths array
+
     usedPaths.forEach(pathName => {
       if (!paths.find(p => p.name === pathName)) {
         allPaths.push({
@@ -145,20 +142,50 @@ export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, 
       }
     });
 
-    let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
-    const uniqueTreeName = treeName || generateUniqueDefName('Tree');
-    xml += exportTalentTree(nodes, allPaths, uniqueTreeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler);
-    xml += exportPaths(allPaths, config);
-    xml += exportNodes(nodes, treeSize, config);
-    xml += '</Defs>';
-    return xml;
-  } catch (error) {
-    // Ensure export state is reset even if there's an error
+    // Create tree and nodes XML
+    const treeXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
+      exportTalentTree(nodes, allPaths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) +
+      exportNodes(nodes, treeSize, config) +
+      '</Defs>';
+
+    // Create paths XML if there are any paths
+    if (allPaths.length > 0) {
+      const pathsXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
+        exportPaths(allPaths, config) +
+        '</Defs>';
+
+      // Download paths file
+      const pathsBlob = new Blob([pathsXml], { type: 'text/xml' });
+      const pathsUrl = URL.createObjectURL(pathsBlob);
+      const pathsLink = document.createElement('a');
+      pathsLink.href = pathsUrl;
+      pathsLink.download = `${treeName}_Paths.xml`;
+      document.body.appendChild(pathsLink);
+      pathsLink.click();
+      document.body.removeChild(pathsLink);
+      URL.revokeObjectURL(pathsUrl);
+    }
+
+    // Download tree file
+    const treeBlob = new Blob([treeXml], { type: 'text/xml' });
+    const treeUrl = URL.createObjectURL(treeBlob);
+    const treeLink = document.createElement('a');
+    treeLink.href = treeUrl;
+    treeLink.download = `${treeName}_Tree.xml`;
+    document.body.appendChild(treeLink);
+    treeLink.click();
+    document.body.removeChild(treeLink);
+    URL.revokeObjectURL(treeUrl);
+
+    return treeXml;
+  } 
+  
+  catch (error) 
+  {
     exportState.idMapping = null;
     throw error;
   }
 };
-
 
 const validateTalentDef = (def) => {
   const errors = [];
@@ -346,53 +373,66 @@ const downloadXmlFile = (xml) => {
 
 
 export const exportDefEditorDefs = (exportType = 'ALL') => {
-  let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
- 
+  // Wrapper functions for XML creation
+  const createXmlWrapper = (content) => {
+    return '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' + content + '</Defs>';
+  };
+  
+  const downloadFile = (content, filename) => {
+    const blob = new Blob([content], { type: 'text/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Get the defs
+  const talentDefs = StorageUtils.getDefsOfType('TalentDef');
+  const pathDefs = StorageUtils.getDefsOfType('TalentPathDef');
+
+  // Generate XML based on export type
   switch(exportType) {
     case 'TALENTS':
-      const talentDefs = StorageUtils.getDefsOfType('TalentDef');
-      Object.values(talentDefs).forEach(def => {
-        xml += generateTalentDefXml(def);  // Use the proper generator
-      });
+      if (Object.keys(talentDefs).length > 0) {
+        const talentXml = createXmlWrapper(
+          Object.values(talentDefs).map(def => generateTalentDefXml(def)).join('')
+        );
+        downloadFile(talentXml, 'TalentDefs.xml');
+      }
       break;
- 
+
     case 'PATHS':
-      const pathDefs = StorageUtils.getDefsOfType('TalentPathDef');
-      Object.values(pathDefs).forEach(def => {
-        xml += generateTalentPathDefXml(def); 
-      });
+      if (Object.keys(pathDefs).length > 0) {
+        const pathXml = createXmlWrapper(
+          Object.values(pathDefs).map(def => generateTalentPathDefXml(def)).join('')
+        );
+        downloadFile(pathXml, 'PathDefs.xml');
+      }
       break;
- 
-    default:
-      const allTalentDefs = StorageUtils.getDefsOfType('TalentDef');
-      const allPathDefs = StorageUtils.getDefsOfType('TalentPathDef');
- 
-      Object.values(allTalentDefs).forEach(def => {
-        xml += generateTalentDefXml(def); 
-      });
-      Object.values(allPathDefs).forEach(def => {
-        xml += generateTalentPathDefXml(def);
-      });
+
+    default: // ALL
+      // Export talents if they exist
+      if (Object.keys(talentDefs).length > 0) {
+        const talentXml = createXmlWrapper(
+          Object.values(talentDefs).map(def => generateTalentDefXml(def)).join('')
+        );
+        downloadFile(talentXml, 'TalentDefs.xml');
+      }
+      
+      // Export paths if they exist
+      if (Object.keys(pathDefs).length > 0) {
+        const pathXml = createXmlWrapper(
+          Object.values(pathDefs).map(def => generateTalentPathDefXml(def)).join('')
+        );
+        downloadFile(pathXml, 'PathDefs.xml');
+      }
   }
- 
-  xml += '</Defs>';
-
-  const fileName = exportType === 'ALL' ? 'TalentAndPathDefs.xml' 
-                  : exportType === 'PATHS' ? 'PathDefs.xml' 
-                  : 'TalentDefs.xml';
-
-  const blob = new Blob([xml], { type: 'text/xml' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 };
-
-const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler) => {
+const exportTalentTree = (nodes, paths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) => {
   // Generate the ID mapping first since the tree export happens before node export
   exportState.idMapping = createIdMapping(nodes);
   
@@ -401,7 +441,10 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, tr
   xml += `    <defName>${treeName}</defName>\n`;
   xml += `    <dimensions>(${treeSize.width},${treeSize.height})</dimensions>\n`;
   xml += `    <handlerClass>${getFullDefName(treeHandler)}</handlerClass>\n`;
-  
+
+  console.log(treeSkinDefName);
+  xml += `    <skin>${treeSkinDefName || 'DefaultTreeSkin'}</skin>\n`;
+
   // Add root nodes with updated IDs
   xml += '    <nodes>\n';
   nodes.filter(node => node.type === 'Start')

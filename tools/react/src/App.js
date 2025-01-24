@@ -12,9 +12,12 @@ function App() {
   const [paths, setPaths] = useState([]);
   const [treeName, setTreeName] = useState('');
   const [treeSize, setTreeSize] = useState({width: 600, height: 400});
+  const [treeSkinDefName, setTreeSkinDefName] = useState('DefaultTreeSkin');
+
   const [treeDisplayStrategy, setTreeDisplay] = useState('FixedPosition');
   const [pointStrategy, setTreePointStrategy] = useState('PerLevel');
   const [treeHandler, setTreeHandler] = useState('ActiveTreeHandler');
+  const [bgImage, setBGImage] = useState(null);
 
   return (
     <Router basename="/">
@@ -74,6 +77,10 @@ function App() {
               setTreePointStrategy={setTreePointStrategy}
               treeHandler={treeHandler}
               setTreeHandler={setTreeHandler}
+              bgImage={bgImage}
+              setBGImage={setBGImage}
+              treeSkinDefName={treeSkinDefName}
+              setTreeSkinDefName={setTreeSkinDefName}
             />
           ) : (
             <DefManager /> 

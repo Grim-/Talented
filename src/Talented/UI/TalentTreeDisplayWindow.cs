@@ -167,7 +167,12 @@ namespace Talented
                 {
                     GUI.color = new Color(0.1f, 0.1f, 0.1f, 0.1f);
                 }
-                GUI.DrawTexture(nodeRect, skin.NodeTexture);
+
+                if (skin != null && skin.NodeTexture != null)
+                {
+                    GUI.DrawTexture(nodeRect, skin.NodeTexture);
+                }
+              
                 GUI.color = Color.white;
             }
         }

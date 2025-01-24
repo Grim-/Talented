@@ -14,10 +14,12 @@ const CustomOption = ({ innerProps, label, data }) => (
 
 const TreePropertiesPanel = ({
   treeName, setTreeName,
+  treeSkinDefName, setTreeSkinDefName,
   treeSize, setTreeSize,
   treeDisplayStrategy, setTreeDisplay,
   pointStrategy, setTreePointStrategy,
-  treeHandler, setTreeHandler
+  treeHandler, setTreeHandler,
+  bgImage = ''
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [customDisplayStrategy, setCustomDisplayStrategy] = useState(false);
@@ -123,6 +125,31 @@ const TreePropertiesPanel = ({
         </div>
    
         <div className={`${isExpanded ? 'block' : 'hidden'}`}>
+        <div className="p-3 space-y-4">
+            <label htmlFor="treeName" className={labelClasses}>
+              Talent Tree Skin Definition Name
+              <HelpCircle 
+                size={14} 
+                className="text-gray-400 cursor-help"
+                data-tooltip-id="tree-name-tip"
+              />
+              <Tooltip id="tree-name-tip" className="bg-gray-800 text-gray-300">
+                The name of the TalentSkinTreeDef
+              </Tooltip>
+            </label>
+            <input
+              type="text"
+              id="treeSkinDef"
+              value={treeSkinDefName || 'DefaultTreeSkin'}
+              onChange={(e) => setTreeSkinDefName(e.target.value)}
+              className={`${inputClasses} ${
+                treeSkinDefName 
+                  ? 'bg-green-900 border-green-600' 
+                  : 'bg-red-900 border-red-600'
+              }`}
+              placeholder="DefaultTreeSkin"
+            />
+          </div>
           <div className="p-3 space-y-4">
             <div className="space-y-1">
               <label className={labelClasses}>

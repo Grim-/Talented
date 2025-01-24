@@ -39,7 +39,7 @@ const ChangelogPanel = () => {
   return (
     <FloatingPanel
       buttonIcon={ClipboardList}
-      buttonPosition="absolute right-4 top-55"
+      buttonPosition="fixed right-4 top-46"
       buttonTitle="View Changelog"
       title="Changelog"
       isInitiallyVisible={autoShow}

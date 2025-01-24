@@ -24,10 +24,12 @@ const NodeEditor = ({
   nodes, setNodes, 
   paths, setPaths, 
   treeName, setTreeName, 
+  treeSkinDefName, setTreeSkinDefName,
   treeSize, setTreeSize, 
   treeDisplayStrategy, setTreeDisplay, 
   pointStrategy, setTreePointStrategy,
-  treeHandler, setTreeHandler
+  treeHandler, setTreeHandler,
+  bgImage, setBGImage
  }) => {
   //useLockBodyScroll();
   //state
@@ -154,11 +156,9 @@ const NodeEditor = ({
     
     e.preventDefault();
     
-    // Find the node being dragged
     const draggedNode = nodes.find(n => n.id === draggingNode);
     if (!draggedNode) return;
   
-    // Calculate new position
     let newX = e.clientX - draggingOffset.x;
     let newY = e.clientY - draggingOffset.y;
   
@@ -168,14 +168,14 @@ const NodeEditor = ({
       newY = draggedNode.y;
     }
   
-    // Apply grid snapping if enabled
+   
     if (canvasSettings.lockToGrid) {
       const gridSize = canvasSettings.gridSize || 20;
       newX = Math.round(newX / gridSize) * gridSize;
       newY = Math.round(newY / gridSize) * gridSize;
     }
   
-    // If not doing hierarchy movement, just update the dragged node
+   
     if (!canvasSettings.hierarchyMove) {
       setNodes(nodes.map(node => 
         node.id === draggingNode 
@@ -185,15 +185,12 @@ const NodeEditor = ({
       return;
     }
   
-    // For hierarchy movement, we need to track all affected nodes
     const processedNodes = new Set();
     const updates = new Map();
   
-    // Calculate initial delta
     const deltaX = newX - draggedNode.x;
     const deltaY = newY - draggedNode.y;
   
-    // Recursive function to collect all nodes that need updating
     const collectConnectedNodes = (nodeId, dx, dy) => {
       if (processedNodes.has(nodeId)) return;
       processedNodes.add(nodeId);
@@ -206,12 +203,12 @@ const NodeEditor = ({
         y: node.y + dy
       };
   
-      // Ensure positions are valid numbers
+      
       if (!isNaN(newPos.x) && !isNaN(newPos.y)) {
         updates.set(nodeId, newPos);
       }
   
-      // Process all connected nodes
+      
       node.connections.forEach(connectedId => {
         if (!processedNodes.has(connectedId)) {
           collectConnectedNodes(connectedId, dx, dy);
@@ -219,16 +216,16 @@ const NodeEditor = ({
       });
     };
   
-    // Start with the dragged node
+    
     updates.set(draggingNode, { x: newX, y: newY });
     processedNodes.add(draggingNode);
   
-    // Collect all connected nodes that need to move
+    
     draggedNode.connections.forEach(connectedId => {
       collectConnectedNodes(connectedId, deltaX, deltaY);
     });
   
-    // Update all nodes in a single operation
+    
     setNodes(nodes.map(node => {
       const newPos = updates.get(node.id);
       if (newPos) {
@@ -264,7 +261,7 @@ const NodeEditor = ({
     ));
   };
 
-  // Connection Management
+ 
   const startConnection = (nodeId) => {
     setConnecting(nodeId);
   };
@@ -284,7 +281,7 @@ const NodeEditor = ({
     setConnecting(null);
   };
 
-  // Branch Path Management
+  
   const addBranchPath = (nodeId) => {
     setNodes(nodes.map(node => {
       if (node.id === nodeId) {
@@ -372,7 +369,7 @@ const NodeEditor = ({
           setTreeHandler(session.treeHandler);
         }}
         onImportXml={handleFileSelect}
-        onExportXml={() => exportToXml(nodes, paths, treeName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
+        onExportXml={() => exportToXml(nodes, paths, treeName, treeSkinDefName, treeSize, treeDisplayStrategy, pointStrategy, treeHandler)}
         onClearSession={() => clearSession(setNodes, setPaths)}
         setTreeName={setTreeName}
       />
@@ -415,6 +412,8 @@ const NodeEditor = ({
         setTreePointStrategy={setTreePointStrategy}
         treeHandler={treeHandler}
         setTreeHandler={setTreeHandler}
+        treeSkinDefName={treeSkinDefName}
+        setTreeSkinDefName={setTreeSkinDefName}
       />
       {/* Properties Panel */}
       {selectedNode && (
@@ -440,6 +439,7 @@ const NodeEditor = ({
           width={treeSize?.width} 
           height={treeSize?.height}
           nodes={nodes}
+          key={bgImage || 'no-image'}
         />
       {/* Main canvas area */}
       <div
@@ -453,6 +453,7 @@ const NodeEditor = ({
         <CanvasSettings 
           onSettingChange={handleSettingChange}
           initialSettings={canvasSettings}
+          setBGImage={setBGImage}
         />
         <ChangelogPanel />
         <ConnectionsDisplay
@@ -474,7 +475,7 @@ const NodeEditor = ({
           gameWidth={treeSize.x}
           gameHeight={treeSize.y}
         />
-                <GridOverlay 
+        <GridOverlay 
           enabled={canvasSettings.lockToGrid}
           gridSize={canvasSettings.gridSize || 20}
         />

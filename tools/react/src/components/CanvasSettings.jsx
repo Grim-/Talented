@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { Settings, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Settings, X, Image as ImageIcon, Upload, Trash2 } from 'lucide-react';
 
-const CanvasSettings = ({ onSettingChange, initialSettings = {} }) => {
+const CanvasSettings = ({ onSettingChange, initialSettings = {}, setBGImage }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const fileInputRef = useRef(null);
   const [settings, setSettings] = useState({
     lockToGrid: initialSettings.lockToGrid || false,
     hierarchyMove: initialSettings.hierarchyMove || false,
-    gridSize: initialSettings.gridSize || 35
+    gridSize: initialSettings.gridSize || 35,
+    backgroundImage: initialSettings.backgroundImage || localStorage.getItem('treeSizePreviewBg') || ''
   });
 
   const handleSettingChange = (setting, value) => {
@@ -26,6 +28,29 @@ const CanvasSettings = ({ onSettingChange, initialSettings = {} }) => {
     const value = parseInt(e.target.value) || 35;
     const clampedValue = Math.max(5, Math.min(100, value));
     handleSettingChange('gridSize', clampedValue);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageDataUrl = event.target?.result;
+        if (typeof imageDataUrl === 'string') {
+          setBGImage(imageDataUrl);
+          localStorage.setItem('treeSizePreviewBg', imageDataUrl);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleClearImage = () => {
+    handleSettingChange('backgroundImage', '');
+    localStorage.removeItem('treeSizePreviewBg');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -53,6 +78,53 @@ const CanvasSettings = ({ onSettingChange, initialSettings = {} }) => {
           </div>
 
           <div className="p-4 space-y-4">
+            {/* Background Image Section */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <ImageIcon size={16} />
+                Background Image
+              </h3>
+              
+              <div className="space-y-2">
+                {settings.backgroundImage && (
+                  <div className="relative w-full h-24 rounded-md overflow-hidden">
+                    <img 
+                      src={settings.backgroundImage} 
+                      alt="Background Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      onClick={handleClearImage}
+                      className="absolute top-2 right-2 p-1 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                      title="Remove background image"
+                    >
+                      <Trash2 size={14} className="text-white" />
+                    </button>
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    <Upload size={14} />
+                    {settings.backgroundImage ? 'Change Image' : 'Upload Image'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-700 my-4"></div>
+
+            {/* Existing Settings */}
             <label className="flex items-center space-x-3">
               <input
                 type="checkbox"

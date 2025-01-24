@@ -4,18 +4,21 @@ import { ChevronDown } from 'lucide-react';
 const DropdownButton = ({ 
   primary,
   options,
-  bgColor = 'bg-gray-800',
-  bgColorHover = 'bg-gray-600',
-  dropDownColor = 'bg-gray-600',
-  dropDownColorHover = 'bg-gray-400'
+  className = '',
+  bgColor = 'bg-emerald-600',
+  bgColorHover = 'bg-emerald-700',
+  dropDownColor = 'bg-emerald-700',
+  dropDownColorHover = 'bg-emerald-800',
+  buttonClassName = '',
+  dropdownClassName = ''
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex">
+    <div className={`flex ${className}`}>
       <button
         onClick={primary.action}
-        className={`${bgColor} hover:${bgColorHover} text-white text-xs py-1 px-4 rounded-l`}
+        className={`${bgColor} hover:${bgColorHover} text-white py-2 px-4 rounded-l flex items-center ${buttonClassName}`}
       >
         {primary.label}
       </button>
@@ -23,14 +26,14 @@ const DropdownButton = ({
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`${dropDownColor} hover:${dropDownColorHover} text-white text-xs py-1 px-2 rounded-r`}
+          className={`${dropDownColor} hover:${dropDownColorHover} text-white px-2 rounded-r flex items-center h-full ${dropdownClassName}`}
           aria-expanded={isOpen}
         >
           <ChevronDown className="h-4 w-4" />
         </button>
         
         {isOpen && (
-          <div className="absolute right-0 mt-1 w-40 bg-white rounded shadow-lg z-50">
+          <div className="absolute right-0 mt-1 w-40 bg-gray-800 rounded shadow-lg -z-5000">
             {options.map(({ label, action }) => (
               <button
                 key={label}
@@ -38,7 +41,7 @@ const DropdownButton = ({
                   action();
                   setIsOpen(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-700"
               >
                 {label}
               </button>

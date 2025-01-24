@@ -223,7 +223,18 @@ const TalentDefEditor = ({ currentDef, setCurrentDef, onSave }) => {
             placeholder="Enter talent name"
           />
         </div>
-
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-200">
+            Talent Label
+          </label>
+          <input
+            type="text"
+            value={currentDef.label || 'No Label'}
+            onChange={e => setCurrentDef({ ...currentDef, label: e.target.value })}
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter talent label"
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium mb-2 text-gray-200">
             Description

@@ -1,8 +1,25 @@
 import React, { useEffect, useState } from 'react';
 
-const TreeSizePreview = ({ width, height }) => {
+const TreeSizePreview = ({ width, height, bgImage = '' }) => {
   const [visible, setVisible] = useState(true);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [currentBgImage, setCurrentBgImage] = useState('');
+  
+  // Load background image from localStorage on mount
+  useEffect(() => {
+    const savedBgImage = localStorage.getItem('treeSizePreviewBg');
+    if (savedBgImage) {
+      setCurrentBgImage(savedBgImage);
+    }
+  }, []);
+
+  // Update localStorage when bgImage prop changes
+  useEffect(() => {
+    if (bgImage) {
+      setCurrentBgImage(bgImage);
+      localStorage.setItem('treeSizePreviewBg', bgImage);
+    }
+  }, [bgImage]);
 
   useEffect(() => {
     setVisible(true);
@@ -16,7 +33,7 @@ const TreeSizePreview = ({ width, height }) => {
       if (container) {
         const rect = container.getBoundingClientRect();
         const viewportHeight = window.innerHeight - rect.top - 40;
-        const viewportWidth = container.clientWidth - 40; 
+        const viewportWidth = container.clientWidth - 40;
 
         setContainerSize({
           width: viewportWidth,
@@ -50,13 +67,18 @@ const TreeSizePreview = ({ width, height }) => {
           In-game size: {width}x{height}
         </div>
         
-        {/* Size visualization */}
+        {/* Size visualization with background image */}
         <div 
-          className="border border-gray-100 rounded-lg"
+          className="border border-gray-100 rounded-lg overflow-hidden"
           style={{
             width: `${scaledWidth}px`,
             height: `${scaledHeight}px`,
-            transition: 'all 0.3s ease-in-out'
+            transition: 'all 0.3s ease-in-out',
+            backgroundImage: currentBgImage ? `url(${currentBgImage})` : 'none',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)'
           }}
         >
           {/* Corner indicators */}
@@ -65,6 +87,19 @@ const TreeSizePreview = ({ width, height }) => {
           <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-gray-400/50 rounded-full" />
           <div className="absolute -bottom-1 -right-1 w-1.5 h-1.5 bg-gray-400/50 rounded-full" />
         </div>
+
+        {/* Clear background button - only show when there's a background image */}
+        {currentBgImage && (
+          <button
+            onClick={() => {
+              setCurrentBgImage('');
+              localStorage.removeItem('treeSizePreviewBg');
+            }}
+            className="absolute -top-6 right-0 bg-red-500 text-white px-2 py-0.5 rounded text-xs pointer-events-auto hover:bg-red-600"
+          >
+            Clear Background
+          </button>
+        )}
       </div>
     </div>
   );
