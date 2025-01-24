@@ -18,7 +18,7 @@ import TreeSizePreview from './components/TreeSizePreview';
 import Minimap from './components/Minimap';
 import CanvasSettings from './components/CanvasSettings';
 import GridOverlay from './components/GridOverlay';
-
+import ChangelogPanel from './components/ChangeLogPanel';
 
 const NodeEditor = ({ 
   nodes, setNodes, 
@@ -454,6 +454,7 @@ const NodeEditor = ({
           onSettingChange={handleSettingChange}
           initialSettings={canvasSettings}
         />
+        <ChangelogPanel />
         <ConnectionsDisplay
           nodes={nodes}
           connecting={connecting}

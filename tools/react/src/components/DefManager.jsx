@@ -3,7 +3,7 @@ import { StorageUtils } from '../utils/StorageUtils';
 import TalentDefEditor from './TalentDefEditor';
 import TalentPathEditor from './TalentPathEditor';
 import Button from './Button';
-import { serializeDefToXml, handleXmlImport } from '../utils/xmlSerializer';
+import { exportDefEditorDefs, handleXmlImport } from '../utils/xmlSerializer';
 
 const DefManager = () => {
   const [selectedType, setSelectedType] = useState(null);
@@ -61,28 +61,6 @@ const DefManager = () => {
     refreshDefs();
   };
 
-  const exportToXml = () => {
-    const allDefs = StorageUtils.getSavedDefs();
-    const xml = ['<?xml version="1.0" encoding="utf-8" ?>\n<Defs>'];
-    
-    Object.entries(allDefs).forEach(([type, defs]) => {
-      Object.values(defs).forEach(def => {
-        xml.push(serializeDefToXml({ ...def, type }));
-      });
-    });
-    
-    xml.push('</Defs>');
-
-    const blob = new Blob([xml.join('\n')], { type: 'text/xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `TalentAndPathDefs.xml`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
 
   const handleFileChange = (e) => {
     const allCurrentDefs = {};
@@ -115,7 +93,7 @@ const DefManager = () => {
             Import
           </Button>
           <Button
-            onClick={exportToXml}
+            onClick={(e) => exportDefEditorDefs()}
             className="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-1"
           >
             Export

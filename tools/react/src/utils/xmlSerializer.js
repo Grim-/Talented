@@ -8,6 +8,26 @@ export const DefTypeConfig = {
   GENE: 'TalentedGeneDef'
 };
 
+export const createEmptyTalentDef = () => ({
+  defName: '',
+  type: 'TalentDef',
+  description: '',
+  prerequisites: [],
+  statEffects: [],
+  hediffEffects: [],
+  abilityEffects: [],
+  organEffects: [],
+  pathPrerequisites: [],
+  pathExclusions: []
+});
+
+export const createEmptyPathDef = () => ({
+  defName: '',
+  type: 'TalentPathDef',
+  description: '',
+  color: '#000000',
+  exclusiveWith: []
+});
 
 export const NamespaceConfig = {
   prefix: 'Talented',
@@ -139,6 +159,118 @@ export const exportToXml = (nodes, paths, treeName, treeSize, treeDisplayStrat, 
     exportState.idMapping = null;
     throw error;
   }
+};
+
+export const exportDefEditorDefs = () => {
+  const talentDefs = StorageUtils.getDefsOfType('TalentDef');
+  const talentPathDefs = StorageUtils.getDefsOfType('TalentPathDef');
+  
+  let invalidDefs = [];
+
+  // Validate TalentDefs
+  for (const def of Object.values(talentDefs)) {
+    if (!def.defName || def.defName === 'undefined') {
+      invalidDefs.push(`TalentDef with missing name`);
+      continue;
+    }
+    if (!def.label) {
+      invalidDefs.push(`TalentDef ${def.defName} is missing a label`);
+      continue;
+    }
+    if (def.abilityEffects?.length) {
+      for (const ability of def.abilityEffects) {
+        if (!ability.abilityDef || ability.abilityDef === 'undefined') {
+          invalidDefs.push(`TalentDef ${def.defName} has an ability effect with no abilityDef`);
+        }
+      }
+    }
+  }
+
+  // Validate PathDefs
+  for (const def of Object.values(talentPathDefs)) {
+    if (!def.defName || def.defName === 'undefined') {
+      invalidDefs.push(`TalentPathDef with missing name`);
+      continue;
+    }
+    if (def.exclusiveWith?.length) {
+      for (const path of def.exclusiveWith) {
+        if (!path || path === 'undefined') {
+          invalidDefs.push(`TalentPathDef ${def.defName} has an invalid exclusiveWith entry`);
+        }
+      }
+    }
+  }
+
+  if (invalidDefs.length > 0) {
+    alert(`Cannot export due to invalid definitions:\n${invalidDefs.join('\n')}`);
+    return;
+  }
+
+  let xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n';
+
+  for (const def of Object.values(talentDefs)) {
+    // Skip any that somehow got past validation
+    if (!def.defName || def.defName === 'undefined' || !def.label) continue;
+
+    xml += `  <Talented.TalentDef>\n`;
+    xml += `    <defName>${def.defName}</defName>\n`;
+    xml += `    <label>${def.label}</label>\n`;
+    if (def.description) xml += `    <description>${def.description}</description>\n`;
+    if (def.levelRequired) xml += `    <levelRequired>${def.levelRequired}</levelRequired>\n`;
+
+    if (def.abilityEffects?.length) {
+      const validAbilities = def.abilityEffects.filter(ability => 
+        ability.abilityDef && ability.abilityDef !== 'undefined'
+      );
+      if (validAbilities.length) {
+        xml += '    <abilityEffects>\n';
+        xml += '      <li>\n';
+        xml += '        <abilities>\n';
+        for (const ability of validAbilities) {
+          xml += `          <li>\n`;
+          xml += `            <abilityDef>${ability.abilityDef}</abilityDef>\n`;
+          xml += `          </li>\n`;
+        }
+        xml += '        </abilities>\n';
+        xml += '      </li>\n';
+        xml += '    </abilityEffects>\n';
+      }
+    }
+
+    xml += `  </Talented.TalentDef>\n`;
+  }
+
+  for (const def of Object.values(talentPathDefs)) {
+    // Skip any that somehow got past validation
+    if (!def.defName || def.defName === 'undefined') continue;
+
+    xml += `  <Talented.TalentPathDef>\n`;
+    xml += `    <defName>${def.defName}</defName>\n`;
+    xml += `    <pathDescription>${def.description || ''}</pathDescription>\n`;
+    if (def.exclusiveWith?.length) {
+      const validPaths = def.exclusiveWith.filter(path => path && path !== 'undefined');
+      if (validPaths.length) {
+        xml += '    <exclusiveWith>\n';
+        for (const path of validPaths) {
+          xml += `      <li>${path}</li>\n`;
+        }
+        xml += '    </exclusiveWith>\n';
+      }
+    }
+    xml += `  </Talented.TalentPathDef>\n`;
+  }
+
+  xml += '</Defs>';
+
+  const blob = new Blob([xml], { type: 'text/xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'TalentAndPathDefs.xml';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler) => {
