@@ -217,63 +217,83 @@ const validateTalentPathDef = (def) => {
   return errors;
 };
 
-// XML Generation functions
+
 const generateTalentEffectsXml = (def) => {
   let xml = '';
-  
   if (def.abilityEffects?.length) {
-    const validAbilities = def.abilityEffects.filter(effect => 
-      effect.abilityDef && effect.abilityDef !== 'undefined'
-    );
-    if (validAbilities.length) {
-      xml += '    <abilityEffects>\n      <li>\n        <abilities>\n';
-      for (const effect of validAbilities) {
-        xml += `          <li>\n            <abilityDef>${effect.abilityDef}</abilityDef>\n          </li>\n`;
+      const validAbilities = def.abilityEffects.filter(effect => 
+          effect.abilityDef && effect.abilityDef !== 'undefined'
+      );
+      if (validAbilities.length) {
+          xml += '    <abilityEffects>\n';
+          xml += '        <li>\n';
+          xml += '          <abilities>\n';
+          for (const effect of validAbilities) {
+              xml += '            <li>\n';
+              xml += `              <abilityDef>${effect.abilityDef}</abilityDef>\n`;
+              xml += '            </li>\n';
+          }
+          xml += '          </abilities>\n';
+          xml += '        </li>\n';
+          xml += '    </abilityEffects>\n';
       }
-      xml += '        </abilities>\n      </li>\n    </abilityEffects>\n';
-    }
   }
 
+  // Handle stat effects
   if (def.statEffects?.length) {
-    const validStats = def.statEffects.filter(effect => 
-      effect.statDef && effect.statDef !== 'undefined'
-    );
-    if (validStats.length) {
-      xml += '    <statEffects>\n      <li>\n';
-      for (const effect of validStats) {
-        xml += `        <statDef>${effect.statDef}</statDef>\n`;
-        if (effect.value) xml += `        <value>${effect.value}</value>\n`;
+      const validStats = def.statEffects.filter(effect => 
+          effect.statDef && effect.statDef !== 'undefined'
+      );
+      if (validStats.length) {
+          xml += '    <statEffects>\n';
+          xml += '        <li>\n';
+          for (const effect of validStats) {
+              xml += `            <statDef>${effect.statDef}</statDef>\n`;
+              if (effect.value) {
+                  xml += `            <value>${effect.value}</value>\n`;
+              }
+          }
+          xml += '        </li>\n';
+          xml += '    </statEffects>\n';
       }
-      xml += '      </li>\n    </statEffects>\n';
-    }
   }
 
+  // Handle hediff effects
   if (def.hediffEffects?.length) {
-    const validHediffs = def.hediffEffects.filter(effect => 
-      effect.hediffDef && effect.hediffDef !== 'undefined'
-    );
-    if (validHediffs.length) {
-      xml += '    <hediffEffects>\n      <li>\n';
-      for (const effect of validHediffs) {
-        xml += `        <hediffDef>${effect.hediffDef}</hediffDef>\n`;
-        if (effect.severity) xml += `        <severity>${effect.severity}</severity>\n`;
+      const validHediffs = def.hediffEffects.filter(effect => 
+          effect.hediffDef && effect.hediffDef !== 'undefined'
+      );
+      if (validHediffs.length) {
+          xml += '    <hediffEffects>\n';
+          xml += '        <li>\n';
+          for (const effect of validHediffs) {
+              xml += `            <hediffDef>${effect.hediffDef}</hediffDef>\n`;
+              if (effect.severity) {
+                  xml += `            <severity>${effect.severity}</severity>\n`;
+              }
+          }
+          xml += '        </li>\n';
+          xml += '    </hediffEffects>\n';
       }
-      xml += '      </li>\n    </hediffEffects>\n';
-    }
   }
 
+  // Handle organ effects
   if (def.organEffects?.length) {
-    const validOrgans = def.organEffects.filter(effect => 
-      effect.bodyPartDef && effect.bodyPartDef !== 'undefined'
-    );
-    if (validOrgans.length) {
-      xml += '    <organEffects>\n      <li>\n';
-      for (const effect of validOrgans) {
-        xml += `        <bodyPartDef>${effect.bodyPartDef}</bodyPartDef>\n`;
-        if (effect.efficiency) xml += `        <efficiency>${effect.efficiency}</efficiency>\n`;
+      const validOrgans = def.organEffects.filter(effect => 
+          effect.bodyPartDef && effect.bodyPartDef !== 'undefined'
+      );
+      if (validOrgans.length) {
+          xml += '    <organEffects>\n';
+          xml += '        <li>\n';
+          for (const effect of validOrgans) {
+              xml += `            <bodyPartDef>${effect.bodyPartDef}</bodyPartDef>\n`;
+              if (effect.efficiency) {
+                  xml += `            <efficiency>${effect.efficiency}</efficiency>\n`;
+              }
+          }
+          xml += '        </li>\n';
+          xml += '    </organEffects>\n';
       }
-      xml += '      </li>\n    </organEffects>\n';
-    }
   }
 
   return xml;
@@ -332,41 +352,34 @@ export const exportDefEditorDefs = (exportType = 'ALL') => {
     case 'TALENTS':
       const talentDefs = StorageUtils.getDefsOfType('TalentDef');
       Object.values(talentDefs).forEach(def => {
-        xml += serializeDefToXml(def);
+        xml += generateTalentDefXml(def);  // Use the proper generator
       });
       break;
  
     case 'PATHS':
-      const pathDefs = Object.values(StorageUtils.getDefsOfType('TalentPathDef'))
-        .map(def => ({
-          name: def.defName,
-          description: def.description || '',
-          exclusiveWith: def.exclusiveWith || []
-        }));
-      xml += exportPaths(pathDefs);
+      const pathDefs = StorageUtils.getDefsOfType('TalentPathDef');
+      Object.values(pathDefs).forEach(def => {
+        xml += generateTalentPathDefXml(def); 
+      });
       break;
  
     default:
       const allTalentDefs = StorageUtils.getDefsOfType('TalentDef');
-      const allPathDefs = Object.values(StorageUtils.getDefsOfType('TalentPathDef'))
-        .map(def => ({
-          name: def.defName,
-          description: def.description || '',
-          exclusiveWith: def.exclusiveWith || []
-        }));
+      const allPathDefs = StorageUtils.getDefsOfType('TalentPathDef');
  
       Object.values(allTalentDefs).forEach(def => {
-        xml += serializeDefToXml(def);
+        xml += generateTalentDefXml(def); 
       });
-      xml += exportPaths(allPathDefs);
+      Object.values(allPathDefs).forEach(def => {
+        xml += generateTalentPathDefXml(def);
+      });
   }
  
   xml += '</Defs>';
- 
 
-  let fileName = exportType === 'ALL' ? 'TalentAndPathDefs.xml' 
-  : exportType === 'PATHS' ? 'PathDefs.xml' 
-  : 'TalentDefs.xml';
+  const fileName = exportType === 'ALL' ? 'TalentAndPathDefs.xml' 
+                  : exportType === 'PATHS' ? 'PathDefs.xml' 
+                  : 'TalentDefs.xml';
 
   const blob = new Blob([xml], { type: 'text/xml' });
   const url = URL.createObjectURL(blob);
@@ -377,7 +390,8 @@ export const exportDefEditorDefs = (exportType = 'ALL') => {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
- };
+};
+
 const exportTalentTree = (nodes, paths, treeName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler) => {
   // Generate the ID mapping first since the tree export happens before node export
   exportState.idMapping = createIdMapping(nodes);
