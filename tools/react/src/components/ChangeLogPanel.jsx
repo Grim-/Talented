@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ClipboardList } from 'lucide-react';
 import FloatingPanel from './FloatingPanel';
 
-const CURRENT_VERSION = '1.0.1';
+const CURRENT_VERSION = '1.1.0';
 
 const ChangelogPanel = () => {
   const [autoShow, setAutoShow] = useState(false);
@@ -21,7 +21,7 @@ const ChangelogPanel = () => {
   const changelog = [
     {
       version: '1.0.0',
-      date: '25-01-2025',
+      date: '23-01-2025',
       changes: [
         'Initial release',
       ]
@@ -29,11 +29,19 @@ const ChangelogPanel = () => {
     ,
     {
         version: '1.0.1',
-        date: '25-01-2025',
+        date: '23-01-2025',
         changes: [
           'Fixed Def Editor Export bug',
         ]
-      }
+    },
+    {
+      version: '1.1.0',
+      date: '24-01-2025',
+      changes: [
+        'Fixed Export Bugs, Export now comes in seperate files',
+        'Added custom background BG to Canvas Settings, scaled to preview area.'
+      ]
+  }
   ];
 
   return (
