@@ -173,10 +173,6 @@ export const exportDefEditorDefs = () => {
       invalidDefs.push(`TalentDef with missing name`);
       continue;
     }
-    if (!def.label) {
-      invalidDefs.push(`TalentDef ${def.defName} is missing a label`);
-      continue;
-    }
     if (def.abilityEffects?.length) {
       for (const ability of def.abilityEffects) {
         if (!ability.abilityDef || ability.abilityDef === 'undefined') {
