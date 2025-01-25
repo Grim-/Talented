@@ -311,7 +311,7 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeSkinDefName, tre
 };
 
 const generateTalentDefXml = (talentDef) => {
-  let xml = `  <TalentDef>\n`;
+  let xml = `  <${getFullDefName('TalentDef')}>\n`;
   xml += `    <defName>${talentDef.defName}</defName>\n`;
   xml += `    <label>${talentDef.label}</label>\n`;
   xml += `    <levelRequired>${talentDef.levelRequired}</levelRequired>\n`;
@@ -381,7 +381,7 @@ const generateTalentDefXml = (talentDef) => {
     xml += `    </statEffects>\n`;
   }
   
-  xml += `  </TalentDef>\n`;
+  xml += `  </${getFullDefName('TalentDef')}>\n`;
   return xml;
 };
 
