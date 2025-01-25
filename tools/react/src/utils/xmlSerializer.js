@@ -314,7 +314,7 @@ const generateTalentDefXml = (talentDef) => {
   let xml = `  <${getFullDefName('TalentDef')}>\n`;
   xml += `    <defName>${talentDef.defName}</defName>\n`;
   xml += `    <label>${talentDef.label}</label>\n`;
-  xml += `    <levelRequired>${talentDef.levelRequired}</levelRequired>\n`;
+  xml += `    <levelRequired>${talentDef.levelRequired || 0}</levelRequired>\n`;
   xml += `    <pointCost>${talentDef.pointCost || 1}</pointCost>\n`;
   
   if (talentDef.uiIconPath) {
