@@ -3,7 +3,7 @@ import { StorageUtils } from '../utils/StorageUtils';
 import TalentDefEditor from './TalentDefEditor';
 import TalentPathEditor from './TalentPathEditor';
 import Button from './Button';
-import { exportDefEditorDefs, handleXmlImport } from '../utils/xmlSerializer';
+import { exportDefEditorDefs, handleXmlImport, exportPaths, createEmptyPathDef, createEmptyTalentDef } from '../utils/xmlSerializer';
 import DropdownButton from './DropdownButton';
 
 const DefManager = () => {
@@ -27,23 +27,6 @@ const DefManager = () => {
       ...(type === 'TalentDef' ? createEmptyTalentDef() : createEmptyPathDef())
     });
   };
-
-  const createEmptyTalentDef = () => ({
-    description: '',
-    prerequisites: [],
-    statEffects: [],
-    hediffEffects: [],
-    abilityEffects: [],
-    organEffects: [],
-    pathPrerequisites: [],
-    pathExclusions: []
-  });
-
-  const createEmptyPathDef = () => ({
-    description: '',
-    color: '#000000',
-    exclusiveWith: []
-  });
 
   const handleLoadDef = (type, defName) => {
     const def = StorageUtils.getSingleDef(type, defName);

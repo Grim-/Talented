@@ -25,8 +25,7 @@ const ChangelogPanel = () => {
       changes: [
         'Initial release',
       ]
-    }
-    ,
+    },
     {
         version: '1.0.1',
         date: '23-01-2025',
@@ -38,8 +37,9 @@ const ChangelogPanel = () => {
       version: '1.1.0',
       date: '24-01-2025',
       changes: [
-        'Fixed Export Bugs, Export now comes in seperate files',
-        'Added custom background BG to Canvas Settings, scaled to preview area.'
+        'Fixed Export Bugs, Exports now comes in seperate files.',
+        'Added custom background BG to Canvas Settings, scaled to preview area.',
+        'More export bug squashing, added multiple export options.'
       ]
   }
   ];

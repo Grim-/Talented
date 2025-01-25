@@ -482,11 +482,11 @@ const NodeEditor = ({
       </div>
 
       {/* Export Modal */}
-      <Modal isOpen={showExport} onClose={() => setShowExport(false)}>
+      {/* <Modal isOpen={showExport} onClose={() => setShowExport(false)}>
         <pre className="bg-gray-900 p-4 rounded-lg overflow-auto max-h-96">
           {exportedXml}
         </pre>
-      </Modal>
+      </Modal> */}
 
       {/* Import Modal */}
       <Modal isOpen={showImport} onClose={() => setShowImport(false)}>

@@ -1,4 +1,39 @@
 import { StorageUtils } from './StorageUtils';
+import {Node} from '../components/Node';
+
+//DATA STRUCTUR
+const generateUniqueDefName = (basePrefix) => {
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 10000);
+  return `${basePrefix}_${timestamp}_${random}`;
+};
+
+const createIdMapping = (nodes) => {
+  const mapping = new Map();
+  nodes.forEach(node => {
+    mapping.set(node.id, generateUniqueDefName('Node'));
+  });
+  return mapping;
+};
+
+const updateConnections = (connections, idMapping) => {
+  if (!connections || !connections.length) return [];
+  return connections.map(conn => idMapping.get(conn) || conn);
+};
+
+const updateBranchPaths = (branchPaths, idMapping) => {
+  if (!branchPaths || !branchPaths.length) return [];
+  
+  return branchPaths.map(branch => ({
+    path: branch.path,
+    nodes: branch.nodes.map(nodeId => idMapping.get(nodeId) || nodeId)
+  }));
+};
+
+const exportState = {
+  idMapping: null
+};
+
 
 export const DefTypeConfig = {
   NODE: 'TalentTreeNodeDef',
@@ -12,6 +47,7 @@ export const createEmptyTalentDef = () => ({
   defName: '',
   type: 'TalentDef',
   description: '',
+  pointCost: 1,
   prerequisites: [],
   statEffects: [],
   hediffEffects: [],
@@ -34,10 +70,17 @@ export const NamespaceConfig = {
   separator: '.'
 };
 
-// Helper to generate full def type name
-const getFullDefName = (defType) => {
+
+
+//HELPERS
+export const getFullDefName = (defType) => {
   return `${NamespaceConfig.prefix}${NamespaceConfig.separator}${defType}`;
 };
+export const stripNamespace = (fullDefType) => {
+  return fullDefType.replace(`${NamespaceConfig.prefix}${NamespaceConfig.separator}`, '');
+};
+
+
 
 export const serializeDefToXml = (def, config = DefTypeConfig) => {
   const fullDefType = getFullDefName(def.type);
@@ -55,9 +98,6 @@ export const serializeDefToXml = (def, config = DefTypeConfig) => {
 };
 
 
-export const stripNamespace = (fullDefType) => {
-  return fullDefType.replace(`${NamespaceConfig.prefix}${NamespaceConfig.separator}`, '');
-};
 
 
 export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = DefTypeConfig) => {
@@ -125,6 +165,7 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
 
   event.target.value = '';
 };
+
 export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
   try {
     exportState.idMapping = null;
@@ -135,303 +176,104 @@ export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, t
     usedPaths.forEach(pathName => {
       if (!paths.find(p => p.name === pathName)) {
         allPaths.push({
-          name: pathName,
-          description: '',
-          exclusiveWith: []
+          name: pathName
         });
       }
     });
 
-    // Create tree and nodes XML
+    // Create tree and nodes XML, using exportPaths for path definitions
     const treeXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
+      exportPaths(allPaths, config) +
       exportTalentTree(nodes, allPaths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) +
       exportNodes(nodes, treeSize, config) +
       '</Defs>';
 
-    // Create paths XML if there are any paths
-    if (allPaths.length > 0) {
-      const pathsXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
-        exportPaths(allPaths, config) +
-        '</Defs>';
-
-      // Download paths file
-      const pathsBlob = new Blob([pathsXml], { type: 'text/xml' });
-      const pathsUrl = URL.createObjectURL(pathsBlob);
-      const pathsLink = document.createElement('a');
-      pathsLink.href = pathsUrl;
-      pathsLink.download = `${treeName}_Paths.xml`;
-      document.body.appendChild(pathsLink);
-      pathsLink.click();
-      document.body.removeChild(pathsLink);
-      URL.revokeObjectURL(pathsUrl);
-    }
+    const updatedTreeName = treeName || 'NoTreeName';
 
     // Download tree file
     const treeBlob = new Blob([treeXml], { type: 'text/xml' });
     const treeUrl = URL.createObjectURL(treeBlob);
     const treeLink = document.createElement('a');
     treeLink.href = treeUrl;
-    treeLink.download = `${treeName}_Tree.xml`;
+    treeLink.download = `${updatedTreeName}_Tree.xml`;
     document.body.appendChild(treeLink);
     treeLink.click();
     document.body.removeChild(treeLink);
     URL.revokeObjectURL(treeUrl);
 
     return treeXml;
-  } 
-  
-  catch (error) 
-  {
+  } catch (error) {
     exportState.idMapping = null;
     throw error;
   }
 };
+// export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
+//   try {
+//     exportState.idMapping = null;
+    
+//     const usedPaths = new Set(nodes.map(node => node.path).filter(Boolean));
+//     const allPaths = [...paths];
 
-const validateTalentDef = (def) => {
-  const errors = [];
-  if (!def.defName || def.defName === 'undefined') {
-    errors.push(`TalentDef with missing name`);
-    return errors;
-  }
-  if (!def.label) {
-    errors.push(`TalentDef ${def.defName} is missing a label`);
-  }
+//     usedPaths.forEach(pathName => {
+//       console.log(pathName);
+//       if (!paths.find(p => p.name === pathName)) {
+//         allPaths.push({
+//           name: pathName,
+//           description: '',
+//           exclusiveWith: []
+//         });
+//       }
+//     });
 
-  if (def.abilityEffects?.length) {
-    for (const effect of def.abilityEffects) {
-      if (!effect.abilityDef || effect.abilityDef === 'undefined') {
-        errors.push(`TalentDef ${def.defName} has an ability effect with no abilityDef`);
-      }
-    }
-  }
-  if (def.statEffects?.length) {
-    for (const effect of def.statEffects) {
-      if (!effect.statDef || effect.statDef === 'undefined') {
-        errors.push(`TalentDef ${def.defName} has a stat effect with no statDef`);
-      }
-    }
-  }
-  if (def.hediffEffects?.length) {
-    for (const effect of def.hediffEffects) {
-      if (!effect.hediffDef || effect.hediffDef === 'undefined') {
-        errors.push(`TalentDef ${def.defName} has a hediff effect with no hediffDef`);
-      }
-    }
-  }
-  if (def.organEffects?.length) {
-    for (const effect of def.organEffects) {
-      if (!effect.bodyPartDef || effect.bodyPartDef === 'undefined') {
-        errors.push(`TalentDef ${def.defName} has an organ effect with no bodyPartDef`);
-      }
-    }
-  }
-  return errors;
-};
+//     // Create tree and nodes XML
+//     const treeXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
+//       exportTalentTree(nodes, allPaths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) +
+//       exportNodes(nodes, treeSize, config) +
+//       '</Defs>';
 
-const validateTalentPathDef = (def) => {
-  const errors = [];
-  if (!def.defName || def.defName === 'undefined') {
-    errors.push(`TalentPathDef with missing name`);
-    return errors;
-  }
-  if (def.exclusiveWith?.length) {
-    for (const path of def.exclusiveWith) {
-      if (!path || path === 'undefined') {
-        errors.push(`TalentPathDef ${def.defName} has an invalid exclusiveWith entry`);
-      }
-    }
-  }
-  return errors;
-};
+//     const updatedTreeName = treeName || 'NoTreeName';
 
+//     // Create paths XML if there are any paths
+//     if (allPaths.length > 0) {
+//       const pathsXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
+//         exportPaths(allPaths, config) +
+//         '</Defs>';
 
-const generateTalentEffectsXml = (def) => {
-  let xml = '';
-  if (def.abilityEffects?.length) {
-      const validAbilities = def.abilityEffects.filter(effect => 
-          effect.abilityDef && effect.abilityDef !== 'undefined'
-      );
-      if (validAbilities.length) {
-          xml += '    <abilityEffects>\n';
-          xml += '        <li>\n';
-          xml += '          <abilities>\n';
-          for (const effect of validAbilities) {
-              xml += '            <li>\n';
-              xml += `              <abilityDef>${effect.abilityDef}</abilityDef>\n`;
-              xml += '            </li>\n';
-          }
-          xml += '          </abilities>\n';
-          xml += '        </li>\n';
-          xml += '    </abilityEffects>\n';
-      }
-  }
+//       // Download paths file
+//       const pathsBlob = new Blob([pathsXml], { type: 'text/xml' });
+//       const pathsUrl = URL.createObjectURL(pathsBlob);
+//       const pathsLink = document.createElement('a');
+//       pathsLink.href = pathsUrl;
+//       pathsLink.download = `${updatedTreeName}_Paths.xml`;
+//       document.body.appendChild(pathsLink);
+//       pathsLink.click();
+//       document.body.removeChild(pathsLink);
+//       URL.revokeObjectURL(pathsUrl);
+//     }
 
-  // Handle stat effects
-  if (def.statEffects?.length) {
-      const validStats = def.statEffects.filter(effect => 
-          effect.statDef && effect.statDef !== 'undefined'
-      );
-      if (validStats.length) {
-          xml += '    <statEffects>\n';
-          xml += '        <li>\n';
-          for (const effect of validStats) {
-              xml += `            <statDef>${effect.statDef}</statDef>\n`;
-              if (effect.value) {
-                  xml += `            <value>${effect.value}</value>\n`;
-              }
-          }
-          xml += '        </li>\n';
-          xml += '    </statEffects>\n';
-      }
-  }
+//     // Download tree file
+//     const treeBlob = new Blob([treeXml], { type: 'text/xml' });
+//     const treeUrl = URL.createObjectURL(treeBlob);
+//     const treeLink = document.createElement('a');
+//     treeLink.href = treeUrl;
+//     treeLink.download = `${updatedTreeName}_Tree.xml`;
+//     document.body.appendChild(treeLink);
+//     treeLink.click();
+//     document.body.removeChild(treeLink);
+//     URL.revokeObjectURL(treeUrl);
 
-  // Handle hediff effects
-  if (def.hediffEffects?.length) {
-      const validHediffs = def.hediffEffects.filter(effect => 
-          effect.hediffDef && effect.hediffDef !== 'undefined'
-      );
-      if (validHediffs.length) {
-          xml += '    <hediffEffects>\n';
-          xml += '        <li>\n';
-          for (const effect of validHediffs) {
-              xml += `            <hediffDef>${effect.hediffDef}</hediffDef>\n`;
-              if (effect.severity) {
-                  xml += `            <severity>${effect.severity}</severity>\n`;
-              }
-          }
-          xml += '        </li>\n';
-          xml += '    </hediffEffects>\n';
-      }
-  }
+//     return treeXml;
+//   } 
 
-  // Handle organ effects
-  if (def.organEffects?.length) {
-      const validOrgans = def.organEffects.filter(effect => 
-          effect.bodyPartDef && effect.bodyPartDef !== 'undefined'
-      );
-      if (validOrgans.length) {
-          xml += '    <organEffects>\n';
-          xml += '        <li>\n';
-          for (const effect of validOrgans) {
-              xml += `            <bodyPartDef>${effect.bodyPartDef}</bodyPartDef>\n`;
-              if (effect.efficiency) {
-                  xml += `            <efficiency>${effect.efficiency}</efficiency>\n`;
-              }
-          }
-          xml += '        </li>\n';
-          xml += '    </organEffects>\n';
-      }
-  }
-
-  return xml;
-};
-
-const generateTalentDefXml = (def) => {
-  let xml = `  <Talented.TalentDef>\n`;
-  xml += `    <defName>${def.defName}</defName>\n`;
-  xml += `    <label>${def.label}</label>\n`;
-  if (def.description) xml += `    <description>${def.description}</description>\n`;
-  if (def.levelRequired) xml += `    <levelRequired>${def.levelRequired}</levelRequired>\n`;
-  
-  xml += generateTalentEffectsXml(def);
-  
-  xml += `  </Talented.TalentDef>\n`;
-  return xml;
-};
-
-const generateTalentPathDefXml = (def) => {
-  let xml = `  <Talented.TalentPathDef>\n`;
-  xml += `    <defName>${def.defName}</defName>\n`;
-  xml += `    <pathDescription>${def.description || ''}</pathDescription>\n`;
-  
-  if (def.exclusiveWith?.length) {
-    const validPaths = def.exclusiveWith.filter(path => path && path !== 'undefined');
-    if (validPaths.length) {
-      xml += '    <exclusiveWith>\n';
-      for (const path of validPaths) {
-        xml += `      <li>${path}</li>\n`;
-      }
-      xml += '    </exclusiveWith>\n';
-    }
-  }
-  
-  xml += `  </Talented.TalentPathDef>\n`;
-  return xml;
-};
-
-const downloadXmlFile = (xml) => {
-  const blob = new Blob([xml], { type: 'text/xml' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'TalentAndPathDefs.xml';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
+//   catch (error) 
+//   {
+//     exportState.idMapping = null;
+//     throw error;
+//   }
+// };
 
 
-export const exportDefEditorDefs = (exportType = 'ALL') => {
-  // Wrapper functions for XML creation
-  const createXmlWrapper = (content) => {
-    return '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' + content + '</Defs>';
-  };
-  
-  const downloadFile = (content, filename) => {
-    const blob = new Blob([content], { type: 'text/xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
 
-  // Get the defs
-  const talentDefs = StorageUtils.getDefsOfType('TalentDef');
-  const pathDefs = StorageUtils.getDefsOfType('TalentPathDef');
-
-  // Generate XML based on export type
-  switch(exportType) {
-    case 'TALENTS':
-      if (Object.keys(talentDefs).length > 0) {
-        const talentXml = createXmlWrapper(
-          Object.values(talentDefs).map(def => generateTalentDefXml(def)).join('')
-        );
-        downloadFile(talentXml, 'TalentDefs.xml');
-      }
-      break;
-
-    case 'PATHS':
-      if (Object.keys(pathDefs).length > 0) {
-        const pathXml = createXmlWrapper(
-          Object.values(pathDefs).map(def => generateTalentPathDefXml(def)).join('')
-        );
-        downloadFile(pathXml, 'PathDefs.xml');
-      }
-      break;
-
-    default: // ALL
-      // Export talents if they exist
-      if (Object.keys(talentDefs).length > 0) {
-        const talentXml = createXmlWrapper(
-          Object.values(talentDefs).map(def => generateTalentDefXml(def)).join('')
-        );
-        downloadFile(talentXml, 'TalentDefs.xml');
-      }
-      
-      // Export paths if they exist
-      if (Object.keys(pathDefs).length > 0) {
-        const pathXml = createXmlWrapper(
-          Object.values(pathDefs).map(def => generateTalentPathDefXml(def)).join('')
-        );
-        downloadFile(pathXml, 'PathDefs.xml');
-      }
-  }
-};
 const exportTalentTree = (nodes, paths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) => {
   // Generate the ID mapping first since the tree export happens before node export
   exportState.idMapping = createIdMapping(nodes);
@@ -468,42 +310,255 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeSkinDefName, tre
   return xml;
 };
 
-
-const validateAndFixPaths = (paths) => {
-  // Create a deep copy to avoid mutating the original paths
-  const validatedPaths = JSON.parse(JSON.stringify(paths));
+const generateTalentDefXml = (talentDef) => {
+  let xml = `  <TalentDef>\n`;
+  xml += `    <defName>${talentDef.defName}</defName>\n`;
+  xml += `    <label>${talentDef.label}</label>\n`;
+  xml += `    <levelRequired>${talentDef.levelRequired}</levelRequired>\n`;
+  xml += `    <pointCost>${talentDef.pointCost || 1}</pointCost>\n`;
   
-  // For each path
-  validatedPaths.forEach(pathA => {
-    // Initialize exclusivePaths array if it doesn't exist
-    if (!pathA.exclusiveWith) {
-      pathA.exclusiveWith = [];
+  if (talentDef.uiIconPath) {
+    xml += `    <uiIconPath>${talentDef.uiIconPath}</uiIconPath>\n`;
+  }
+
+  if (talentDef.DescriptionString) {
+    xml += `    <DescriptionString>${talentDef.DescriptionString}</DescriptionString>\n`;
+  }
+  
+  if (talentDef.prerequisites?.length > 0) {
+    xml += `    <prerequisites>\n`;
+    talentDef.prerequisites.forEach(prereq => {
+      xml += `      <li>${prereq.defName}</li>\n`;
+    });
+    xml += `    </prerequisites>\n`;
+  }
+  
+  if (talentDef.hediffEffects?.length > 0) {
+    xml += `    <hediffEffects>\n`;
+    talentDef.hediffEffects.forEach(effect => {
+      xml += `      <li>\n`;
+      xml += `        <hediffDef>${effect.hediffDef}</hediffDef>\n`;
+      xml += `      </li>\n`;
+    });
+    xml += `    </hediffEffects>\n`;
+  }
+  
+  if (talentDef.abilityEffects?.length > 0) {
+    xml += `    <abilityEffects>\n`;
+    xml += `      <li>\n`;
+    xml += `        <abilities>\n`;
+    talentDef.abilityEffects.forEach(ability => {
+      xml += `          <li>\n`;
+      xml += `            <abilityDef>${ability.abilityDef}</abilityDef>\n`;
+      xml += `          </li>\n`;
+    });
+    xml += `        </abilities>\n`;
+    xml += `      </li>\n`;
+    xml += `    </abilityEffects>\n`;
+  }
+  
+  if (talentDef.organEffects?.length > 0) {
+    xml += `    <organEffects>\n`;
+    talentDef.organEffects.forEach(effect => {
+      xml += `      <li>\n`;
+      xml += `        <targetOrgan>${effect.targetOrgan}</targetOrgan>\n`;
+      xml += `        <addedOrganHediff>${effect.addedOrganHediff}</addedOrganHediff>\n`;
+      xml += `        <isAddition>${effect.isAddition}</isAddition>\n`;
+      xml += `      </li>\n`;
+    });
+    xml += `    </organEffects>\n`;
+  }
+  
+  if (talentDef.statEffects?.length > 0) {
+    xml += `    <statEffects>\n`;
+    talentDef.statEffects.forEach(effect => {
+      xml += `      <li>\n`;
+      xml += `        <statDef>${effect.statDef}</statDef>\n`;
+      xml += `        <value>${effect.value}</value>\n`;
+      xml += `        <operation>${effect.operation}</operation>\n`;
+      xml += `      </li>\n`;
+    });
+    xml += `    </statEffects>\n`;
+  }
+  
+  xml += `  </TalentDef>\n`;
+  return xml;
+};
+
+const generateTalentPathDefXml = (pathDef) => {
+  const referenceDefs = JSON.parse(localStorage.getItem('nodeEditorReferenceDefs') || '[]');
+  const referenceDef = referenceDefs.find(def => def.defName === pathDef.name);
+  
+  let pathData;
+  if (referenceDef) {
+    const exclusiveWith = Array.isArray(referenceDef.exclusiveWith) 
+      ? referenceDef.exclusiveWith 
+      : (referenceDef.properties?.exclusiveWith || []);
+      
+    pathData = {
+      name: referenceDef.defName,
+      description: referenceDef.pathDescription || referenceDef.description || pathDef.description || '',
+      exclusiveWith: exclusiveWith
+    };
+  } else {
+    const storedDef = StorageUtils.getSingleDef('TalentPathDef', pathDef.name);
+    if (storedDef) {
+      const exclusiveWith = Array.isArray(storedDef.exclusiveWith) 
+        ? storedDef.exclusiveWith 
+        : (storedDef.properties?.exclusiveWith || []);
+        
+      pathData = {
+        name: storedDef.defName,
+        description: storedDef.description || pathDef.description || '',
+        exclusiveWith: exclusiveWith
+      };
+    } else {
+      pathData = pathDef;
+    }
+  }
+
+  let xml = `  <TalentPathDef>\n`;
+  xml += `    <defName>${pathData.name}</defName>\n`;
+  xml += `    <label>${pathData.label || pathData.name}</label>\n`;
+  xml += `    <pathDescription>${pathData.description || ''}</pathDescription>\n`;
+  xml += `    <pathUIIcon>${pathData.pathUIIcon || ''}</pathUIIcon>\n`;
+  
+  if (pathData.pathColor && typeof pathData.pathColor === 'object') {
+    xml += `    <pathColor>(${pathData.pathColor.r},${pathData.pathColor.g},${pathData.pathColor.b})</pathColor>\n`;
+  }
+  
+  if (Array.isArray(pathData.exclusiveWith) && pathData.exclusiveWith.length > 0) {
+    xml += `    <exclusiveWith>\n`;
+    pathData.exclusiveWith.forEach(exclusive => {
+      xml += `      <li>${exclusive.defName || exclusive}</li>\n`;
+    });
+    xml += `    </exclusiveWith>\n`;
+  }
+  
+  xml += `  </TalentPathDef>\n`;
+  return xml;
+};
+
+export const exportDefEditorDefs = (exportType = 'ALL') => {
+  const createXmlWrapper = (content) => {
+    return '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' + content + '</Defs>';
+  };
+  
+  const downloadFile = (content, filename) => {
+    const blob = new Blob([content], { type: 'text/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const talentDefs = StorageUtils.getDefsOfType('TalentDef');
+  const pathDefs = StorageUtils.getDefsOfType('TalentPathDef');
+
+  const generateTalentPathDefXml = (pathDef) => {
+    const referenceDefs = JSON.parse(localStorage.getItem('nodeEditorReferenceDefs') || '[]');
+    const referenceDef = referenceDefs.find(def => def.defName === pathDef.defName);
+    
+    let pathData;
+    if (referenceDef) {
+      const exclusiveWith = Array.isArray(referenceDef.exclusiveWith) 
+        ? referenceDef.exclusiveWith 
+        : (referenceDef.properties?.exclusiveWith || []);
+        
+      pathData = {
+        name: referenceDef.defName,
+        description: referenceDef.pathDescription || referenceDef.description || '',
+        exclusiveWith: exclusiveWith
+      };
+    } else {
+      const storedDef = StorageUtils.getSingleDef('TalentPathDef', pathDef.defName);
+      if (storedDef) {
+        const exclusiveWith = Array.isArray(storedDef.exclusiveWith) 
+          ? storedDef.exclusiveWith 
+          : (storedDef.properties?.exclusiveWith || []);
+          
+        pathData = {
+          name: storedDef.defName,
+          description: storedDef.description || '',
+          exclusiveWith: exclusiveWith
+        };
+      } else {
+        pathData = pathDef;
+      }
     }
 
-    // Check each exclusive path
-    pathA.exclusiveWith.forEach(exclusiveName => {
-      // Find the corresponding path
-      const pathB = validatedPaths.find(p => p.name === exclusiveName);
-      
-      if (pathB) {
-        // Initialize exclusivePaths array if it doesn't exist for pathB
-        if (!pathB.exclusiveWith) {
-          pathB.exclusiveWith = [];
-        }
-        
-        // If pathA is not in pathB's exclusive list, add it
-        if (!pathB.exclusiveWith.includes(pathA.name)) {
-          pathB.exclusiveWith.push(pathA.name);
-        }
-      }
-    });
-  });
+    let xml = `  <${getFullDefName('TalentPathDef')}>\n`;
+    xml += `    <defName>${pathData.name}</defName>\n`;
+    xml += `    <label>${pathData.label || pathData.name}</label>\n`;
+    xml += `    <pathDescription>${pathData.description || ''}</pathDescription>\n`;
+    xml += `    <pathUIIcon>${pathData.pathUIIcon || ''}</pathUIIcon>\n`;
+    
+    if (pathData.pathColor && typeof pathData.pathColor === 'object') {
+      xml += `    <pathColor>(${pathData.pathColor.r},${pathData.pathColor.g},${pathData.pathColor.b})</pathColor>\n`;
+    }
+    
+    if (Array.isArray(pathData.exclusiveWith) && pathData.exclusiveWith.length > 0) {
+      xml += `    <exclusiveWith>\n`;
+      pathData.exclusiveWith.forEach(exclusive => {
+        xml += `      <li>${exclusive.defName || exclusive}</li>\n`;
+      });
+      xml += `    </exclusiveWith>\n`;
+    }
+    
+    xml += `  </${getFullDefName('TalentPathDef')}>\n`;
+    return xml;
+  };
 
-  return validatedPaths;
+  switch(exportType) {
+    case 'TALENTS':
+      if (Object.keys(talentDefs).length > 0) {
+        const talentXml = createXmlWrapper(
+          Object.values(talentDefs)
+            .map(def => generateTalentDefXml(def))
+            .join('\n')
+        );
+        downloadFile(talentXml, 'TalentDefs.xml');
+      }
+      break;
+
+    case 'PATHS':
+      if (Object.keys(pathDefs).length > 0) {
+        const pathXml = createXmlWrapper(
+          Object.values(pathDefs)
+            .map(def => generateTalentPathDefXml(def))
+            .join('\n')
+        );
+        downloadFile(pathXml, 'PathDefs.xml');
+      }
+      break;
+
+    default: // ALL
+      if (Object.keys(talentDefs).length > 0) {
+        const talentXml = createXmlWrapper(
+          Object.values(talentDefs)
+            .map(def => generateTalentDefXml(def))
+            .join('\n')
+        );
+        downloadFile(talentXml, 'TalentDefs.xml');
+      }
+      
+      if (Object.keys(pathDefs).length > 0) {
+        const pathXml = createXmlWrapper(
+          Object.values(pathDefs)
+            .map(def => generateTalentPathDefXml(def))
+            .join('\n')
+        );
+        downloadFile(pathXml, 'PathDefs.xml');
+      }
+  }
 };
 
 
-const exportPaths = (paths, config) => {
+export const exportPaths = (paths, config) => {
   // Get reference definitions first
   const referenceDefs = JSON.parse(localStorage.getItem('nodeEditorReferenceDefs') || '[]');
   
@@ -542,7 +597,7 @@ const exportPaths = (paths, config) => {
     return path;
   };
 
-  const validatedPaths = validateAndFixPaths(paths);
+  const validatedPaths = paths;
   
   let xml = '';
   validatedPaths.forEach(path => {
@@ -584,39 +639,6 @@ const calculateScaledPosition = (node, treeSize) => {
   return `(${scaledX},${scaledY})`;
 };
 
-
-const generateUniqueDefName = (basePrefix) => {
-  const timestamp = Date.now();
-  const random = Math.floor(Math.random() * 10000);
-  return `${basePrefix}_${timestamp}_${random}`;
-};
-
-const createIdMapping = (nodes) => {
-  const mapping = new Map();
-  nodes.forEach(node => {
-    mapping.set(node.id, generateUniqueDefName('Node'));
-  });
-  return mapping;
-};
-
-const updateConnections = (connections, idMapping) => {
-  if (!connections || !connections.length) return [];
-  return connections.map(conn => idMapping.get(conn) || conn);
-};
-
-const updateBranchPaths = (branchPaths, idMapping) => {
-  if (!branchPaths || !branchPaths.length) return [];
-  
-  return branchPaths.map(branch => ({
-    path: branch.path,
-    nodes: branch.nodes.map(nodeId => idMapping.get(nodeId) || nodeId)
-  }));
-};
-
-// Create a shared state object to maintain ID mappings between exports
-const exportState = {
-  idMapping: null
-};
 
 
 const exportNodes = (nodes, treeSize, config) => {
@@ -703,51 +725,26 @@ export const importFromXml = (xmlContents, config = DefTypeConfig) => {
     const pathDefType = getFullDefName(config.PATH);
     const nodeDefType = getFullDefName(config.NODE);
 
+    // Parse paths (this part stays exactly the same)
     Array.from(xmlDoc.getElementsByTagName(pathDefType)).forEach(pathDef => {
       paths.push({
-        id : pathDef.getElementsByTagName("defName")[0].textContent,
+        id: pathDef.getElementsByTagName("defName")[0].textContent,
         name: pathDef.getElementsByTagName("defName")[0].textContent,
         description: pathDef.getElementsByTagName("pathDescription")[0]?.textContent || '',
         exclusiveWith: Array.from(pathDef.getElementsByTagName("exclusiveWith")[0]?.getElementsByTagName("li") || [])
           .map(li => li.textContent)
       });
-    })
+    });
 
+    // Replace the entire node parsing section with this:
     Array.from(xmlDoc.getElementsByTagName(nodeDefType)).forEach(nodeDef => {
-      const position = nodeDef.getElementsByTagName("position")[0]?.textContent || "(0,0)";
-      const [x, y] = position.replace(/[()]/g, '').split(',').map(n => parseInt(n) * 50);
-
-      const connections = Array.from(nodeDef.getElementsByTagName("connections")[0]?.getElementsByTagName("li") || [])
-        .map(li => li.textContent);
-
-      // Read upgrades as a list of li elements
-      const upgrades = Array.from(nodeDef.getElementsByTagName("upgrades")[0]?.getElementsByTagName("li") || [])
-        .map(li => li.textContent);
-
-      const branchPaths = Array.from(nodeDef.getElementsByTagName("branchPaths")[0]?.getElementsByTagName("li") || [])
-        .map(branchElem => ({
-          path: branchElem.getElementsByTagName("path")[0]?.textContent || '',
-          nodes: Array.from(branchElem.getElementsByTagName("nodes")[0]?.getElementsByTagName("li") || [])
-            .map(li => li.textContent)
-        }));
-
-      nodes.push({
-        id: nodeDef.getElementsByTagName("defName")[0].textContent,
-        label: nodeDef.getElementsByTagName("label")[0]?.textContent || "DisplayLabel",
-        type: nodeDef.getElementsByTagName("type")[0]?.textContent || "Normal",
-        points: nodeDef.getElementsByTagName("pointCost")?.textContent || 1,
-        x,
-        y,
-        connections,
-        path: nodeDef.getElementsByTagName("path")[0]?.textContent || "",
-        upgrades: upgrades.length > 0 ? upgrades : undefined,
-        branchPaths
-      });
+      nodes.push(Node.fromXmlDef(nodeDef));
     });
   });
 
   return { nodes, paths };
 };
+
 
 export const serializeProperty = (key, value, indent) => {
   const spaces = ' '.repeat(indent * 2);
@@ -785,3 +782,63 @@ export const serializeProperty = (key, value, indent) => {
 
   return '';
 };
+
+
+
+const validateTalentDef = (def) => {
+  const errors = [];
+  if (!def.defName || def.defName === 'undefined') {
+    errors.push(`TalentDef with missing name`);
+    return errors;
+  }
+  if (!def.label) {
+    errors.push(`TalentDef ${def.defName} is missing a label`);
+  }
+
+  if (def.abilityEffects?.length) {
+    for (const effect of def.abilityEffects) {
+      if (!effect.abilityDef || effect.abilityDef === 'undefined') {
+        errors.push(`TalentDef ${def.defName} has an ability effect with no abilityDef`);
+      }
+    }
+  }
+  if (def.statEffects?.length) {
+    for (const effect of def.statEffects) {
+      if (!effect.statDef || effect.statDef === 'undefined') {
+        errors.push(`TalentDef ${def.defName} has a stat effect with no statDef`);
+      }
+    }
+  }
+  if (def.hediffEffects?.length) {
+    for (const effect of def.hediffEffects) {
+      if (!effect.hediffDef || effect.hediffDef === 'undefined') {
+        errors.push(`TalentDef ${def.defName} has a hediff effect with no hediffDef`);
+      }
+    }
+  }
+  if (def.organEffects?.length) {
+    for (const effect of def.organEffects) {
+      if (!effect.bodyPartDef || effect.bodyPartDef === 'undefined') {
+        errors.push(`TalentDef ${def.defName} has an organ effect with no bodyPartDef`);
+      }
+    }
+  }
+  return errors;
+};
+
+const validateTalentPathDef = (def) => {
+  const errors = [];
+  if (!def.defName || def.defName === 'undefined') {
+    errors.push(`TalentPathDef with missing name`);
+    return errors;
+  }
+  if (def.exclusiveWith?.length) {
+    for (const path of def.exclusiveWith) {
+      if (!path || path === 'undefined') {
+        errors.push(`TalentPathDef ${def.defName} has an invalid exclusiveWith entry`);
+      }
+    }
+  }
+  return errors;
+};
+

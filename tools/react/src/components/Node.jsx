@@ -33,7 +33,30 @@ export class Node {
     static NewId = () => {
         return `node_${Date.now()}`
     };
-
+    
+    static fromXmlDef = (nodeDef) => {
+        const position = nodeDef.getElementsByTagName("position")[0]?.textContent || "(0,0)";
+        const [x, y] = position.replace(/[()]/g, '').split(',').map(n => parseFloat(n.trim()) * 50);
+        
+        const node = new Node(
+            nodeDef.getElementsByTagName("defName")[0].textContent,
+            nodeDef.getElementsByTagName("label")[0]?.textContent || nodeDef.getElementsByTagName("defName")[0].textContent,
+            nodeDef.getElementsByTagName("type")[0]?.textContent || "Normal",
+            x,
+            y
+        );
+    
+        node.connections = Array.from(nodeDef.getElementsByTagName("connections")[0]?.getElementsByTagName("li") || [])
+            .map(li => li.textContent);
+            
+        node.upgrades = Array.from(nodeDef.getElementsByTagName("upgrades")[0]?.getElementsByTagName("li") || [])
+            .map(li => li.textContent);
+            
+        node.path = nodeDef.getElementsByTagName("path")[0]?.textContent || "";
+    
+        return node;
+    };
+    
     center = () => {
         return [
             this.x + this.width/2,

@@ -3,6 +3,7 @@ import Modal from './Modal';
 import Button from './Button';
 import { HardDriveUpload, HardDriveDownload, FolderInput } from 'lucide-react';
 import DropdownButton from './DropdownButton';
+import {exportDefEditorDefs} from '../utils/xmlSerializer';
 
 export const Toolbar = ({
   onAddNode,
@@ -49,12 +50,14 @@ export const Toolbar = ({
         
         <DropdownButton
           primary={{
-            label: "Export ALL",
-            action: () => handleExport()
+            label: "Export Tree + Paths in one file.",
+            action: () => { 
+              onExportXml();
+            }
           }}
           options={[
-            { label: "Export Tree", action: () => console.log('TREE') },
-            { label: "Export Paths", action: () => console.log('TALENTS') }
+            { label: "Export Tree", action: () => onExportXml() },
+            { label: "Export Paths", action: () => exportDefEditorDefs('PATHS') }
           ]}
         />
 
@@ -80,12 +83,12 @@ export const Toolbar = ({
         </Button>
       </div>
 
-      {/* Export Modal */}
+      {/* Export Modal
       <Modal isOpen={showExport} onClose={() => setShowExport(false)}>
         <pre className="bg-gray-800 p-4 rounded-lg overflow-auto max-h-96 text-gray-100">
           {exportedXml}
         </pre>
-      </Modal>
+      </Modal> */}
 
       {/* Import Modal */}
       <Modal isOpen={showImport} onClose={() => setShowImport(false)}>
