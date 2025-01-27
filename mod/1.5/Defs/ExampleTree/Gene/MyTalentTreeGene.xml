@@ -2,12 +2,12 @@
 <Defs>
 
   <Talented.TalentedGeneDef>
-      <defName>MyTalentGene</defName>
+      <defName>GenericExampleTree</defName>
       <label>Talent Gene</label>
       <description>A gene with talent tree mechanics.</description>
       <!-- Tree Configuration -->
       <TalentTrees>
-        <li>TestTree</li>
+        <li>GenericExampleTree</li>
       </TalentTrees>
 
       <!-- Experience System -->

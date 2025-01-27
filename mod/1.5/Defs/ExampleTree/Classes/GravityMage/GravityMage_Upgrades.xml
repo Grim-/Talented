@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Gravity Well Ability -->
+    <AbilityDef>
+        <defName>GravityWellEffect</defName>
+        <label>gravity well</label>
+        <description>Creates a zone of intense gravitational force that slows and damages enemies.</description>
+        <iconPath>Abilities/GravityWell</iconPath>
+        <targetRequired>True</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>1.0</warmupTime>
+            <range>15.0</range>
+        </verbProperties>
+        <comps>
+          <li Class="CompProperties_AbilityGiveHediff">
+              <hediffDef>GravityWellState</hediffDef>
+              <compClass>CompAbilityEffect_GiveHediff</compClass>
+          </li>
+        </comps>
+    </AbilityDef>
+
+    <HediffDef>
+        <defName>GravityWellState</defName>
+        <label>crushing gravity</label>
+                <hediffClass>HediffWithComps</hediffClass>
+        <description>Being crushed by intense gravitational forces.</description>
+        <defaultLabelColor>(0.3, 0.0, 0.4)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MoveSpeed>-0.50</MoveSpeed>
+                    <IncomingDamageMultiplier>0.25</IncomingDamageMultiplier>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Zero Gravity Field Ability -->
+    <AbilityDef>
+        <defName>ZeroGravityFieldEffect</defName>
+        <label>zero gravity field</label>
+        <description>Creates a zone of weightlessness that enhances mobility and evasion.</description>
+        <iconPath>Abilities/ZeroGravity</iconPath>
+        <targetRequired>False</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>0.5</warmupTime>
+        </verbProperties>
+        <comps>
+          <li Class="CompProperties_AbilityGiveHediff">
+              <hediffDef>ZeroGravityState</hediffDef>
+              <compClass>CompAbilityEffect_GiveHediff</compClass>
+          </li>
+        </comps>
+    </AbilityDef>
+
+    <HediffDef>
+        <defName>ZeroGravityState</defName>
+        <label>zero gravity</label>
+                <hediffClass>HediffWithComps</hediffClass>
+        <description>Moving in a weightless state.</description>
+        <defaultLabelColor>(0.2, 0.4, 0.6)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MoveSpeed>0.50</MoveSpeed>
+                    <MeleeDodgeChance>0.25</MeleeDodgeChance>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Mass Manipulation Hediff -->
+    <HediffDef>
+        <defName>MassManipulationBuff</defName>
+        <label>mass manipulation</label>
+                <hediffClass>HediffWithComps</hediffClass>
+        <description>Enhanced control over gravitational forces.</description>
+        <defaultLabelColor>(0.5, 0.2, 0.5)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <CarryingCapacity>50</CarryingCapacity>
+                    <MeleeDamageFactor>0.15</MeleeDamageFactor>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Singularity Burst Ability -->
+    <AbilityDef>
+        <defName>SingularityBurstEffect</defName>
+        <label>singularity burst</label>
+        <description>Unleashes a concentrated burst of gravitational force.</description>
+        <iconPath>Abilities/SingularityBurst</iconPath>
+        <targetRequired>True</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>1.5</warmupTime>
+            <range>10.0</range>
+        </verbProperties>
+    </AbilityDef>
+</Defs>

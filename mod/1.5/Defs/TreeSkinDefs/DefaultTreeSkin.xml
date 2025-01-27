@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-<Talented.TalentTreeSkinDef>
+<Talented.TalentTreeSkinDef Name="Talented_DefaultSkin">
   <defName>DefaultTreeSkin</defName>
   <label>Default Tree Skin</label>
   <description>Default visual style for upgrade trees</description>
 
   <!-- Background configuration -->
-  <backgroundTexturePath>SymbioteBG</backgroundTexturePath>
+  <backgroundTexturePath>UI/Tree/defaultbackground</backgroundTexturePath>
   <backgroundColor>(1, 1, 1)</backgroundColor>
   <backgroundScaleMode>StretchToFill</backgroundScaleMode>
 

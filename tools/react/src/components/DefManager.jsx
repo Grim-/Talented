@@ -89,39 +89,65 @@ const DefManager = () => {
     <div className="flex gap-4">
       {/* Sidebar */}
       <div className="w-66 bg-gray-800 p-4 rounded-lg">
-        <div className="flex gap-2 mb-3 flex-wrap">
-          <Button
-            onClick={() => document.getElementById('xmlImport').click()}
-            className="flex-none bg-gray-700 hover:bg-blue-600 text-white text-xs py-1 px-2"
-          >
-            Import Talent Defs
-          </Button>
-          <DropdownButton
-            primary={{
-              label: "Create new TalentDef",
-              action: () => handleCreateNewTalent()
-            }}
-            options={[
-              { label: "Create new TalentPathDef", action: () => handleCreateNewTalentPath() },
-            ]}
-          />
-          <DropdownButton
-            primary={{
-              label: "Export ALL Talents",
-              action: () => exportDefEditorDefs('TALENTS') 
-            }}
-            options={[
-            ]}
-          />
-          <input 
-            id="xmlImport" 
-            type="file" 
-            multiple 
-            accept=".xml" 
-            onChange={handleFileChange} 
-            className="hidden" 
-          />
-        </div>
+      <div className="grid grid-cols-2 gap-2 w-full max-w-xl">
+      <Button
+        onClick={() => document.getElementById('xmlImport').click()}
+        className="bg-gray-700 hover:bg-blue-600 text-white text-xs py-1 px-2"
+      >
+        Import XML
+      </Button>
+
+      <DropdownButton
+        primary={{
+          label: "New Talent",
+          action: () => handleCreateNewTalent()
+        }}
+        options={[
+          { label: "New Path", action: () => handleCreateNewTalentPath() },
+        ]}
+      />
+
+
+      <DropdownButton
+        primary={{
+          label: "Export All",
+          action: () => exportDefEditorDefs('TALENTS') 
+        }}
+        options={[]}
+      />
+
+      <DropdownButton
+        primary={{
+          label: "Clear Talents",
+          action: () => {
+            if (window.confirm('Remove all stored Talent Definitions?')) {
+              StorageUtils.clearDefsOfType('TalentDef');
+            }
+          }
+        }}
+        options={[
+          {           
+            label: "Clear Paths",
+            action: () => {
+              if (window.confirm('Remove all stored Talent Paths?')) {
+                StorageUtils.clearDefsOfType('TalentPathDef');
+              }
+            }
+          },
+        ]}
+        bgColor={'bg-red-500'}
+        dropDownColor={'bg-red-500'}
+      />
+
+      <input 
+        id="xmlImport" 
+        type="file" 
+        multiple 
+        accept=".xml" 
+        onChange={handleFileChange} 
+        className="hidden" 
+      />
+    </div>
 
         <h2 className="font-semibold text-sm mb-2 text-gray-200">Saved Definitions</h2>
         {defTypes.map(({ id, label }) => (

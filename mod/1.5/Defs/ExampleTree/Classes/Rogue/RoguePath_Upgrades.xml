@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Quick Strikes Hediff -->
+    <HediffDef>
+        <defName>QuickStrikesBuff</defName>
+        <label>quick strikes</label>
+        <description>Mastery of swift attacks.</description>
+        <defaultLabelColor>(0.7, 0.3, 0.3)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MeleeCooldownFactor>-0.15</MeleeCooldownFactor>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Vital Strike Ability -->
+    <AbilityDef>
+        <defName>VitalStrikeEffect</defName>
+        <label>vital strike</label>
+        <description>A deadly precise attack.</description>
+        <iconPath>Abilities/VitalStrike</iconPath>
+        <targetRequired>True</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>0.5</warmupTime>
+            <range>1.5</range>
+        </verbProperties>
+    </AbilityDef>
+
+    <!-- Combat Flow Hediff -->
+    <HediffDef>
+        <defName>CombatFlowEffect</defName>
+        <label>combat flow</label>
+        <description>Improved combat movement and precision.</description>
+        <defaultLabelColor>(0.5, 0.5, 0.8)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MeleeHitChance>0.15</MeleeHitChance>
+                    <MeleeDodgeChance>0.15</MeleeDodgeChance>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Lethal Fury Ability and Effects -->
+    <AbilityDef>
+        <defName>LethalFuryEffect</defName>
+        <label>lethal fury</label>
+        <description>A state of deadly combat mastery.</description>
+        <iconPath>Abilities/LethalFury</iconPath>
+        <targetRequired>False</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>1.0</warmupTime>
+        </verbProperties>
+        <comps>
+            <li Class="CompProperties_AbilityGiveHediff">
+                <hediffDef>LethalFuryState</hediffDef>
+                <compClass>CompAbilityEffect_GiveHediff</compClass>
+            </li>
+        </comps>
+    </AbilityDef>
+
+    <HediffDef>
+        <defName>LethalFuryState</defName>
+        <label>lethal fury</label>
+        <description>In a state of perfect lethal precision.</description>
+        <defaultLabelColor>(1.0, 0.3, 0.3)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MeleeDamageFactor>0.50</MeleeDamageFactor>
+                    <MeleeHitChance>0.15</MeleeHitChance>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+</Defs>

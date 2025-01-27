@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Passive: Mass Manipulation -->
+    <Talented.TalentDef>
+        <defName>MassManipulationPassive</defName>
+        <label>Mass Manipulation</label>
+        <description>Your mastery over gravity allows you to manipulate the mass of objects and enhance your physical capabilities.</description>
+        <levelRequired>2</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>MassManipulationBuff</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Active: Gravity Well -->
+    <Talented.TalentDef>
+        <defName>GravityWellAbility</defName>
+        <label>Gravity Well</label>
+        <description>Create a zone of intense gravitational force that slows and crushes enemies caught within.</description>
+        <levelRequired>3</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>GravityWellEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+
+    <!-- Passive: Zero Gravity Mastery -->
+    <Talented.TalentDef>
+        <defName>ZeroGravityMasteryPassive</defName>
+        <label>Zero Gravity Mastery</label>
+        <description>Your control over gravitational forces allows you to create zones of weightlessness, enhancing mobility and defense.</description>
+        <levelRequired>4</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>ZeroGravityState</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Ultimate: Singularity Burst -->
+    <Talented.TalentDef>
+        <defName>SingularityBurstUltimate</defName>
+        <label>Singularity Burst</label>
+        <description>Unleash a concentrated burst of gravitational force, creating a temporary singularity that devastates the target area.</description>
+        <levelRequired>5</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>SingularityBurstEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+</Defs>

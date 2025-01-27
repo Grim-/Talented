@@ -18,4 +18,18 @@
           </li>
       </statEffects>
   </Talented.TalentDef>
+
+  <Talented.TalentDef>
+    <defName>HardyPassive</defName>
+    <label>Hardy</label>
+    <levelRequired>0</levelRequired>
+    <pointCost>1</pointCost>
+    <statEffects>
+      <li>
+        <statDef>ArmorRating_Blunt</statDef>
+        <value>1.2</value>
+        <operation>Multiply</operation>
+      </li>
+    </statEffects>
+  </Talented.TalentDef>
 </Defs>
