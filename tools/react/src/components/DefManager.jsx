@@ -94,7 +94,7 @@ const DefManager = () => {
             onClick={() => document.getElementById('xmlImport').click()}
             className="flex-none bg-gray-700 hover:bg-blue-600 text-white text-xs py-1 px-2"
           >
-            Import
+            Import Talent Defs
           </Button>
           <DropdownButton
             primary={{

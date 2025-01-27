@@ -485,7 +485,7 @@ const hexToRGB = (hex) => {
   
   return { r, g, b };
 };
-const generateTalentDefXml = (talentDef) => {
+export const generateTalentDefXml = (talentDef) => {
   let xml = `  <${getFullDefName('TalentDef')}>\n`;
   xml += `    <defName>${talentDef.defName}</defName>\n`;
   xml += `    <label>${talentDef.label}</label>\n`;

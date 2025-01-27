@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { StorageUtils } from '../utils/StorageUtils';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
+import { Download } from 'lucide-react';
+import {generateTalentDefXml} from '../utils/xmlSerializer';
 
 // Types for better type safety
 const EFFECT_TYPES = {
@@ -15,6 +17,7 @@ const STAT_OPERATIONS = {
   MULTIPLY: 'Multiply',
   OVERRIDE: 'Override',
 };
+
 
 
 const EffectEditorBase = ({ children, onRemove }) => (
@@ -178,6 +181,20 @@ const EffectsList = ({ title, effects = [], onChange, createEmpty, EffectCompone
 };
 
 const TalentDefEditor = ({ currentDef, setCurrentDef, onSave }) => {
+
+  const handleExport = useCallback(() => {
+    const xml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' + generateTalentDefXml(currentDef) + '</Defs>';
+    const blob = new Blob([xml], { type: 'text/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${currentDef.defName || 'talent'}.xml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [currentDef]);
+
   const createEmptyEffect = useCallback((type) => {
     const templates = {
       [EFFECT_TYPES.STAT]: { statDef: '', value: 0, operation: STAT_OPERATIONS.ADD },
@@ -281,13 +298,23 @@ const TalentDefEditor = ({ currentDef, setCurrentDef, onSave }) => {
             EffectComponent={AbilityEffectEditor}
           />
         </div>
-
-        <button
-          onClick={handleSave}
-          className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-        >
-          Save Talent Definition
-        </button>
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            title="Export Talent Definition"
+          >
+            <Download className="w-4 h-4" />
+            <span>Export Talent Definition</span>
+          </button>
+          
+          <button
+            onClick={handleSave}
+            className="py-2 px-4 bg-gray-600 hover:bg-green-700 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+          >
+            Update Talent Definition
+          </button>
+        </div>
       </div>
     </div>
   );
