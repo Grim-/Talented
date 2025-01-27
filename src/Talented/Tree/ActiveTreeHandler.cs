@@ -68,7 +68,7 @@ namespace Talented
             return unlockResult;
         }
 
-        public override void OnPathSelected(TalentPathDef path)
+        public override void OnPathSelected(TalentPath path)
         {
         }
 

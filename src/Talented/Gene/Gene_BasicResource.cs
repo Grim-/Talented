@@ -36,7 +36,7 @@ namespace Talented
         public float ValueCostMultiplied => Value * CostMult;
         public string DisplayLabel => Def.resourceName + " (" + "Gene".Translate() + ")";
         public float ResourceLossPerDay => def?.resourceLossPerDay ?? 0f;
-        public override float InitialResourceMax => Def?.maxStat != null ? Pawn.GetStatValue(Def.maxStat) : 100f;
+        public override float InitialResourceMax => Def?.maxStat != null ? Pawn.GetStatValue(Def.maxStat, true, 1250) : 100f;
         public override float MinLevelForAlert => 0.15f;
         public override float MaxLevelOffset => 0.1f;
 
@@ -46,7 +46,7 @@ namespace Talented
             get
             {
                 if (Def?.maxStat == null) return 10f;
-                float currentMax = Pawn.GetStatValue(Def.maxStat, true);
+                float currentMax = Pawn.GetStatValue(Def.maxStat, true, 1250);
                 if (currentMax != lastMax)
                 {
                     lastMax = currentMax;

@@ -12,7 +12,7 @@ namespace Talented
         public IntVec2 dimensions;
         public Type handlerClass = typeof(ActiveTreeHandler);
         public TalentTreeSkinDef skin;
-        public List<TalentPathDef> availablePaths;
+        public List<TalentPath> availablePaths;
         public TreeDisplayStrategyDef displayStrategy;
 
         public TalentPointFormulaDef talentPointFormula;
@@ -57,6 +57,32 @@ namespace Talented
                 return skin;
             }
         }
+
+        private Dictionary<string, TalentPath> pathLookup;
+
+        public TalentPath GetPath(string pathName)
+        {
+            if (String.IsNullOrEmpty(pathName))
+            {
+                return null;
+            }
+
+
+            if (pathLookup == null)
+            {
+                pathLookup = availablePaths.ToDictionary(p => p.name);
+            }
+            return pathLookup.TryGetValue(pathName, out var path) ? path : null;
+        }
+
+        public bool ArePathsExclusive(string pathAName, string pathBName)
+        {
+            var pathA = GetPath(pathAName);
+            var pathB = GetPath(pathBName);
+            if (pathA == null || pathB == null) return false;
+            return pathA.IsPathExclusiveWith(pathB);
+        }
+
         public List<TalentTreeNodeDef> GetAllNodes()
         {
             if (nodes.NullOrEmpty())

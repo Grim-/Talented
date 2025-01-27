@@ -69,7 +69,7 @@ namespace Talented
                     }
                     catch (Exception ex)
                     {
-                        Log.Error($"Protean EventManager: Error processing event: {ex}");
+                        Log.Error($"Talented EventManager: Error processing event: {ex}");
                     }
                 }
             }

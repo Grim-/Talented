@@ -8,9 +8,17 @@ namespace Talented
 {
     public class TalentedTabUI : ITab
     {
+        public override bool IsVisible => SelPawn != null && CheckTalentGene();
+
+        private bool CheckTalentGene()
+        {
+            if (SelPawn == null) return false;
+            if (SelPawn.RaceProps?.Humanlike != true) return false;
+            if (SelPawn.genes == null) return false;
+            return SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>() != null;
+        }
         protected Gene_TalentBase TalentGene => SelPawn.genes.GetFirstGeneOfType<Gene_TalentBase>();
-        protected TalentedGeneDef GeneDef => TalentGene.TalentedGeneDef;
-        public override bool IsVisible => TalentGene != null;
+
         protected const float PADDING = 5f;
         protected const float TREE_BUTTON_SPACING = 5f;
         protected const float LEVEL_WIDTH = 60f;

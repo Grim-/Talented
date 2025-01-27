@@ -23,7 +23,7 @@ namespace Talented
         public HashSet<TalentTreeNodeDef> unlockedNodes;
         public Dictionary<TalentDef, List<UpgradeEffect>> activeEffects;
 
-        protected HashSet<TalentPathDef> selectedPaths;
+        protected HashSet<TalentPath> selectedPaths;
         protected Dictionary<TalentTreeNodeDef, int> nodeProgress;
 
         public Dictionary<TalentTreeNodeDef, int> NodeProgress
@@ -53,7 +53,7 @@ namespace Talented
             this.unlockedUpgrades = new HashSet<TalentDef>();
             this.unlockedNodes = new HashSet<TalentTreeNodeDef>();
             this.activeEffects = new Dictionary<TalentDef, List<UpgradeEffect>>();
-            this.selectedPaths = new HashSet<TalentPathDef>();
+            this.selectedPaths = new HashSet<TalentPath>();
             this.nodeProgress = new Dictionary<TalentTreeNodeDef, int>();
             if (treeDef.talentPointFormula != null)
             {
@@ -152,16 +152,18 @@ namespace Talented
         public Color GetNodeColor(TalentTreeNodeDef node, int currentProgress)
         {
             bool isFullyUnlocked = IsNodeFullyUnlocked(node);
+            TalentPath nodePath = this.TreeDef.GetPath(node.path);
 
-            if (node.BelongsToUpgradePath)
+
+            if (node.BelongsToUpgradePath && nodePath != null)
             {
                 if (isFullyUnlocked)
                     return this.treeDef.Skin.unlockedNodeColor;
 
-                if (IsPathSelected(node.path))
+                if (nodePath != null && IsPathSelected(nodePath))
                     return this.treeDef.Skin.pathSelectedColor;
 
-                return CanSelectPath(node.path) ? this.treeDef.Skin.pathAvailableColor : this.treeDef.Skin.pathExcludedColor;
+                return nodePath != null && CanSelectPath(nodePath) ? this.treeDef.Skin.pathAvailableColor : this.treeDef.Skin.pathExcludedColor;
             }
 
             if (isFullyUnlocked)
@@ -323,7 +325,9 @@ namespace Talented
                     return UnlockResult.Failed(UpgradeUnlockError.NoPrecedingNode, "Requires all previous upgrades to be fully unlocked");
             }
 
-            if (node.type != NodeType.Branch && node.path != null && !IsPathSelected(node.path))
+            var nodePath = this.TreeDef.GetPath(node.path);
+
+            if (node.type != NodeType.Branch && nodePath != null && !IsPathSelected(nodePath))
                 return UnlockResult.Failed(UpgradeUnlockError.ExclusivePath, "Must select path at branch point first");
 
             return ValidateTreeSpecificRules(node);
@@ -336,7 +340,7 @@ namespace Talented
 
 
         #region Progression Paths
-        public bool IsPathSelected(TalentPathDef path) => selectedPaths.Contains(path);
+        public bool IsPathSelected(TalentPath path) => selectedPaths.Contains(path);
 
 
         public PathStatus GetPathStatusBetweenNodes(TalentTreeNodeDef StartNode, TalentTreeNodeDef EndNode)
@@ -371,15 +375,14 @@ namespace Talented
         protected virtual bool ValidateUpgradePath(TalentTreeNodeDef node)
         {
             if (node.type == NodeType.Branch)
-                return node.path != null && CanSelectPath(node.path);
+                return node.path != string.Empty && CanSelectPath(this.TreeDef.GetPath(node.path));
 
-            // Non-branch nodes require their path to be selected already
-            if (node.path != null)
-                return IsPathSelected(node.path);
+            if (node.path != string.Empty)
+                return IsPathSelected(this.TreeDef.GetPath(node.path));
 
             return true;
         }
-        public virtual UnlockResult SelectPath(TalentPathDef path)
+        public virtual UnlockResult SelectPath(TalentPath path)
         {
             if (!CanSelectPath(path))
                 return UnlockResult.Failed(UpgradeUnlockError.ExclusivePath, "Path conflicts with current selections");
@@ -389,25 +392,26 @@ namespace Talented
             return UnlockResult.Succeeded();
         }
 
-        public virtual bool CanSelectPath(TalentPathDef path)
+        public virtual bool CanSelectPath(TalentPath path)
         {
             if (path == null) return false;
             if (selectedPaths.Contains(path)) return false;
 
-            var nodesInPath = treeDef.GetAllNodes().Where(n => n.path == path).ToList();
+            var nodesInPath = treeDef.GetAllNodes().Where(n => n.path == path.name).ToList();
             if (!nodesInPath.Any()) return false;
 
             foreach (var node in nodesInPath)
             {
                 var predecessorPaths = node.GetPredecessors(treeDef)
-                    .Where(p => p.path != null)
+                    .Where(p => p.path != string.Empty)
                     .Select(p => p.path)
                     .Distinct();
 
                 foreach (var predPath in predecessorPaths)
                 {
-                    if (predPath.IsPathExclusiveWith(selectedPaths) ||
-                        selectedPaths.Any(sp => sp.IsPathExclusiveWith(predPath)))
+                    var Path = this.TreeDef.GetPath(predPath);
+                    if (Path != null && Path.IsPathExclusiveWith(selectedPaths)
+                        || selectedPaths.Any(sp => sp.IsPathExclusiveWith(Path)))
                     {
                         return false;
                     }
@@ -422,7 +426,7 @@ namespace Talented
             return selectedPaths != null && selectedPaths.Count > 0;
         }
 
-        public abstract void OnPathSelected(TalentPathDef path);
+        public abstract void OnPathSelected(TalentPath path);
 
         #endregion
  
@@ -565,7 +569,7 @@ namespace Talented
             Scribe_Values.Look(ref availablePoints, "availablePoints", 0);
             Scribe_Collections.Look(ref unlockedUpgrades, "unlockedUpgrades", LookMode.Def);
             Scribe_Collections.Look(ref unlockedNodes, "unlockedNodes", LookMode.Def);
-            Scribe_Collections.Look(ref selectedPaths, "selectedPaths", LookMode.Def);
+            Scribe_Collections.Look(ref selectedPaths, "selectedPaths", LookMode.Deep);
             Scribe_Collections.Look(ref nodeProgress, "nodeProgress", LookMode.Def, LookMode.Value);
             Scribe_Collections.Look(
                 ref activeEffects,
@@ -578,7 +582,7 @@ namespace Talented
             {
                 if (unlockedUpgrades == null) unlockedUpgrades = new HashSet<TalentDef>();
                 if (unlockedNodes == null) unlockedNodes = new HashSet<TalentTreeNodeDef>();
-                if (selectedPaths == null) selectedPaths = new HashSet<TalentPathDef>();
+                if (selectedPaths == null) selectedPaths = new HashSet<TalentPath>();
                 if (nodeProgress == null) nodeProgress = new Dictionary<TalentTreeNodeDef, int>();
                 if (activeEffects == null) activeEffects = new Dictionary<TalentDef, List<UpgradeEffect>>();
 

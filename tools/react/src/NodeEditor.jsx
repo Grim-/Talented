@@ -29,7 +29,8 @@ const NodeEditor = ({
   treeDisplayStrategy, setTreeDisplay, 
   pointStrategy, setTreePointStrategy,
   treeHandler, setTreeHandler,
-  bgImage, setBGImage
+  bgImage, setBGImage,
+  useAspectRatioPreview, SetUseAspectRatioPreview
  }) => {
   //useLockBodyScroll();
   //state
@@ -122,7 +123,10 @@ const NodeEditor = ({
       const fileContents = await Promise.all(
         Array.from(event.target.files).map(file => file.text())
       );
-      const { nodes: newNodes, paths: newPaths } = importFromXml(fileContents);
+
+      console.log(fileContents);
+
+      const { nodes: newNodes, paths: newPaths } = importFromXml(fileContents, setTreeName, setTreeSize, setTreeHandler, setTreeDisplay);
       clearSession(setNodes, setPaths, true);
       setNodes([...nodes, ...newNodes]);
       setPaths([...paths, ...newPaths]);
@@ -351,7 +355,12 @@ const NodeEditor = ({
       id="mainContent"
       className="w-full h-screen bg-gray-600 border-b border-gray-700 relative p-4"
       onContextMenu={handleContextMenu}
+      style={{ isolation: 'isolate' }}
     >
+      <GridOverlay 
+        enabled={canvasSettings.lockToGrid}
+        gridSize={canvasSettings.gridSize || 53}
+      />
       {/* Top toolbar */}
       <Toolbar
         treeName={treeName || ''}
@@ -440,6 +449,7 @@ const NodeEditor = ({
           height={treeSize?.height}
           nodes={nodes}
           key={bgImage || 'no-image'}
+          useAspectRatioPreview={useAspectRatioPreview}
         />
       {/* Main canvas area */}
       <div
@@ -454,6 +464,8 @@ const NodeEditor = ({
           onSettingChange={handleSettingChange}
           initialSettings={canvasSettings}
           setBGImage={setBGImage}
+          useAspectRatioPreview={useAspectRatioPreview}
+          setUseAspectRatioPreview={SetUseAspectRatioPreview}
         />
         <ChangelogPanel />
         <ConnectionsDisplay
@@ -474,10 +486,6 @@ const NodeEditor = ({
           onContextMenuClick={handleNodeContextMenu}
           gameWidth={treeSize.x}
           gameHeight={treeSize.y}
-        />
-        <GridOverlay 
-          enabled={canvasSettings.lockToGrid}
-          gridSize={canvasSettings.gridSize || 20}
         />
       </div>
 

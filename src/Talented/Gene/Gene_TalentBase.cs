@@ -292,6 +292,8 @@ namespace Talented
             Scribe_Values.Look(ref talentPoints, "talentPoints", 0);
             Scribe_Values.Look(ref currentLevel, "currentLevel", 1);
             Scribe_Values.Look(ref currentExperience, "currentExperience", 0f);
+
+            Scribe_Collections.Look(ref treeHandlers, "treeHandlers", LookMode.Value, LookMode.Deep);
         }
 
     }

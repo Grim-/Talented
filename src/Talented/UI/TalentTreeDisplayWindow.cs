@@ -126,7 +126,7 @@ namespace Talented
                     pathRect.y -= borderThickness;
                     pathRect.width += 4;
                     pathRect.height += 4;
-                    GUI.color = node.path.pathColor;
+                    GUI.color = Color.yellow;
                     GUI.DrawTexture(pathRect, skin.NodeTexture);
                 }
 
@@ -161,7 +161,8 @@ namespace Talented
             {
                 if (node.BelongsToUpgradePath)
                 {
-                    GUI.color = new Color(node.path.pathColor.r, node.path.pathColor.g, node.path.pathColor.b, 0.1f);
+                    TalentPath path = this.treeHandler.TreeDef.GetPath(node.path);
+                    GUI.color = new Color(path.pathColor.r, path.pathColor.g, path.pathColor.b, 0.1f);
                 }
                 else
                 {
@@ -226,10 +227,12 @@ namespace Talented
             if (!Widgets.ButtonInvisible(nodeRect))
                 return;
 
-            if (node.BelongsToUpgradePath && node.path != null && !treeHandler.IsPathSelected(node.path))
+            TalentPath nodePath = this.treeDef.GetPath(node.path);
+
+            if (node.BelongsToUpgradePath && nodePath != null && !treeHandler.IsPathSelected(nodePath))
             {
                 HandlePathSelection(node);
-                if (treeHandler.IsPathSelected(node.path))
+                if (treeHandler.IsPathSelected(nodePath))
                 {
                     HandleSuccessfulUnlock(node);
                 }
@@ -266,10 +269,12 @@ namespace Talented
         }
         private void HandlePathSelection(TalentTreeNodeDef node)
         {
-            if (node.BelongsToUpgradePath && node.path != null &&
-                !treeHandler.IsPathSelected(node.path) && treeHandler.CanSelectPath(node.path))
+            TalentPath nodePath = this.treeDef.GetPath(node.path);
+
+            if (node.BelongsToUpgradePath && nodePath != null &&
+                !treeHandler.IsPathSelected(nodePath) && treeHandler.CanSelectPath(nodePath))
             {
-                UnlockResult result = treeHandler.SelectPath(node.path);
+                UnlockResult result = treeHandler.SelectPath(nodePath);
                 if (result.Success)
                 {
                     var predecessors = node.GetPredecessors(treeDef)
@@ -286,7 +291,7 @@ namespace Talented
                             color = skin.unlockedNodeColor
                         });
                     }
-                    Messages.Message($"Selected {node.path.defName} upgrade path.", MessageTypeDefOf.NeutralEvent);
+                    Messages.Message($"Selected {node.path} upgrade path.", MessageTypeDefOf.NeutralEvent);
                 }
                 else
                 {
@@ -382,10 +387,12 @@ namespace Talented
                 tooltip += $"\nFully Unlocked: {isFullyUnlocked}";
                 tooltip += $"\nCan Unlock Next: {canUnlockResult.Success}";
 
-                if (node.BelongsToUpgradePath)
+
+                TalentPath nodePath = treeDef.GetPath(node.path);
+                if (node.BelongsToUpgradePath && nodePath != null)
                 {
-                    tooltip += $"\nPath: {node.path.defName}";
-                    tooltip += $"\nPath Selected: {treeHandler.IsPathSelected(node.path)}";
+                    tooltip += $"\nPath: {node.path}";
+                    tooltip += $"\nPath Selected: {treeHandler.IsPathSelected(nodePath)}";
                 }
             }
 
@@ -462,6 +469,7 @@ namespace Talented
 
             for (int i = 0; i < numberOfLinks; i++)
             {
+                matrixBackup = GUI.matrix;
                 float progress = i / (float)(numberOfLinks - 1);
                 Vector2 position = Vector2.Lerp(start, end, progress);
 
@@ -472,9 +480,9 @@ namespace Talented
                     skin.connectionLinkSize
                 );
 
-                GUI.matrix = matrixBackup;
                 GUIUtility.RotateAroundPivot(angle, position);
                 GUI.DrawTexture(linkRect, skin.ConnectionTexture);
+                GUI.matrix = matrixBackup;
             }
 
             GUI.color = Color.white;

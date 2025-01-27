@@ -36,7 +36,7 @@ export class Node {
     
     static fromXmlDef = (nodeDef) => {
         const position = nodeDef.getElementsByTagName("position")[0]?.textContent || "(0,0)";
-        const [x, y] = position.replace(/[()]/g, '').split(',').map(n => parseFloat(n.trim()) * 50);
+        const [x, y] = position.replace(/[()]/g, '').split(',').map(n => parseFloat(n.trim()));
         
         const node = new Node(
             nodeDef.getElementsByTagName("defName")[0].textContent,
@@ -127,7 +127,8 @@ export class Node {
                         top: `${this.y}px`,
                         width: expanded ? `${this.width + 210}px` : `${this.width + 20}px`,
                         height: expanded ? `${this.height + 210}px` : `${this.height}px`,
-                        transition: 'height 0.2s ease-in-out'
+                        transition: 'height 0.2s ease-in-out',
+                        zIndex: 100
                     }}
                     onMouseDown={(e) => {
                         // Start drag or other interaction

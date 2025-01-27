@@ -16,8 +16,10 @@ function App() {
 
   const [treeDisplayStrategy, setTreeDisplay] = useState('FixedPosition');
   const [pointStrategy, setTreePointStrategy] = useState('PerLevel');
-  const [treeHandler, setTreeHandler] = useState('ActiveTreeHandler');
+  const [treeHandler, setTreeHandler] = useState('Talented.ActiveTreeHandler');
   const [bgImage, setBGImage] = useState(null);
+  const [useAspectRatioPreview, SetUseAspectRatioPreview] = useState(true);
+
 
   return (
     <Router basename="/">
@@ -81,6 +83,8 @@ function App() {
               setBGImage={setBGImage}
               treeSkinDefName={treeSkinDefName}
               setTreeSkinDefName={setTreeSkinDefName}
+              useAspectRatioPreview={useAspectRatioPreview}
+              SetUseAspectRatioPreview={SetUseAspectRatioPreview}
             />
           ) : (
             <DefManager /> 

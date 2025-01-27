@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Node } from './Node';
+import GridOverlay from './GridOverlay';
 
 const NodeDisplay = ({ 
   nodes, 

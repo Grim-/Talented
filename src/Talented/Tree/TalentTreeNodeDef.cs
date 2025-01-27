@@ -10,7 +10,7 @@ namespace Talented
         public IntVec2 position;
         public List<TalentTreeNodeDef> connections;
         public NodeType type = NodeType.Normal;
-        public TalentPathDef path;
+        public string path;
         public List<BranchPathData> branchPaths;
 
         public List<NodeUnlockRuleDef> unlockRules;

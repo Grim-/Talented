@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Settings, X, Image as ImageIcon, Upload, Trash2 } from 'lucide-react';
 
-const CanvasSettings = ({ onSettingChange, initialSettings = {}, setBGImage }) => {
+const CanvasSettings = ({ onSettingChange, initialSettings = {}, setBGImage, useAspectRatioPreview, setUseAspectRatioPreview }) => {
   const [isVisible, setIsVisible] = useState(false);
   const fileInputRef = useRef(null);
   const [settings, setSettings] = useState({
@@ -124,7 +124,17 @@ const CanvasSettings = ({ onSettingChange, initialSettings = {}, setBGImage }) =
 
             <div className="border-t border-gray-700 my-4"></div>
 
-            {/* Existing Settings */}
+            {/* Aspect Ratio Preview Toggle */}
+            <label className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={useAspectRatioPreview}
+                onChange={() => setUseAspectRatioPreview(!useAspectRatioPreview)}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-300">Maintain Aspect Ratio</span>
+            </label>
+
             <label className="flex items-center space-x-3">
               <input
                 type="checkbox"

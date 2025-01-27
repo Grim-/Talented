@@ -25,7 +25,7 @@ export const Toolbar = ({
 
   return (
     <>
-      <div className="fixed top-20 right-4 flex space-x-2">
+      <div className="fixed top-20 right-16 flex space-x-2">
         <input
           id="sessionLoad"
           type="file"
@@ -50,14 +50,12 @@ export const Toolbar = ({
         
         <DropdownButton
           primary={{
-            label: "Export Tree + Paths in one file.",
+            label: "Export",
             action: () => { 
               onExportXml();
             }
           }}
           options={[
-            { label: "Export Tree", action: () => onExportXml() },
-            { label: "Export Paths", action: () => exportDefEditorDefs('PATHS') }
           ]}
         />
 

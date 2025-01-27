@@ -107,12 +107,10 @@ const DefManager = () => {
           />
           <DropdownButton
             primary={{
-              label: "Export ALL",
-              action: () => exportDefEditorDefs()
+              label: "Export ALL Talents",
+              action: () => exportDefEditorDefs('TALENTS') 
             }}
             options={[
-              { label: "Export Talents", action: () => exportDefEditorDefs('TALENTS') },
-              { label: "Export Paths", action: () => exportDefEditorDefs('PATHS') }
             ]}
           />
           <input 

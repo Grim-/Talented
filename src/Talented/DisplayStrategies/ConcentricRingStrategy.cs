@@ -136,7 +136,12 @@ namespace Talented
             var groups = new Dictionary<string, List<TalentTreeNodeDef>>();
             foreach (var node in nodes.FindAll(n => n.BelongsToUpgradePath))
             {
-                string key = node.path.defName;
+                if (string.IsNullOrEmpty(node.path))
+                {
+                    continue;
+                }
+
+                string key = node.path;
                 if (!groups.ContainsKey(key))
                     groups[key] = new List<TalentTreeNodeDef>();
                 groups[key].Add(node);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const TreeSizePreview = ({ width, height, bgImage = '' }) => {
+const TreeSizePreview = ({ width, height, bgImage = '', useAspectRatioPreview = false }) => {
   const [visible, setVisible] = useState(true);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [currentBgImage, setCurrentBgImage] = useState('');
@@ -49,16 +49,30 @@ const TreeSizePreview = ({ width, height, bgImage = '' }) => {
 
   if (!width || !height || !containerSize.width || !containerSize.height) return null;
 
-  const scaleX = (containerSize.width) / width;
-  const scaleY = (containerSize.height) / height;
-  const scale = Math.min(scaleX, scaleY, 2);
+  // Increase base display size to account for larger web app nodes
+  const BASE_DISPLAY_WIDTH = 600; // Doubled from previous 600
+  const WEB_APP_SCALE = 1.5; // Additional scaling factor for web app nodes
+
+  // Calculate base scale with the web app scaling factor
+  const baseWidthScale = (BASE_DISPLAY_WIDTH / width) * WEB_APP_SCALE;
+
+  let scale;
+  if (useAspectRatioPreview) {
+    // In aspect ratio mode, use fixed width scale with a higher cap
+    scale = Math.min(baseWidthScale, 4); // Increased cap to 4 to allow for larger scaling
+  } else {
+    // In regular mode, use container-based scaling but with web app scale factor
+    const scaleX = (containerSize.width / width) * WEB_APP_SCALE;
+    const scaleY = (containerSize.height / height) * WEB_APP_SCALE;
+    scale = Math.min(scaleX, scaleY, 4); // Increased cap to 4
+  }
 
   const scaledWidth = width * scale;
   const scaledHeight = height * scale;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div className="relative" style={{ maxHeight: '100vh' }}>
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-1">
+      <div className="relative" style={{ maxHeight: '100vh', zIndex: 1 }}>
         {/* Size label */}
         <div 
           className={`absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-100/50 text-white px-2 py-0.5 rounded text-xs

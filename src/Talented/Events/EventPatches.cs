@@ -24,7 +24,7 @@ namespace Talented
             public static DamageWorker.DamageResult Postfix(DamageWorker.DamageResult __result, DamageInfo dinfo, Pawn pawn)
             {
                 if (Current.ProgramState != ProgramState.Playing) return __result;
-                DebugDamage(__result, dinfo, pawn);
+                //DebugDamage(__result, dinfo, pawn);
                 return EventManager.RaiseDamageDealt(pawn, dinfo.Instigator, dinfo, __result);
             }
 

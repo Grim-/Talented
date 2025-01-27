@@ -75,9 +75,9 @@ namespace Talented
             return unlockResult;
         }
 
-        public override void OnPathSelected(TalentPathDef path)
+        public override void OnPathSelected(TalentPath path)
         {
-            Log.Message("Talented.Tree.Log.PathSelected".Translate(treeDef.defName, path.defName, unspentLevels));
+            Log.Message("Talented.Tree.Log.PathSelected".Translate(treeDef.defName, path.name, unspentLevels));
             if (unspentLevels > 0)
             {
                 availablePoints += unspentLevels;

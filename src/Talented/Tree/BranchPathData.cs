@@ -4,7 +4,7 @@ namespace Talented
 {
     public class BranchPathData
     {
-        public TalentPathDef path;
+        public TalentPath path;
         public List<TalentTreeNodeDef> nodes;
     }
 }

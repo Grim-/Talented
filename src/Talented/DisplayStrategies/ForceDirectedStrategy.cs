@@ -143,17 +143,17 @@ namespace Talented
                 forces[node] = Vector2.zero;
 
                 // Calculate path centers
-                if (node.path != null)
+                if (!string.IsNullOrEmpty(node.path))
                 {
                     var nodePos = new Vector2(positions[node].x, positions[node].y);
-                    if (pathCenters.ContainsKey(node.path.defName))
+                    if (pathCenters.ContainsKey(node.path))
                     {
-                        var (pos, count) = pathCenters[node.path.defName];
-                        pathCenters[node.path.defName] = (pos + nodePos, count + 1);
+                        var (pos, count) = pathCenters[node.path];
+                        pathCenters[node.path] = (pos + nodePos, count + 1);
                     }
                     else
                     {
-                        pathCenters[node.path.defName] = (nodePos, 1);
+                        pathCenters[node.path] = (nodePos, 1);
                     }
                 }
             }
@@ -199,9 +199,9 @@ namespace Talented
                 }
 
                 // Apply path cohesion force
-                if (node1.path != null && pathCenters.ContainsKey(node1.path.defName))
+                if (!string.IsNullOrEmpty(node1.path) && pathCenters.ContainsKey(node1.path))
                 {
-                    var pathCenter = pathCenters[node1.path.defName].position;
+                    var pathCenter = pathCenters[node1.path].position;
                     var toCenter = pathCenter - pos1;
                     forces[node1] += toCenter * PATH_COHESION_FORCE;
                 }

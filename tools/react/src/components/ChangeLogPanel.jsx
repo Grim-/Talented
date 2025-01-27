@@ -2,36 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { ClipboardList } from 'lucide-react';
 import FloatingPanel from './FloatingPanel';
 
-const CURRENT_VERSION = '1.1.0';
+const CURRENT_VERSION = '1.1.1';
 
 const ChangelogPanel = () => {
   const [autoShow, setAutoShow] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen this version
     const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
     if (lastSeenVersion !== CURRENT_VERSION) {
       setAutoShow(true);
-      // Update the last seen version
       localStorage.setItem('lastSeenChangelogVersion', CURRENT_VERSION);
     }
   }, []);
 
-  // Version history - newest first
   const changelog = [
     {
       version: '1.0.0',
       date: '23-01-2025',
-      changes: [
-        'Initial release',
-      ]
+      changes: ['Initial release']
     },
     {
-        version: '1.0.1',
-        date: '23-01-2025',
-        changes: [
-          'Fixed Def Editor Export bug',
-        ]
+      version: '1.0.1', 
+      date: '23-01-2025',
+      changes: ['Fixed Def Editor Export bug']
     },
     {
       version: '1.1.0',
@@ -41,13 +34,23 @@ const ChangelogPanel = () => {
         'Added custom background BG to Canvas Settings, scaled to preview area.',
         'More export bug squashing, added multiple export options.'
       ]
-  }
+    },
+    {
+      version: '1.1.1',
+      date: '27-01-2025',
+      changes: [
+        'Fixed GridOverlay Zindex issues',
+        'Removed TalentPathDefs, they are now baked into the TreeDef, TalentPathDefs still exist on the web app for convienence but any paths used in an exported tree are baked into the tree.',
+        'Updated Import to better handle nodes exported from other screens of various sizes.'
+      ]
+    }
   ];
 
   return (
     <FloatingPanel
       buttonIcon={ClipboardList}
-      buttonPosition="fixed right-4 top-46"
+      buttonPosition="right-4 top-20"
+      panelPosition="right-4 top-44"
       buttonTitle="View Changelog"
       title="Changelog"
       isInitiallyVisible={autoShow}
