@@ -11,25 +11,23 @@
               <value>1.05</value>
               <operation>Add</operation>
           </li>
-          <li>
-              <statDef>ArmorRating_Blunt</statDef>
-              <value>1.05</value>
-              <operation>Add</operation>
-          </li>
       </statEffects>
   </Talented.TalentDef>
 
   <Talented.TalentDef>
-    <defName>HardyPassive</defName>
-    <label>Hardy</label>
-    <levelRequired>0</levelRequired>
-    <pointCost>1</pointCost>
-    <statEffects>
-      <li>
-        <statDef>ArmorRating_Blunt</statDef>
-        <value>1.2</value>
-        <operation>Multiply</operation>
-      </li>
-    </statEffects>
+      <defName>HardyPassive</defName>
+      <label>Hardy</label>
+      <levelRequired>0</levelRequired>
+      <pointCost>1</pointCost>
+      <stackingStatEffect>
+        <maxRepeats>5</maxRepeats>
+          <effects>
+            <li>
+              <statDef>LifespanFactor</statDef>
+              <value>1.2</value>
+              <operation>Multiply</operation>
+            </li>
+        </effects>
+      </stackingStatEffect>
   </Talented.TalentDef>
 </Defs>

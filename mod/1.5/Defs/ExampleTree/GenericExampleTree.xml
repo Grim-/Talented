@@ -2,6 +2,14 @@
 <Defs>
   <Talented.TalentTreeDef>
     <defName>GenericExampleTree</defName>
+    <treeName>A Generic Example Tree</treeName>
+    <!-- treeToolbarName variables
+    //0 Tree name
+    //1 Level
+    //2 Points Available
+    //3 Points Spent
+    //4 Pawn Name -->
+    <treeToolbarName>{0} Level({1}) Points({2})</treeToolbarName>
     <dimensions>(600,400)</dimensions>
     <handlerClass>Talented.ActiveTreeHandler</handlerClass>
     <skin>DefaultTreeSkin</skin>
@@ -48,6 +56,7 @@
     <type>Start</type>
     <upgrades>
       <li>HardyPassive</li>
+      <li>ArmorUpgrade</li>
     </upgrades>
     <connections>
       <li>Node_1737940031273_8757</li>
@@ -117,6 +126,7 @@
     <label>New Node</label>
     <position>(276,86)</position>
     <type>Normal</type>
+        <style>CapstoneNodeStyle</style>
     <upgrades>
       <li>ArmyOfTheDeadUltimate</li>
     </upgrades>
@@ -156,6 +166,7 @@
     <label>New Node</label>
     <position>(167,90)</position>
     <type>Normal</type>
+    <style>CapstoneNodeStyle</style>
     <upgrades>
       <li>CannonBarrageUltimate</li>
     </upgrades>

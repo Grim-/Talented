@@ -16,6 +16,7 @@ namespace Talented
         public List<AbilityEffectProperties> abilityEffects;
         public List<OrganEffectProperties> organEffects;
         public List<StatEffectProperties> statEffects;
+        public StackingStatEffectProperties stackingStatEffect;
 
         public string DescriptionString;
 
@@ -30,6 +31,7 @@ namespace Talented
             }
         }
 
+
         private string GenerateDefaultDescription()
         {
             var description = new List<string>();
@@ -38,10 +40,9 @@ namespace Talented
             {
                 foreach (var effect in hediffEffects)
                 {
-                    description.Add($"Adds {effect.hediffDef?.label ?? "unknown hediff"}");
+                    description.Add($"Adds {effect.hediffDef?.label ?? "unknown hediff"}  \r\nDescription: {effect.hediffDef?.description}");
                 }
             }
-
             if (abilityEffects?.Count > 0)
             {
                 foreach (var effect in abilityEffects)
@@ -50,12 +51,11 @@ namespace Talented
                     {
                         foreach (var ability in effect.abilities)
                         {
-                            description.Add($"Grants {ability?.label ?? "unknown ability"}");
+                            description.Add($"Grants {ability?.label ?? "unknown ability"} \r\nDescription: {ability.description}");
                         }
                     }
                 }
             }
-
             if (organEffects?.Count > 0)
             {
                 foreach (var effect in organEffects)
@@ -66,10 +66,22 @@ namespace Talented
                     description.Add($"{actionType} {hediffEffect} to {organName}");
                 }
             }
+            if (stackingStatEffect != null)
+            {
+                foreach (var effect in stackingStatEffect.effects)
+                {
+                    string statName = effect.statDef?.label ?? "unknown stat";
+                    string operation = effect.operation.ToString().ToLower();
 
+                    for (int i = 0; i < stackingStatEffect.currentRepeats; i++)
+                    {
+                        description.Add($"{operation}s {statName} by {effect.value} \r\n");
+                    }
+                    
+                }
+            }
             if (description.Count == 0)
                 description.Add("No effects");
-
             return string.Join("\n", description);
         }
 
@@ -107,6 +119,28 @@ namespace Talented
                     effects.Add(effect);
                 }
 
+            if (stackingStatEffect != null)
+            {
+                var stackingEffect = new StackingStatEffect
+                {
+                    maxLevel = stackingStatEffect.maxRepeats,
+                    currentLevel = 1
+                };
+
+                foreach (var props in stackingStatEffect.effects)
+                {
+                    stackingEffect.effects.Add(new StatEffect
+                    {
+                        statDef = props.statDef,
+                        value = props.value,
+                        operation = props.operation,
+                        parentUpgrade = this
+                    });
+                }
+
+                effects.Add(stackingEffect);
+            }
+
             return effects;
         }
     }
@@ -115,6 +149,65 @@ namespace Talented
         public StatDef statDef;
         public float value;
         public StatModifierOperation operation = StatModifierOperation.Add;
+
+    }
+    public class StackingStatEffect : UpgradeEffect
+    {
+        public List<StatEffect> effects = new List<StatEffect>();
+        public int currentLevel = 0;
+        public int maxLevel;
+        public bool repeatable = true;
+
+        protected override bool IsEffectAppliedTo(Pawn pawn)
+        {
+            return isActive;
+        }
+
+        protected override void Apply(Pawn pawn)
+        {
+            base.Apply(pawn);
+            foreach (var effect in effects)
+            {
+                var scaledEffect = new StatEffect
+                {
+                    statDef = effect.statDef,
+                    value = effect.value,
+                    operation = effect.operation,
+                    parentUpgrade = effect.parentUpgrade
+                };
+                scaledEffect.TryApply(pawn);
+            }
+        }
+
+        protected override void Remove(Pawn pawn)
+        {
+            foreach (var effect in effects)
+            {
+                var scaledEffect = new StatEffect
+                {
+                    statDef = effect.statDef,
+                    value = effect.value,
+                    operation = effect.operation,
+                    parentUpgrade = effect.parentUpgrade
+                };
+                scaledEffect.TryRemove(pawn);
+            }
+        }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref currentLevel, "currentLevel", 1);
+            Scribe_Values.Look(ref maxLevel, "maxLevel", 1);
+            Scribe_Values.Look(ref repeatable, "repeatable", true);
+            Scribe_Collections.Look(ref effects, "effects", LookMode.Deep);
+        }
+    }
+    public class StackingStatEffectProperties
+    {
+        public int maxRepeats = 1;
+        public int currentRepeats = 1;
+        public List<StatEffectProperties> effects;
     }
 
     public class OrganEffectProperties

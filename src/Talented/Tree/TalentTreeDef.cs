@@ -8,6 +8,28 @@ namespace Talented
     public class TalentTreeDef : Def
     {
         public string treeName = "A Talent Tree";
+
+        //0 Tree name
+        //1 Level
+        //2 Points Available
+        //3 Points Spent
+        //4 Pawn Name
+        public string treeToolbarName = "{0} Level({1}) Points({2})";
+
+
+
+        public string GetFormattedTreeToolbarName(string treeName, int level, int pointsAvailable, int pointsSpent, string pawnLabel)
+        {
+            return String.Format(treeToolbarName, new object[]
+            {
+                treeName,
+                level,
+                pointsAvailable,
+                pointsSpent,
+                pawnLabel
+            });
+        }
+
         public List<TalentTreeNodeDef> nodes;
         public IntVec2 dimensions;
         public Type handlerClass = typeof(ActiveTreeHandler);

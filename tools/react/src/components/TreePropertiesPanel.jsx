@@ -11,6 +11,37 @@ const CustomOption = ({ innerProps, label, data }) => (
     </Tooltip>
   </div>
 );
+export const customSelectStyles = {
+  control: (base) => ({
+    ...base,
+    background: '#1f2937',
+    borderColor: '#4b5563',
+    '&:hover': { borderColor: '#6b7280' },
+  }),
+  menu: (base) => ({
+    ...base,
+    background: '#1f2937',
+    border: '1px solid #4b5563',
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused ? '#374151' : '#1f2937',
+    color: '#d1d5db',
+    '&:hover': { backgroundColor: '#374151' },
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: '#d1d5db',
+  }),
+  input: (base) => ({
+    ...base,
+    color: '#d1d5db',
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: '#9ca3af',
+  }),
+};
 
 const TreePropertiesPanel = ({
   treeName, setTreeName,
@@ -29,37 +60,7 @@ const TreePropertiesPanel = ({
   const inputClasses = "w-full p-1.5 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-sm bg-gray-800 border-gray-600 text-gray-300";
   const labelClasses = "text-xs font-medium text-gray-300 flex items-center gap-1";
 
-  const customSelectStyles = {
-    control: (base) => ({
-      ...base,
-      background: '#1f2937',
-      borderColor: '#4b5563',
-      '&:hover': { borderColor: '#6b7280' },
-    }),
-    menu: (base) => ({
-      ...base,
-      background: '#1f2937',
-      border: '1px solid #4b5563',
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-      color: '#d1d5db',
-      '&:hover': { backgroundColor: '#374151' },
-    }),
-    singleValue: (base) => ({
-      ...base,
-      color: '#d1d5db',
-    }),
-    input: (base) => ({
-      ...base,
-      color: '#d1d5db',
-    }),
-    placeholder: (base) => ({
-      ...base,
-      color: '#9ca3af',
-    }),
-  };
+
 
   const displayOptions = [
     { value: "FixedPosition", label: "Manual Position", description: "Manually position each node in the talent tree" },

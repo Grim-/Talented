@@ -20,8 +20,6 @@
     -->
 
   <!-- Node appearance -->
-  <nodeTexturePath>UI/Tree/node</nodeTexturePath>
-  <nodeSize>50</nodeSize>
   <nodeSpacing>5</nodeSpacing>
 
   <!-- Connection appearance -->

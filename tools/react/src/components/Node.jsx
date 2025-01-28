@@ -4,6 +4,15 @@ import { ArrowLeftRight, Trash, ChevronDown, ChevronUp } from 'lucide-react';
 import NodeProperties from './NodePropertiesDisplay';
 import { Tooltip } from 'react-tooltip';
 
+
+
+export const NodeStyleTypes = [
+    'DefaultNodeStyle',
+    'CapstoneNodeStyle', 
+    'UltimateNodeStyle'
+  ];
+
+
 export class Node {
     constructor(id = null, label = "New Node", type = 'Normal', x = 0, y = 0, width = 120, height = 70) {
         this.id = id == null ? `node_${Date.now()}` : id;
@@ -28,6 +37,7 @@ export class Node {
         this.descriptionString = '';
         this.levelRequired = 0;
         this.canDrag = true;
+        this.style = 'DefaultNodeStyle';
     }
 
     static NewId = () => {

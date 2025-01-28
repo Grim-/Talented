@@ -48,7 +48,7 @@ export const ListEditor = ({
 
       {/* Fixed action buttons */}
       <div className="flex space-x-2 pt-1">
-        <div className="flex-1">
+        <div className="flex-2">
           <DefSelector
             defType={defType}
             onChange={(e) => onItemAdd(propName, e)}
@@ -56,7 +56,7 @@ export const ListEditor = ({
         </div>
         <button
           onClick={() => onItemAdd(propName)}
-          className="flex-1 p-1.5 bg-blue-600 text-gray-200 rounded hover:bg-blue-700 
+          className="flex-1 p-1.5 bg-gray-600 text-gray-200 rounded hover:bg-blue-700 
             transition-colors text-sm"
         >
           Add Empty

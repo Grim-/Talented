@@ -9,12 +9,6 @@ namespace Talented
 {
     public class Gene_TalentBase : Gene_BasicResource, IExperienceHolder
     {
-        protected PassiveTreeHandler passiveTree;
-        protected ActiveTreeHandler activeTree;
-
-        public BaseTreeHandler PassiveTree => passiveTree;
-        public BaseTreeHandler ActiveTree => activeTree;
-
         protected int talentPoints = 0;
         public int TalentPointsAvailable => talentPoints;
 
@@ -97,10 +91,17 @@ namespace Talented
         protected virtual void InitializeTrees()
         {
             if (pawn == null)
-                throw new ArgumentNullException(nameof(pawn), "Pawn cannot be null when initializing trees");
+            {
+                Log.Error("Pawn cannot be null when initializing trees");
+                return;
+            }
 
             if (TalentedGeneDef.TalentTrees == null || !TalentedGeneDef.TalentTrees.Any())
-                throw new InvalidOperationException("No tree definitions found");
+            {
+                Log.Error("No tree definitions found");
+                return;
+            }
+                
 
             foreach (var treeDef in TalentedGeneDef.TalentTrees)
             {
@@ -242,10 +243,6 @@ namespace Talented
             }
         }
 
-        public bool CanAffordUpgrade(TalentDef upgrade)
-        {
-            return HasTalentPointsAvailable(upgrade.pointCost);
-        }
 
         public bool HasTalentPointsAvailable(int amount)
         {
@@ -259,6 +256,7 @@ namespace Talented
                 talentPoints -= amount;
             }
         }
+
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var gizmo in base.GetGizmos())
@@ -281,14 +279,26 @@ namespace Talented
                     defaultDesc = "Fill Experience Bar (Debug)",
                     action = () => GainExperience(MaxExperienceForLevel(currentLevel) - currentExperience - 0.1f),
                 };
+
+                yield return new Command_Action
+                {
+                    defaultLabel = $"DEV: Refund all trees points",
+                    defaultDesc = "Refund Spent Points",
+                    action = () =>
+                    {
+                        foreach (var item in treeHandlers)
+                        {
+                            item.Value.ResetTree();
+                        }                
+                    },
+                };
+    
             }
         }
 
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Deep.Look(ref passiveTree, "passiveTree");
-            Scribe_Deep.Look(ref activeTree, "activeTree");
             Scribe_Values.Look(ref talentPoints, "talentPoints", 0);
             Scribe_Values.Look(ref currentLevel, "currentLevel", 1);
             Scribe_Values.Look(ref currentExperience, "currentExperience", 0f);

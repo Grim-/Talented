@@ -51,6 +51,7 @@ namespace Talented
             if (nodes == null || nodes.Count == 0)
                 return new Dictionary<TalentTreeNodeDef, Rect>();
 
+
             var nodePositions = new Dictionary<TalentTreeNodeDef, Rect>();
             var startNodes = FindStartNodes(nodes);
             var layoutTree = CreateLayoutTree(nodes);
@@ -71,8 +72,8 @@ namespace Talented
                 nodePositions[startNodes[0]] = new Rect(
                     centerX - (nodeSize / 2),
                     startY,
-                    nodeSize,
-                    nodeSize);
+                    GetNodeSize(startNodes[0]),
+                    GetNodeSize(startNodes[0]));
             }
             else if (startNodes.Count > 1)
             {
@@ -92,6 +93,7 @@ namespace Talented
             var maxChildrenPerLevel = new Dictionary<int, int>();
             foreach (var node in nodes)
             {
+                nodeSize = GetNodeSize(node);
                 if (node.connections != null)
                 {
                     children[node] = new List<TalentTreeNodeDef>(node.connections);
@@ -135,7 +137,7 @@ namespace Talented
                     nodesToPosition.Add(layoutNode.node);
                 }
 
-                // Handle branching for non-start nodes with adaptive spread
+                // Handle branching for non-start nodes
                 foreach (var node in nodes.Where(n => n.type != NodeType.Start))
                 {
                     if (!children.ContainsKey(node) || children[node].Count <= 1) continue;
@@ -224,7 +226,10 @@ namespace Talented
             FindLevel(node, 0);
             return level;
         }
-
+        private float GetNodeSize(TalentTreeNodeDef node)
+        {
+            return node.Style != null ? node.Style.nodeSize : 60f;
+        }
         private class LayoutNode
         {
             public TalentTreeNodeDef node;

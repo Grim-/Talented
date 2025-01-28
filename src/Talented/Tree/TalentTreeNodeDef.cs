@@ -11,6 +11,22 @@ namespace Talented
         public List<TalentTreeNodeDef> connections;
         public NodeType type = NodeType.Normal;
         public string path;
+        public NodeStyleDef style;
+
+        public NodeStyleDef Style
+        {
+            get
+            {
+                if (style == null)
+                {
+                    style = TalentedDefOf.DefaultNodeStyle;
+                }
+
+                return style;
+            }
+        }
+
+
         public List<BranchPathData> branchPaths;
 
         public List<NodeUnlockRuleDef> unlockRules;
@@ -44,6 +60,20 @@ namespace Talented
             return result;
         }
 
+        public int GetNodeMaxProgress()
+        {
+            if (upgrades == null)
+                return 0;
+
+            bool IsStackingStatEffect = upgrades.Any(x => x.stackingStatEffect != null);
+
+            if (IsStackingStatEffect)
+            {
+                return upgrades.Where(x => x.stackingStatEffect != null).FirstOrDefault().stackingStatEffect.maxRepeats;
+            }
+
+            return upgrades.Count;
+        }
 
         public IEnumerable<TalentTreeNodeDef> GetPredecessors(TalentTreeDef treeDef)
         {
@@ -55,9 +85,17 @@ namespace Talented
         {
             if (HasUpgrade(upgradeIndex))
             {
-                return GetUpgrade(upgradeIndex).pointCost;
+                TalentDef upgrade = GetUpgrade(upgradeIndex);
+                if (upgrade.stackingStatEffect != null)
+                {
+                    int currentLevel = upgrade.stackingStatEffect.currentRepeats;
+                    if (currentLevel < upgrade.stackingStatEffect.maxRepeats)
+                    {
+                        return upgrade.pointCost;
+                    }
+                }
+                return upgrade.pointCost;
             }
-
             return 0;
         }
         public string GetUpgradeLabel(int upgradeIndex)

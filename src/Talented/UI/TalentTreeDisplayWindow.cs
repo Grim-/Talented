@@ -80,6 +80,9 @@ namespace Talented
             absorbInputAroundWindow = false;
         }
 
+
+        private const float DefaultNodeSize = 50f;
+
         public override void DoWindowContents(Rect inRect)
         {
             DrawBackground(inRect);
@@ -87,18 +90,17 @@ namespace Talented
             Rect toolbarRect = new Rect(0f, 0f, inRect.width, ToolBarHeight);
             DrawToolbar(toolbarRect);
 
-            nodePositions = displayStrategy.PositionNodes(allNodes, inRect, skin.nodeSize, skin.nodeSpacing);
+            nodePositions = displayStrategy.PositionNodes(allNodes, inRect, DefaultNodeSize, skin.nodeSpacing);
             DrawConnections();
             DrawNodes();
         }
 
         private void DrawBackground(Rect inRect)
         {
-            if (skin?.BackgroundTexture)
+            if (skin?.BackgroundTexture != null)
             {
                 GUI.color = Color.white;
                 GUI.DrawTexture(inRect, skin.BackgroundTexture, skin.backgroundScaleMode);
-
             }
         }
 
@@ -109,13 +111,11 @@ namespace Talented
                 DrawNode(kvp.Key, kvp.Value);
             }
         }
-
         private void DrawNode(TalentTreeNodeDef node, Rect nodeRect)
         {
             UnlockResult canUnlockResult = treeHandler.ValidateUnlock(node);
             int currentProgress = treeHandler.GetNodeProgress(node);
             bool isFullyUnlocked = treeHandler.IsNodeFullyUnlocked(node);
-
             if (!node.hide || node.hide && node.MeetsVisibilityRequirements(treeHandler))
             {
                 if (node.BelongsToUpgradePath)
@@ -127,28 +127,47 @@ namespace Talented
                     pathRect.width += 4;
                     pathRect.height += 4;
                     GUI.color = Color.yellow;
-                    GUI.DrawTexture(pathRect, skin.NodeTexture);
+                    if (node.Style != null)
+                    {
+                        GUI.DrawTexture(pathRect, node.Style.GlowTexture);
+                    }
                 }
 
- 
+                // Draw glow effect if node has a style with glow
+                if (node.Style != null && node.Style.glowIntensity > 0)
+                {
+                    GUI.color = node.Style.borderColor * node.Style.glowIntensity;
+                    if (node.Style != null && node.Style.pulsing)
+                    {
+                        float pulse = Mathf.PingPong(Time.realtimeSinceStartup * node.Style.pulseSpeed, 1f);
+                        GUI.color *= pulse;
+                    }
+                    GUI.DrawTexture(nodeRect, node.Style.GlowTexture);
+                }
+
                 GUI.color = treeHandler.GetNodeColor(node, currentProgress);
-                GUI.DrawTexture(nodeRect, skin.NodeTexture);
+                if (node.Style != null)
+                {
+                    GUI.DrawTexture(nodeRect, node.Style.Texture);
+                }
                 GUI.color = Color.white;
 
                 if (currentProgress > 0 && !isFullyUnlocked)
                 {
-                    float progressPercentage = (float)currentProgress / node.upgrades.Count;
+                    float progressPercentage = (float)currentProgress / treeHandler.GetNodeMaxProgress(node);
                     Rect progressRect = nodeRect;
                     progressRect.height *= progressPercentage;
                     progressRect.y = nodeRect.yMax - progressRect.height;
                     GUI.color = Color.red;
-                    GUI.DrawTexture(progressRect, skin.NodeTexture);
+                    if (node.Style != null)
+                    {
+                        GUI.DrawTexture(nodeRect, node.Style.Texture);
+                    }
                     GUI.color = Color.white;
                 }
 
                 DrawNodeIconBG(node, nodeRect);
                 DrawNodeIcon(node, treeHandler, nodeRect);
-         
                 HandleNodeClick(nodeRect, node, canUnlockResult);
 
                 if (Mouse.IsOver(nodeRect))
@@ -168,48 +187,110 @@ namespace Talented
                 {
                     GUI.color = new Color(0.1f, 0.1f, 0.1f, 0.1f);
                 }
-
-                if (skin != null && skin.NodeTexture != null)
+                if (node.Style != null)
                 {
-                    GUI.DrawTexture(nodeRect, skin.NodeTexture);
+                    GUI.DrawTexture(nodeRect, node.Style.Texture);
                 }
-              
                 GUI.color = Color.white;
             }
         }
+        //private void DrawNode(TalentTreeNodeDef node, Rect nodeRect)
+        //{
+        //    UnlockResult canUnlockResult = treeHandler.ValidateUnlock(node);
+        //    int currentProgress = treeHandler.GetNodeProgress(node);
+        //    bool isFullyUnlocked = treeHandler.IsNodeFullyUnlocked(node);
+        //    if (!node.hide || node.hide && node.MeetsVisibilityRequirements(treeHandler))
+        //    {
+        //        if (node.BelongsToUpgradePath)
+        //        {
+        //            float borderThickness = 2;
+        //            Rect pathRect = nodeRect;
+        //            pathRect.x -= borderThickness;
+        //            pathRect.y -= borderThickness;
+        //            pathRect.width += 4;
+        //            pathRect.height += 4;
+        //            GUI.color = Color.yellow;
+        //            if (node.Style != null)
+        //            {
+        //                GUI.DrawTexture(pathRect, node.Style.Texture);
+        //            }
+        //        }
 
+        //        GUI.color = treeHandler.GetNodeColor(node, currentProgress);
+        //        if (node.Style != null) 
+        //        {
+        //            GUI.DrawTexture(nodeRect, node.Style.Texture);
+        //        }
+        //        GUI.color = Color.white;
+
+        //        if (currentProgress > 0 && !isFullyUnlocked)
+        //        {
+        //            float progressPercentage = (float)currentProgress / treeHandler.GetNodeMaxProgress(node);
+        //            Rect progressRect = nodeRect;
+        //            progressRect.height *= progressPercentage;
+        //            progressRect.y = nodeRect.yMax - progressRect.height;
+        //            GUI.color = Color.red;
+        //            if (node.Style != null)
+        //            {
+        //                GUI.DrawTexture(nodeRect, node.Style.Texture);
+        //            }
+        //            GUI.color = Color.white;
+        //        }
+        //        DrawNodeIconBG(node, nodeRect);
+        //        DrawNodeIcon(node, treeHandler, nodeRect);
+
+        //        HandleNodeClick(nodeRect, node, canUnlockResult);
+        //        if (Mouse.IsOver(nodeRect))
+        //        {
+        //            DrawNodeBadge(node, nodeRect, currentProgress);
+        //            DrawDescription(nodeRect, node, currentProgress);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (node.BelongsToUpgradePath)
+        //        {
+        //            TalentPath path = this.treeHandler.TreeDef.GetPath(node.path);
+        //            GUI.color = new Color(path.pathColor.r, path.pathColor.g, path.pathColor.b, 0.1f);
+        //        }
+        //        else
+        //        {
+        //            GUI.color = new Color(0.1f, 0.1f, 0.1f, 0.1f);
+        //        }
+        //        if (node.Style != null)
+        //        {
+        //            GUI.DrawTexture(nodeRect, node.Style.Texture);
+        //        }
+
+        //        GUI.color = Color.white;
+        //    }
+        //}
         private void DrawNodeBadge(TalentTreeNodeDef node, Rect nodeRect, int currentProgress)
         {
             int progress = treeHandler.GetNodeProgress(node);
-            string label = "";
+            int maxProgress = node.upgrades.Sum(upgrade => upgrade.stackingStatEffect?.maxRepeats ?? 1);
 
-            if (currentProgress > 0)
+            string label = "";
+            if (!node.upgrades.NullOrEmpty())
             {
-                var currentUpgrade = node.upgrades[currentProgress - 1];
-                label = $"{currentUpgrade.label}  {progress}/{node.upgrades.Count}";
-            }
-            else
-            {
-                label = $"{node.GetUpgradeLabel(progress)}  {progress}/{node.upgrades.Count}";
+                var upgrade = node.upgrades[0];
+                if (upgrade.stackingStatEffect != null)
+                {
+                    label = $"{upgrade.label} {progress}/{upgrade.stackingStatEffect.maxRepeats}";
+                }
+                else
+                {
+                    label = $"{upgrade.label} {progress}/{maxProgress}";
+                }
             }
 
             Vector2 labelSize = Text.CalcSize(label);
-
-            // Add padding to the label
             float padding = 4f;
             float xPos = nodeRect.x + (nodeRect.width - (labelSize.x + padding * 2)) / 2;
             float yPos = nodeRect.y - (labelSize.y + padding * 2) - 2f;
-
-            // Create badge rectangle with padding
             Rect badgeRect = new Rect(xPos, yPos, labelSize.x + padding * 2, labelSize.y + padding * 2);
-
-            // Optional: Draw a background for the badge
-            Widgets.DrawBoxSolid(badgeRect, new Color(0, 0, 0, 0.5f)); // Semi-transparent black background
-
-            // Draw border (optional)
+            Widgets.DrawBoxSolid(badgeRect, new Color(0, 0, 0, 0.5f));
             Widgets.DrawBox(badgeRect, 1, null);
-
-            // Draw label
             Text.Font = GameFont.Small;
             Rect labelRect = new Rect(
                 badgeRect.x + padding,
@@ -218,7 +299,6 @@ namespace Talented
                 labelSize.y
             );
             Widgets.Label(labelRect, label);
-
             Text.Font = GameFont.Small;
         }
 
@@ -258,14 +338,6 @@ namespace Talented
                     return;
                 }
             }
-            //else if (!treeHandler.IsNodeFullyUnlocked(node))
-            //{
-            //    int progress = treeHandler.GetNodeProgress(node);
-            //    if (node.HasUpgrade(progress + 1))
-            //    {
-            //        treeHandler.UnlockUpgrade(node.GetUpgrade(progress + 1));
-            //    }
-            //}
         }
         private void HandlePathSelection(TalentTreeNodeDef node)
         {
@@ -310,10 +382,7 @@ namespace Talented
             Texture2D iconToUse = null;
             if (!node.upgrades.NullOrEmpty())
             {
-                int progress = tree.GetNodeProgress(node);
-                int upgradeIndex = progress > 0 ? progress - 1 : 0;
-                TalentDef upgrade = node.GetUpgrade(upgradeIndex);
-
+                TalentDef upgrade = node.upgrades.FirstOrDefault();
                 if (upgrade != null && !string.IsNullOrEmpty(upgrade.uiIconPath))
                 {
                     iconToUse = ContentFinder<Texture2D>.Get(upgrade.uiIconPath);
@@ -344,50 +413,51 @@ namespace Talented
             UnlockResult canUnlockResult = treeHandler.ValidateUnlock(node);
             string tooltip = "";
 
-            // Show current upgrade description if any upgrades are unlocked
-            if (currentProgress > 0)
+            if (!node.upgrades.NullOrEmpty())
             {
-                var currentUpgrade = node.upgrades[currentProgress - 1];
-                tooltip = $"Current Upgrade: {currentUpgrade.label}\n{currentUpgrade.FormattedDescriptionString}";
-            }
-
-            // Show next upgrade description if not fully unlocked
-            if (currentProgress < node.upgrades.Count)
-            {
-                var nextUpgrade = node.upgrades[currentProgress];
-                if (!string.IsNullOrEmpty(tooltip))
+                var upgrade = node.upgrades[0];
+                if (upgrade.stackingStatEffect != null)
                 {
-                    tooltip += "\n\n";
+                    int currentLevel = currentProgress;
+                    tooltip = $"{upgrade.label} (Level {currentLevel})\n{upgrade.FormattedDescriptionString}";
+
+                    if (currentLevel < upgrade.stackingStatEffect.maxRepeats)
+                    {
+                        tooltip += $"\n\nNext Level: {currentLevel + 1}/{upgrade.stackingStatEffect.maxRepeats}";
+                    }
+                    else
+                    {
+                        tooltip += "\n\nMaximum level reached";
+                    }
                 }
-                tooltip += $"Next Upgrade: {nextUpgrade?.label ?? "Unknown"}\n{nextUpgrade?.FormattedDescriptionString ?? "Unknown upgrade"}";
-            }
-            else
-            {
-                tooltip += "\n\nAll upgrades unlocked";
-            }
-
-            tooltip += $"\n\nProgress: {currentProgress}/{node.upgrades.Count}";
-
-            // Show list of unlocked upgrades
-            if (currentProgress > 0)
-            {
-                tooltip += "\n\nUnlocked Upgrades:";
-                for (int i = 0; i < currentProgress; i++)
+                else
                 {
-                    tooltip += $"\n- {node.upgrades[i].label}";
+                    // Show current upgrade description if any upgrades are unlocked
+                    if (currentProgress > 0)
+                    {
+                        var currentUpgrade = node.upgrades[currentProgress - 1];
+                        tooltip = $"Current Upgrade: {currentUpgrade.label}\n{currentUpgrade.FormattedDescriptionString}";
+                    }
+                    // Show next upgrade description if not fully unlocked
+                    if (currentProgress < this.treeHandler.GetNodeMaxProgress(node))
+                    {
+                        var nextUpgrade = node.upgrades[currentProgress];
+                        if (!string.IsNullOrEmpty(tooltip))
+                        {
+                            tooltip += "\n\n";
+                        }
+                        tooltip += $"Next Upgrade: {nextUpgrade?.label ?? "Unknown"}\n{nextUpgrade?.FormattedDescriptionString ?? "Unknown upgrade"}";
+                    }
                 }
             }
 
             if (Prefs.DevMode)
             {
-                // Debug information
                 tooltip += "\n[== Debug Info ==]";
                 tooltip += $"\nNode: {node.defName}";
                 tooltip += $"\nType: {node.type}";
                 tooltip += $"\nFully Unlocked: {isFullyUnlocked}";
                 tooltip += $"\nCan Unlock Next: {canUnlockResult.Success}";
-
-
                 TalentPath nodePath = treeDef.GetPath(node.path);
                 if (node.BelongsToUpgradePath && nodePath != null)
                 {
@@ -403,7 +473,6 @@ namespace Talented
 
             TooltipHandler.TipRegion(nodeRect, tooltip);
         }
-
         private void DrawConnections()
         {
             foreach (var node in allNodes)
@@ -441,7 +510,7 @@ namespace Talented
             Color lineColor = GetPathStatusColor(from, to);
             Widgets.DrawLine(start, end, lineColor, skin.connectionThickness);
 
-            if (skin.showConnectionArrows && Vector2.Distance(start, end) > skin.nodeSize)
+            if (skin.showConnectionArrows && Vector2.Distance(start, end) > from.Style.nodeSize)
             {
                 DrawConnectionArrow(start, end, lineColor);
             }
@@ -481,14 +550,20 @@ namespace Talented
                 );
 
                 GUIUtility.RotateAroundPivot(angle, position);
-                GUI.DrawTexture(linkRect, skin.ConnectionTexture);
+
+                if (skin != null && skin.ConnectionTexture)
+                {
+                    GUI.DrawTexture(linkRect, skin.ConnectionTexture);
+                }
+
+           
                 GUI.matrix = matrixBackup;
             }
 
             GUI.color = Color.white;
             GUI.matrix = matrixBackup;
 
-            if (skin.showConnectionArrows && distance > skin.nodeSize)
+            if (skin.showConnectionArrows && distance > from.Style.nodeSize)
             {
                 DrawConnectionArrow(start, end, lineColor);
             }
@@ -537,9 +612,50 @@ namespace Talented
 
         private void DrawToolbar(Rect rect)
         {
-            //Widgets.DrawBoxSolidWithOutline(rect, Color.white * 0.2f, Color.white * 0.7f);
-            //Widgets.DrawMenuSection(rect);
             treeHandler?.DrawToolBar(rect);
+        }
+    }
+
+    public class NodeStyleDef : Def
+    {
+        public float nodeSize = 50f;
+        public string texturePath;
+        public string glowTexturePath;
+        public Color borderColor = Color.white;
+        public bool pulsing = false;
+        public float pulseSpeed = 1f;
+        public float glowIntensity = 1f;
+
+        private Texture2D cachedTexture;
+        private Texture2D cachedGlowTexture;
+
+        public Texture2D Texture
+        {
+            get
+            {
+                if (cachedTexture == null && !texturePath.NullOrEmpty())
+                {
+                    cachedTexture = ContentFinder<Texture2D>.Get(texturePath);
+                }
+                return cachedTexture;
+            }
+        }
+
+        public Texture2D GlowTexture
+        {
+            get
+            {
+                if (cachedGlowTexture == null && !glowTexturePath.NullOrEmpty())
+                {
+                    cachedGlowTexture = ContentFinder<Texture2D>.Get(glowTexturePath);
+                }
+                else if(cachedGlowTexture == null && glowTexturePath.NullOrEmpty())
+                {
+                    return Texture;
+                }
+
+                return cachedGlowTexture;
+            }
         }
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.NodeStyleDef>
+      <defName>DefaultNodeStyle</defName>
+      <texturePath>UI/Tree/node</texturePath>
+      <borderColor>(1.0, 1, 1)</borderColor>
+      <pulsing>true</pulsing>
+      <pulseSpeed>0.8</pulseSpeed>
+      <glowIntensity>1.5</glowIntensity>
+  </Talented.NodeStyleDef>
+
+  <Talented.NodeStyleDef>
+      <defName>CapstoneNodeStyle</defName>
+      <texturePath>UI/Tree/node_gold</texturePath>
+      <borderColor>(1.0, 1, 1)</borderColor>
+      <pulsing>true</pulsing>
+      <pulseSpeed>0.8</pulseSpeed>
+      <glowIntensity>1.5</glowIntensity>
+  </Talented.NodeStyleDef>
+
+  <Talented.NodeStyleDef>
+      <defName>UltimateNodeStyle</defName>
+      <texturePath>UI/Tree/Points</texturePath>
+      <borderColor>(1.0, 1, 1)</borderColor>
+      <pulsing>true</pulsing>
+      <pulseSpeed>0.8</pulseSpeed>
+      <glowIntensity>1.5</glowIntensity>
+  </Talented.NodeStyleDef>
+</Defs>

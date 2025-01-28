@@ -5,7 +5,7 @@ import DefSelector from './DefRefSelector';
 import ListEditor from './PropertiesList';
 import TagGrid from './TagGrid';
 import PathInput from './PathInput';
-
+import { NodeStyleTypes } from './Node';
 
 const NodePropertiesPanel = ({
   selectedNode,
@@ -110,6 +110,28 @@ const NodePropertiesPanel = ({
                   <option>Branch</option>
                 </select>
               </div>
+              {/* Style Dropdown */}
+                <div className="w-40">
+                <label
+                  className="block text-xs font-medium text-gray-300"
+                  title="Node type: Start (beginning node), Normal (standard node), or Branch (splits into multiple paths)"
+                >
+                  <div className="flex items-center gap-1">
+                    Type <BadgeHelp className="h-4 w-4 text-gray-400" />
+                  </div>
+                </label>
+                <select
+                  value={node.style || 'DefaultNodeStyle'}
+                  onChange={(e) => onUpdateProperty('style', e.target.value)}
+                  className="w-full p-1.5 text-sm bg-gray-700 border border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-300"
+                >
+                {NodeStyleTypes.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -150,7 +172,7 @@ const NodePropertiesPanel = ({
                 color={node.path}
               />
 
-{node.path && node.path !== '' && (() => {
+              {node.path && node.path !== '' && (() => {
                 const savedDefs = JSON.parse(localStorage.getItem('savedDefs') || '{}');
                 const defsOfType = savedDefs['TalentPathDef'] || {};
                 const pathExists = Object.keys(defsOfType).includes(node.path);

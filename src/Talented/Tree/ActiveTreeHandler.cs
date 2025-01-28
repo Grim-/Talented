@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace Talented
@@ -25,7 +26,7 @@ namespace Talented
             }
 
             int currentProgress = GetNodeProgress(node);
-            if (currentProgress >= node.UpgradeCount)
+            if (currentProgress >= GetNodeMaxProgress(node))
                 return UnlockResult.Failed(UpgradeUnlockError.AlreadyUnlocked,
                     "Talented.Tree.Error.AlreadyUnlockedAll".Translate(treeDef.defName));
 
@@ -47,35 +48,36 @@ namespace Talented
             }
 
             int currentProgress = GetNodeProgress(node);
-            if (currentProgress >= node.UpgradeCount)
+            int maxProgress = GetNodeMaxProgress(node);
+
+            if (currentProgress >= maxProgress)
             {
                 return UnlockResult.Failed(UpgradeUnlockError.AlreadyUnlocked,
                     "Talented.Tree.Error.NodeFullyUnlocked".Translate(treeDef.defName));
             }
 
-            int cost = node.GetUpgradeCost(currentProgress);
-            if (availablePoints < cost)
+            int totalCost = GetTotalCostForNode(node);
+
+            if (availablePoints < totalCost)
             {
                 return UnlockResult.Failed(UpgradeUnlockError.InsufficientPoints,
-                    "Talented.Tree.Error.RequiresPoints".Translate(treeDef.defName, cost));
+                    "Talented.Tree.Error.RequiresPoints".Translate(treeDef.defName, totalCost));
             }
 
             UnlockResult unlockResult = TryUnlockNextUpgrade(node);
             if (unlockResult.Success)
             {
-                this.availablePoints -= cost;
+                this.availablePoints -= totalCost;
             }
             return unlockResult;
         }
+
+
 
         public override void OnPathSelected(TalentPath path)
         {
         }
 
-        public override void ExposeData()
-        {
-            base.ExposeData();
-        }
 
         public int GetTotalPointsSpent()
         {
@@ -83,7 +85,7 @@ namespace Talented
             foreach (var node in treeDef.GetAllNodes())
             {
                 int progress = GetNodeProgress(node);
-                for (int i = 0; i < progress && i < node.UpgradeCount; i++)
+                for (int i = 0; i < progress && i < GetNodeMaxProgress(node); i++)
                 {
                     total += node.GetUpgradeCost(i);
                 }
@@ -91,11 +93,7 @@ namespace Talented
             return total;
         }
 
-        public override void DrawToolBar(Rect rect)
-        {
-            base.DrawToolBar(rect);
 
-        }
 
         protected override void OnTalentPointsGained(int points)
         {

@@ -10,7 +10,6 @@ namespace Talented
         public StatDef statDef;
         public float value;
         public StatModifierOperation operation;
-
         protected override bool IsEffectAppliedTo(Pawn pawn)
         {
             return IsActive;
@@ -23,8 +22,9 @@ namespace Talented
 
         protected override void Remove(Pawn pawn)
         {
-            
+
         }
+
 
         public override void ExposeData()
         {

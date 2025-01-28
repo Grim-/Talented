@@ -19,16 +19,15 @@ namespace Talented
         //Tree list appearance
         public string treeListbackgroundTexturePath;
         public ScaleMode treeListbackgroundScaleMode = ScaleMode.ScaleAndCrop;
-        public bool HasCustomTreeListBG => !string.IsNullOrEmpty(treeListbackgroundTexturePath);
+        public bool HasCustomTreeListBG => !string.IsNullOrEmpty(treeListbackgroundTexturePath) && TreeListBackgroundTexture != null;
 
 
         // Node appearance
-        public string nodeTexturePath = "UI/Tree/defaultnode";
-        private string defaultNodeTexturePath = "UI/Tree/defaultnode";
+        //public string nodeTexturePath = "UI/Tree/defaultnode";
+        //private string defaultNodeTexturePath = "UI/Tree/defaultnode";
 
         private string defaultUpgradeNodeTexturePath = "UI/Tree/defaultupgradeicon";
 
-        public float nodeSize = 60f;
         public float nodeSpacing = 10f;
 
         // Connection appearance
@@ -107,18 +106,18 @@ namespace Talented
                 return cachedBackgroundTexture;
             }
         }
-        private Texture2D cachedNodeTexture;
-        public Texture2D NodeTexture
-        {
-            get
-            {
-                if (cachedNodeTexture == null)
-                {
-                    cachedNodeTexture = LoadTexture(nodeTexturePath, defaultNodeTexturePath, "node");
-                }
-                return cachedNodeTexture;
-            }
-        }
+        //private Texture2D cachedNodeTexture;
+        //public Texture2D NodeTexture
+        //{
+        //    get
+        //    {
+        //        if (cachedNodeTexture == null)
+        //        {
+        //            cachedNodeTexture = LoadTexture(nodeTexturePath, defaultNodeTexturePath, "node");
+        //        }
+        //        return cachedNodeTexture;
+        //    }
+        //}
 
 
         private Texture2D cachedDefaultUpgradeIcon;

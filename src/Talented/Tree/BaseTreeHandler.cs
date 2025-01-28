@@ -41,6 +41,8 @@ namespace Talented
         }
         protected int availablePoints = 0;
 
+        protected string toolBarStatusMessage = string.Empty;
+
         protected BaseTreeHandler()
         {
         }
@@ -133,11 +135,15 @@ namespace Talented
                 Log.ErrorOnce($"Node Def[{node.defName}] has no upgrades defined!", 2105);
                 return false;
             }
-
-            return nodeProgress.TryGetValue(node, out int progress) &&
-                   progress >= node.upgrades.Count;
+            int progress = GetNodeProgress(node);
+            int maxProgress = GetNodeMaxProgress(node);
+           // Log.Message($"Node {node.defName}: Progress={progress}, MaxProgress={maxProgress}");
+            return progress >= maxProgress;
         }
-
+        public int GetNodeMaxProgress(TalentTreeNodeDef node)
+        {
+            return node.GetNodeMaxProgress();
+        }
         public int GetNodeProgress(TalentTreeNodeDef node)
         {
             return nodeProgress.TryGetValue(node, out int progress) ? progress : 0;
@@ -147,7 +153,7 @@ namespace Talented
         {
             if (node?.upgrades == null) return false;
             int currentProgress = GetNodeProgress(node);
-            return currentProgress < node.upgrades.Count;
+            return currentProgress < GetNodeMaxProgress(node);
         }
         public Color GetNodeColor(TalentTreeNodeDef node, int currentProgress)
         {
@@ -180,7 +186,6 @@ namespace Talented
 
             return this.treeDef.Skin.availableNodeColor;
         }
-
         public virtual UnlockResult TryUnlockNextUpgrade(TalentTreeNodeDef node, bool ignoreRequirements = false)
         {
             if (ignoreRequirements)
@@ -192,7 +197,6 @@ namespace Talented
                         UnlockUpgrade(item);
                     }
                 }
-
                 return UnlockResult.Succeeded();
             }
 
@@ -200,17 +204,33 @@ namespace Talented
             if (!validationResult.Success)
                 return validationResult;
 
-            if (!CanUnlockNextUpgrade(node))
+            int currentProgress = GetNodeProgress(node);
+            int maxProgress = GetNodeMaxProgress(node);
+
+            if (currentProgress >= maxProgress)
                 return UnlockResult.Failed(UpgradeUnlockError.AlreadyUnlocked, "All upgrades in this node are already unlocked");
 
-            int currentProgress = GetNodeProgress(node);
-            UnlockUpgrade(node.upgrades[currentProgress]);
+            var stackingUpgrade = node.upgrades.FirstOrDefault(x => x.stackingStatEffect != null);
+
+            TalentDef upgradeToUnlock;
+            if (stackingUpgrade != null)
+            {
+                upgradeToUnlock = stackingUpgrade;
+                if (currentProgress >= stackingUpgrade.stackingStatEffect.maxRepeats)
+                    return UnlockResult.Failed(UpgradeUnlockError.AlreadyUnlocked, "Maximum stacking level reached");
+            }
+            else
+            {
+                upgradeToUnlock = node.upgrades[currentProgress];
+            }
+
+            UnlockUpgrade(upgradeToUnlock);
 
             if (!nodeProgress.ContainsKey(node))
                 nodeProgress[node] = 0;
             nodeProgress[node]++;
 
-            if (GetNodeProgress(node) == node.upgrades.Count)
+            if (GetNodeProgress(node) >= maxProgress)
             {
                 unlockedNodes.Add(node);
                 OnNodeFullyUnlocked(node);
@@ -218,6 +238,44 @@ namespace Talented
 
             return UnlockResult.Succeeded();
         }
+
+        //public virtual UnlockResult TryUnlockNextUpgrade(TalentTreeNodeDef node, bool ignoreRequirements = false)
+        //{
+        //    if (ignoreRequirements)
+        //    {
+        //        if (node.upgrades != null)
+        //        {
+        //            foreach (var item in node.upgrades)
+        //            {
+        //                UnlockUpgrade(item);
+        //            }
+        //        }
+        //        return UnlockResult.Succeeded();
+        //    }
+
+        //    UnlockResult validationResult = ValidateUnlock(node);
+        //    if (!validationResult.Success)
+        //        return validationResult;
+
+        //    if (!CanUnlockNextUpgrade(node))
+        //        return UnlockResult.Failed(UpgradeUnlockError.AlreadyUnlocked, "All upgrades in this node are already unlocked");
+
+        //    int currentProgress = GetNodeProgress(node);
+        //    UnlockUpgrade(node.upgrades[currentProgress]);
+
+        //    if (!nodeProgress.ContainsKey(node))
+        //        nodeProgress[node] = 0;
+        //    nodeProgress[node]++;
+
+        //    int maxProgress = GetNodeMaxProgress(node);
+        //    if (GetNodeProgress(node) >= maxProgress)
+        //    {
+        //        unlockedNodes.Add(node);
+        //        OnNodeFullyUnlocked(node);
+        //    }
+
+        //    return UnlockResult.Succeeded();
+        //}
 
         protected virtual void OnNodeFullyUnlocked(TalentTreeNodeDef node)
         {
@@ -255,22 +313,78 @@ namespace Talented
             bool isSequential = node?.sequential ?? false;
             Log.Message($"Unlocking upgrade {upgrade.defName}, Sequential: {isSequential}");
 
-            if (!activeEffects.ContainsKey(upgrade))
+            // Handle stacking upgrades
+            if (upgrade.stackingStatEffect != null)
             {
-                if (isSequential && node != null)
+                // If this is the first time unlocking
+                if (!activeEffects.ContainsKey(upgrade))
                 {
-                    RemovePreviousNodeUpgrades(node, upgrade);
+                    activeEffects[upgrade] = new List<UpgradeEffect>();
                 }
 
-                activeEffects[upgrade] = new List<UpgradeEffect>();
-                var effects = upgrade.CreateEffects();
-                foreach (var effect in effects)
+                // Get current level for the stacking effect
+                int currentLevel = nodeProgress.TryGetValue(node, out int progress) ? progress : 0;
+                if (currentLevel >= upgrade.stackingStatEffect.maxRepeats + GetNodeMaxProgress(node))
                 {
-                    effect.TryApply(pawn, isSequential);
-                    activeEffects[upgrade].Add(effect);
+                    Log.Error($"Attempted to unlock stacking upgrade {upgrade.defName} beyond max repeats!");
+                    return;
+                }
+
+                // Create new effects with the current level
+                var stackingEffect = new StackingStatEffect
+                {
+                    maxLevel = upgrade.stackingStatEffect.maxRepeats,
+                    currentLevel = currentLevel + 1
+                };
+
+                foreach (var props in upgrade.stackingStatEffect.effects)
+                {
+                    stackingEffect.effects.Add(new StatEffect
+                    {
+                        statDef = props.statDef,
+                        value = props.value,
+                        operation = props.operation,
+                        parentUpgrade = upgrade
+                    });
+                }
+
+                // Remove previous level effects if they exist
+                if (activeEffects[upgrade].Any())
+                {
+                    foreach (var effect in activeEffects[upgrade])
+                    {
+                        effect.TryRemove(pawn);
+                    }
+                    activeEffects[upgrade].Clear();
+                }
+
+                // Apply new stacking effect
+                stackingEffect.TryApply(pawn, isSequential);
+                activeEffects[upgrade].Add(stackingEffect);
+            }
+            else
+            {
+                // Handle regular non-stacking upgrades
+                if (!activeEffects.ContainsKey(upgrade))
+                {
+                    if (isSequential && node != null)
+                    {
+                        RemovePreviousNodeUpgrades(node, upgrade);
+                    }
+                    activeEffects[upgrade] = new List<UpgradeEffect>();
+                    var effects = upgrade.CreateEffects();
+                    foreach (var effect in effects)
+                    {
+                        effect.TryApply(pawn, isSequential);
+                        activeEffects[upgrade].Add(effect);
+                    }
                 }
             }
-            unlockedUpgrades.Add(upgrade);
+
+            if (!unlockedUpgrades.Contains(upgrade))
+            {
+                unlockedUpgrades.Add(upgrade);
+            }
         }
 
         protected void RemovePreviousNodeUpgrades(TalentTreeNodeDef node, TalentDef untilUpgrade)
@@ -292,8 +406,7 @@ namespace Talented
                 unlockedUpgrades.Remove(prevUpgrade);
             }
         }
-
-        public virtual UnlockResult ValidateUnlock(TalentTreeNodeDef node)
+         public virtual UnlockResult ValidateUnlock(TalentTreeNodeDef node)
         {
             if (node?.upgrades == null || !node.upgrades.Any())
                 return UnlockResult.Failed(UpgradeUnlockError.InvalidNode, "Invalid node");
@@ -337,6 +450,30 @@ namespace Talented
 
         protected abstract UnlockResult ValidateTreeSpecificRules(TalentTreeNodeDef node);
 
+        public int GetTotalCostForNode(TalentTreeNodeDef Node)
+        {
+            int totalCost = 0;
+            foreach (var upgradeDef in Node.upgrades)
+            {
+                if (upgradeDef.stackingStatEffect != null)
+                {
+                    int currentLevel = upgradeDef.stackingStatEffect.currentRepeats;
+                    if (currentLevel < upgradeDef.stackingStatEffect.maxRepeats)
+                    {
+                        totalCost += upgradeDef.pointCost;
+                    }
+                }
+                else
+                {
+                    if (!HasUnlockUpgrade(upgradeDef))
+                    {
+                        totalCost = upgradeDef.pointCost;
+                    }
+                }
+            }
+
+            return totalCost;
+        }
 
 
         #region Progression Paths
@@ -374,11 +511,20 @@ namespace Talented
 
         protected virtual bool ValidateUpgradePath(TalentTreeNodeDef node)
         {
+            if (node.type == NodeType.Start)
+            {
+                return true;
+            }
+
             if (node.type == NodeType.Branch)
+            {
                 return node.path != string.Empty && CanSelectPath(this.TreeDef.GetPath(node.path));
+            }
 
             if (node.path != string.Empty)
+            {
                 return IsPathSelected(this.TreeDef.GetPath(node.path));
+            }
 
             return true;
         }
@@ -492,8 +638,7 @@ namespace Talented
 
             rect = rect.ContractedBy(6f);
             float currentX = rect.x;
-
-            string label = "Talented.Tree.UI.AvailablePoints".Translate(this.treeDef.treeName, availablePoints);
+            string label = GetToolbarLabel();
             GameFont oldFont = Text.Font;
             Text.Font = GameFont.Small;
             Vector2 labelSize = Text.CalcSize(label);
@@ -506,8 +651,26 @@ namespace Talented
             Text.Font = oldFont;
         }
 
+
+        private string GetToolbarLabel()
+        {
+            return this.TreeDef.GetFormattedTreeToolbarName(this.treeDef.treeName, this.gene.CurrentLevel, this.availablePoints, this.availablePoints, this.gene.pawn.Label) + "\r\n" + toolBarStatusMessage;
+        }
+
+
+        public void SetStatusMessage(string statusMessage)
+        {
+            this.toolBarStatusMessage = statusMessage;
+        }
+
+        public void ClearStatusMessage()
+        {
+            this.toolBarStatusMessage = "";
+        }
+
         public virtual void ResetTree()
         {
+            // Remove effects first
             if (activeEffects != null)
             {
                 foreach (var effectPair in activeEffects)
@@ -520,7 +683,7 @@ namespace Talented
                 activeEffects.Clear();
             }
 
-
+            // Calculate refund
             int pointsToRefund = 0;
             if (nodeProgress != null)
             {
@@ -528,13 +691,15 @@ namespace Talented
                 {
                     var node = nodePair.Key;
                     var progress = nodePair.Value;
-
-
                     if (node.upgrades != null)
                     {
                         for (int i = 0; i < progress && i < node.upgrades.Count; i++)
                         {
-                            if (node.upgrades[i].pointCost > 0)
+                            if (node.upgrades[i].stackingStatEffect != null)
+                            {
+                                pointsToRefund += node.upgrades[i].pointCost * nodePair.Value;
+                            }
+                            else if (node.upgrades[i].pointCost > 0)
                             {
                                 pointsToRefund += node.upgrades[i].pointCost;
                             }
@@ -543,18 +708,17 @@ namespace Talented
                 }
             }
 
+            pointsToRefund--;
 
+            pointsToRefund = Mathf.Clamp(pointsToRefund, 0, 1000000);
+
+            // Clear progress and give points back
             unlockedUpgrades?.Clear();
             unlockedNodes?.Clear();
             selectedPaths?.Clear();
             nodeProgress?.Clear();
             activeEffects?.Clear();
-
-
             OnTalentPointsGained(pointsToRefund);
-
-
-            UnlockStartingNodes();
         }
 
         public abstract int GetAvailablePoints();

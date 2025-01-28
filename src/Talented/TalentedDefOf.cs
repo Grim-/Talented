@@ -7,5 +7,6 @@ namespace Talented
     {
         public static ExperienceFormulaDef Basic_LinearXP;
         public static TalentTreeSkinDef DefaultTreeSkin;
+        public static NodeStyleDef DefaultNodeStyle;
     }
 }

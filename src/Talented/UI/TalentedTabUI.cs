@@ -6,6 +6,7 @@ using Verse;
 
 namespace Talented
 {
+    [StaticConstructorOnStartup]
     public class TalentedTabUI : ITab
     {
         public override bool IsVisible => SelPawn != null && CheckTalentGene();
@@ -34,9 +35,9 @@ namespace Talented
         protected Vector2 scrollPosition;
 
 
-        private Texture2D GreyTexture = SolidColorMaterials.NewSolidColorTexture(Color.grey);
-        private Texture2D BannerTexture = SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f));
-        private Texture2D DefaultTreeTexture = SolidColorMaterials.NewSolidColorTexture(Color.gray);
+        private static Texture2D GreyTexture = SolidColorMaterials.NewSolidColorTexture(Color.grey);
+        private static Texture2D BannerTexture = SolidColorMaterials.NewSolidColorTexture(new Color(0.2f, 0.2f, 0.2f, 0.5f));
+        private static Texture2D DefaultTreeTexture = SolidColorMaterials.NewSolidColorTexture(Color.gray);
 
         public TalentedTabUI()
         {
@@ -49,7 +50,14 @@ namespace Talented
             var rect = new Rect(0, 0, tabSize.x, tabSize.y);
 
             var toolbarRect = rect.TopPartPixels(toolbarHeight);
-            GUI.DrawTexture(toolbarRect, GreyTexture);
+
+
+            if (GreyTexture != null)
+            {
+                GUI.DrawTexture(toolbarRect, GreyTexture);
+            }
+
+   
             DrawToolbar(toolbarRect);
 
             var contentRect = rect.BottomPartPixels(rect.height - toolbarHeight);
@@ -136,7 +144,11 @@ namespace Talented
         {
             if (gene.HasCustomBackground)
             {
-                GUI.DrawTexture(rect, gene.BackgroundTexture ?? BannerTexture);
+                Texture2D textureToUse = gene.BackgroundTexture ?? BannerTexture;
+                if (textureToUse != null)
+                {
+                    GUI.DrawTexture(rect, textureToUse);
+                }
             }
             else
             {
@@ -196,8 +208,16 @@ namespace Talented
             {
                 if (tree.TreeDef.Skin.HasCustomTreeListBG)
                 {
-                    GUI.DrawTexture(rect, tree.TreeDef.Skin?.TreeListBackgroundTexture ??
-                        BannerTexture, tree.TreeDef.Skin.treeListbackgroundScaleMode);
+
+                    Texture2D tex = tree.TreeDef.Skin?.TreeListBackgroundTexture ??
+                        BannerTexture;
+
+                    if (tex != null)
+                    {
+                        GUI.DrawTexture(rect, tex, tree.TreeDef.Skin.treeListbackgroundScaleMode);
+                    }
+
+             
                 }
                 else
                 {
@@ -214,8 +234,23 @@ namespace Talented
         {
             float iconSize = rect.height - 4f;
             Rect iconRect = new Rect(rect.x + 2f, rect.y + 2f, iconSize, iconSize);
-            GUI.DrawTexture(iconRect, tree.TreeDef.Skin?.BackgroundTexture ??
-               DefaultTreeTexture);
+
+
+            if (tree != null && tree.TreeDef != null && tree.TreeDef.Skin != null)
+            {
+                if (tree.TreeDef.Skin.BackgroundTexture != null)
+                {
+                    GUI.DrawTexture(iconRect, tree.TreeDef.Skin?.BackgroundTexture);
+                }               
+            }
+            else
+            {
+                if (DefaultTreeTexture != null)
+                {
+                    GUI.DrawTexture(iconRect, DefaultTreeTexture);
+                }
+            }
+
             return iconRect;
         }
 

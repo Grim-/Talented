@@ -70,8 +70,6 @@ export const NamespaceConfig = {
   separator: '.'
 };
 
-
-
 //HELPERS
 export const getFullDefName = (defType) => {
   return `${NamespaceConfig.prefix}${NamespaceConfig.separator}${defType}`;
@@ -198,120 +196,6 @@ export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = D
 
   event.target.value = '';
 };
-// export const handleXmlImport = async (event, savedDefs, setSavedDefs, config = DefTypeConfig) => {
-//   const files = event.target.files;
-//   let newDefs = { ...savedDefs };
-
-//   for (const file of Array.from(files)) {
-//     try {
-//       const text = await file.text();
-//       const xmlDoc = new DOMParser().parseFromString(text, "text/xml");
-//       const allElements = xmlDoc.getElementsByTagName('*');
-
-//       for (const element of Array.from(allElements)) {
-//         // Check if this is a TalentTreeDef and process its paths
-//         if (element.tagName === 'Talented.TalentTreeDef') {
-//           const availablePaths = element.getElementsByTagName('availablePaths')[0];
-//           if (availablePaths) {
-//             const pathElements = availablePaths.getElementsByTagName('li');
-//             Array.from(pathElements).forEach(pathElement => {
-//               const name = pathElement.getElementsByTagName('name')[0]?.textContent;
-//               if (!name) return;
-
-//               if (!newDefs['TalentPathDef']) {
-//                 newDefs['TalentPathDef'] = {};
-//               }
-
-//               // Create path def using the same pattern as other defs
-//               const pathDef = {
-//                 defName: name,
-//                 type: 'TalentPathDef',
-//                 description: pathElement.getElementsByTagName('pathDescription')[0]?.textContent || '',
-//                 pathUIIcon: pathElement.getElementsByTagName('pathUIIcon')[0]?.textContent || ''
-//               };
-
-//               // Handle color conversion from (R,G,B) format
-//               const colorElement = pathElement.getElementsByTagName('pathColor')[0];
-//               if (colorElement) {
-//                 const colorText = colorElement.textContent;
-//                 const match = colorText.match(/\(([\d.]+),([\d.]+),([\d.]+)\)/);
-//                 if (match) {
-//                   const [_, r, g, b] = match;
-//                   const toHex = (n) => Math.round(parseFloat(n) * 255).toString(16).padStart(2, '0');
-//                   pathDef.color = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-//                 }
-//               }
-
-//               // Handle exclusiveWith array
-//               const exclusiveWith = pathElement.getElementsByTagName('exclusiveWith')[0];
-//               if (exclusiveWith) {
-//                 pathDef.exclusiveWith = Array.from(exclusiveWith.getElementsByTagName('li'))
-//                   .map(li => li.textContent)
-//                   .filter(Boolean);
-//               }
-
-//               // Merge with existing paths
-//               newDefs['TalentPathDef'] = {
-//                 ...newDefs['TalentPathDef'],
-//                 [name]: pathDef
-//               };
-//             });
-//           }
-//         }
-
-//         // Original def processing
-//         Object.values(config).forEach(defType => {
-//           const fullDefType = getFullDefName(defType);
-//           if (element.tagName === fullDefType) {
-//             const defName = element.getElementsByTagName("defName")[0]?.textContent;
-//             if (!defName) return;
-
-//             if (!newDefs[defType]) {
-//               newDefs[defType] = {};
-//             }
-
-//             const def = { defName, type: defType };
-//             Array.from(element.children).forEach(child => {
-//               if (child.tagName === 'defName') return;
-//               if (!child.children.length) {
-//                 def[child.tagName] = child.textContent;
-//                 return;
-//               }
-//               const liElements = Array.from(child.getElementsByTagName('li'));
-//               if (liElements.length) {
-//                 def[child.tagName] = liElements.map(li => {
-//                   if (!li.children.length) return li.textContent;
-//                   return Array.from(li.children).reduce((obj, prop) => ({
-//                     ...obj,
-//                     [prop.tagName]: prop.textContent
-//                   }), {});
-//                 });
-//                 return;
-//               }
-//               def[child.tagName] = Array.from(child.children).reduce((obj, prop) => ({
-//                 ...obj,
-//                 [prop.tagName]: prop.textContent
-//               }), {});
-//             });
-
-//             newDefs[defType] = {
-//               ...newDefs[defType],
-//               [defName]: def
-//             };
-//           }
-//         });
-//       }
-//     } catch (e) {
-//       console.error(`Error parsing ${file.name}:`, e);
-//     }
-//   }
-
-//   console.log("Current savedDefs:", savedDefs);
-//   console.log("New merged defs:", newDefs);
-//   setSavedDefs(newDefs);
-
-//   event.target.value = '';
-// };
 
 export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
   try {
@@ -355,72 +239,6 @@ export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, t
     throw error;
   }
 };
-// export const exportToXml = (nodes, paths, treeName, treeSkinDefName, treeSize, treeDisplayStrat, treePointsFormula, treeHandler, config = DefTypeConfig) => {
-//   try {
-//     exportState.idMapping = null;
-    
-//     const usedPaths = new Set(nodes.map(node => node.path).filter(Boolean));
-//     const allPaths = [...paths];
-
-//     usedPaths.forEach(pathName => {
-//       console.log(pathName);
-//       if (!paths.find(p => p.name === pathName)) {
-//         allPaths.push({
-//           name: pathName,
-//           description: '',
-//           exclusiveWith: []
-//         });
-//       }
-//     });
-
-//     // Create tree and nodes XML
-//     const treeXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
-//       exportTalentTree(nodes, allPaths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) +
-//       exportNodes(nodes, treeSize, config) +
-//       '</Defs>';
-
-//     const updatedTreeName = treeName || 'NoTreeName';
-
-//     // Create paths XML if there are any paths
-//     if (allPaths.length > 0) {
-//       const pathsXml = '<?xml version="1.0" encoding="utf-8" ?>\n<Defs>\n' +
-//         exportPaths(allPaths, config) +
-//         '</Defs>';
-
-//       // Download paths file
-//       const pathsBlob = new Blob([pathsXml], { type: 'text/xml' });
-//       const pathsUrl = URL.createObjectURL(pathsBlob);
-//       const pathsLink = document.createElement('a');
-//       pathsLink.href = pathsUrl;
-//       pathsLink.download = `${updatedTreeName}_Paths.xml`;
-//       document.body.appendChild(pathsLink);
-//       pathsLink.click();
-//       document.body.removeChild(pathsLink);
-//       URL.revokeObjectURL(pathsUrl);
-//     }
-
-//     // Download tree file
-//     const treeBlob = new Blob([treeXml], { type: 'text/xml' });
-//     const treeUrl = URL.createObjectURL(treeBlob);
-//     const treeLink = document.createElement('a');
-//     treeLink.href = treeUrl;
-//     treeLink.download = `${updatedTreeName}_Tree.xml`;
-//     document.body.appendChild(treeLink);
-//     treeLink.click();
-//     document.body.removeChild(treeLink);
-//     URL.revokeObjectURL(treeUrl);
-
-//     return treeXml;
-//   } 
-
-//   catch (error) 
-//   {
-//     exportState.idMapping = null;
-//     throw error;
-//   }
-// };
-
-
 
 const exportTalentTree = (nodes, paths, treeName, treeSize, treeSkinDefName, treeDisplayStrat, treePointsFormula, treeHandler) => {
   exportState.idMapping = createIdMapping(nodes);
@@ -428,10 +246,10 @@ const exportTalentTree = (nodes, paths, treeName, treeSize, treeSkinDefName, tre
   const fullDefType = getFullDefName(DefTypeConfig.TREE);
   let xml = `  <${fullDefType}>\n`;
   xml += `    <defName>${treeName}</defName>\n`;
+  xml += `    <treeName>${treeName}</treeName>\n`;
   xml += `    <dimensions>(${treeSize.width},${treeSize.height})</dimensions>\n`;
   xml += `    <handlerClass>${treeHandler}</handlerClass>\n`;
   xml += `    <skin>${treeSkinDefName || 'DefaultTreeSkin'}</skin>\n`;
-
   // Root nodes
   xml += '    <nodes>\n';
   nodes.filter(node => node.type === 'Start')
@@ -522,7 +340,6 @@ export const generateTalentDefXml = (talentDef) => {
     xml += `    <abilityEffects>\n`;
     xml += `      <li>\n`;
     xml += `        <abilities>\n`;
-    // Filter out any undefined abilities before generating XML
     const validAbilities = talentDef.abilityEffects.filter(ability => ability.abilityDef);
     validAbilities.forEach(ability => {
       xml += `          <li>\n`;
@@ -546,7 +363,26 @@ export const generateTalentDefXml = (talentDef) => {
     xml += `    </organEffects>\n`;
   }
   
-  if (talentDef.statEffects?.length > 0) {
+  // if(talentDef.statEffects?.length > 0 && talentDef.statEffects[0].isStacking)
+  //   {
+  //       xml += `    <stackingStatEffect>\n`;
+  //       console.log(talentDef.statEffects[0]);
+  //       xml += `      <maxRepeats>${talentDef.statEffects[0].maxStack}</maxRepeats>\n`;
+  //       xml += `      <effects>\n`;
+  //       talentDef.statEffects.forEach(effect => {
+  //         if (effect.statDef && effect.value && effect.operation) {
+  //           xml += `      <li>\n`;
+  //           xml += `        <statDef>${effect.statDef}</statDef>\n`;
+  //           xml += `        <value>${effect.value}</value>\n`;
+  //           xml += `        <operation>${effect.operation}</operation>\n`;
+  //           xml += `      </li>\n`;
+  //         }
+  //       });
+  //       xml += `      </effects>\n`;
+  //       xml += `    </stackingStatEffect>\n`;
+  //   }
+  // else 
+   if (talentDef.statEffects?.length > 0) {
     xml += `    <statEffects>\n`;
     talentDef.statEffects.forEach(effect => {
       if (effect.statDef && effect.value && effect.operation) {
@@ -810,10 +646,9 @@ export const importFromXml = (xmlContents, setTreeName, setTreeSize, setTreeHand
 
   xmlContents.forEach(content => {
     const xmlDoc = parser.parseFromString(content, "text/xml");
-    
-    // First get tree dimensions for scaling
+  
     const treeDef = xmlDoc.getElementsByTagName('Talented.TalentTreeDef')[0];
-    let treeWidth = 600, treeHeight = 400; // defaults
+    let treeWidth = 600, treeHeight = 400; 
     
     if (treeDef) {
       const dimensions = treeDef.getElementsByTagName('dimensions')[0]?.textContent;
@@ -824,8 +659,9 @@ export const importFromXml = (xmlContents, setTreeName, setTreeSize, setTreeHand
           treeWidth = Number(width);
           treeHeight = Number(height);
 
-          setTreeName("wwwwwwww");
+          setTreeName(treeDef.treeName || 'NAME IMPORT FAILED');
           setTreeSize({width: treeWidth || 600, height: treeHeight || 400})
+          setTreeHandler(treeDef.hand)
         }
       }
     }
@@ -980,7 +816,7 @@ const exportNodes = (nodes, treeSize, config) => {
     xml += `  <${defType}>\n`;
     xml += `    <defName>${newDefName}</defName>\n`;
     if (node.label) xml += `    <label>${node.label}</label>\n`;
-    
+    xml += `    <style>${node.style || 'DefaultNodeStyle'}</style>\n`;
     if (node.x !== undefined) {
       xml += `    <position>${calculateScaledPosition(node, treeSize)}</position>\n`;
     }
