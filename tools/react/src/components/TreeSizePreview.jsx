@@ -49,19 +49,18 @@ const TreeSizePreview = ({ width, height, bgImage = '', useAspectRatioPreview = 
 
   if (!width || !height || !containerSize.width || !containerSize.height) return null;
 
-  // Increase base display size to account for larger web app nodes
-  const BASE_DISPLAY_WIDTH = 600; // Doubled from previous 600
-  const WEB_APP_SCALE = 1.5; // Additional scaling factor for web app nodes
+  const BASE_DISPLAY_WIDTH = 600;
+  const WEB_APP_SCALE = 1.5;
 
-  // Calculate base scale with the web app scaling factor
   const baseWidthScale = (BASE_DISPLAY_WIDTH / width) * WEB_APP_SCALE;
 
   let scale;
-  if (useAspectRatioPreview) {
-    // In aspect ratio mode, use fixed width scale with a higher cap
-    scale = Math.min(baseWidthScale, 4); // Increased cap to 4 to allow for larger scaling
-  } else {
-    // In regular mode, use container-based scaling but with web app scale factor
+  if (useAspectRatioPreview)
+    {
+    scale = Math.min(baseWidthScale, 4); 
+  } 
+  else 
+  {
     const scaleX = (containerSize.width / width) * WEB_APP_SCALE;
     const scaleY = (containerSize.height / height) * WEB_APP_SCALE;
     scale = Math.min(scaleX, scaleY, 4); // Increased cap to 4
@@ -92,7 +91,8 @@ const TreeSizePreview = ({ width, height, bgImage = '', useAspectRatioPreview = 
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundColor: 'rgba(0, 0, 0, 0.2)'
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            zIndex: -1
           }}
         >
           {/* Corner indicators */}

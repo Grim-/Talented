@@ -38,6 +38,9 @@ export class Node {
         this.levelRequired = 0;
         this.canDrag = true;
         this.style = 'DefaultNodeStyle';
+
+        this.isDragging = false;
+        this.dragOffset = { x: 0, y: 0 };
     }
 
     static NewId = () => {
@@ -78,10 +81,41 @@ export class Node {
         if (!canvas) return;
     
         const canvasRect = canvas.getBoundingClientRect();
+        const padding = 5; // Add some padding to prevent edge sticking
     
-        // Clamp the position so the node stays fully inside the canvas
-        this.x = Math.max(canvasRect.left, Math.min(this.x, canvasRect.right - this.width));
-        this.y = Math.max(canvasRect.top, Math.min(this.y, canvasRect.bottom - this.height));
+        this.x = Math.max(
+            canvasRect.left + padding, 
+            Math.min(this.x, canvasRect.right - this.width - padding)
+        );
+        this.y = Math.max(
+            canvasRect.top + padding, 
+            Math.min(this.y, canvasRect.bottom - this.height - padding)
+        );
+    }
+
+    startDrag(e) {
+        if (!this.canDrag) return;
+        
+        this.isDragging = true;
+        const rect = e.currentTarget.getBoundingClientRect();
+        this.dragOffset = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
+    handleDrag(e) {
+        if (!this.isDragging || !this.canDrag) return;
+
+        // Use movement relative to drag start point for smoother motion
+        this.x = e.clientX - this.dragOffset.x;
+        this.y = e.clientY - this.dragOffset.y;
+        
+        // Clamp position to canvas bounds
+        this.clampToCanvas();
+    }
+    endDrag() {
+        this.isDragging = false;
+        this.dragOffset = { x: 0, y: 0 };
     }
     static getBackGroundClass = (type) => {
         let backgroundClass = 'bg-gray-700';
@@ -126,35 +160,47 @@ export class Node {
           };
 
         return (
-                <div
-                    className={`absolute p-1 rounded-lg shadow-lg cursor-move transition-all duration-200
-                        ${Node.getBackGroundClass(this.type)}
-                        text-gray-300
-                        ${selected ? 'ring-2 ring-blue-500' : ''}
-                        ${connecting ? 'ring-2 ring-blue-300' : ''}`}
-                    style={{
-                        left: `${this.x}px`,
-                        top: `${this.y}px`,
-                        width: expanded ? `${this.width + 210}px` : `${this.width + 20}px`,
-                        height: expanded ? `${this.height + 210}px` : `${this.height}px`,
-                        transition: 'height 0.2s ease-in-out',
-                        zIndex: 100
-                    }}
-                    onMouseDown={(e) => {
-                        // Start drag or other interaction
-                        // Call clampToCanvas at the end of the interaction
-                        onMouseDown(e);
-                        this.clampToCanvas();
-                    }}
-                    onClick={(e) => {
+            <div
+                className={`absolute p-1 rounded-lg shadow-lg cursor-move transition-all duration-200
+                    ${Node.getBackGroundClass(this.type)}
+                    text-gray-300
+                    ${selected ? 'ring-2 ring-blue-500' : ''}
+                    ${connecting ? 'ring-2 ring-blue-300' : ''}`}
+                style={{
+                    left: `${this.x}px`,
+                    top: `${this.y}px`,
+                    width: expanded ? `${this.width + 210}px` : `${this.width + 20}px`,
+                    height: expanded ? `${this.height + 210}px` : `${this.height}px`,
+                    transition: this.isDragging ? 'none' : 'height 0.2s ease-in-out',
+                    zIndex: this.isDragging ? 1000 : 100,
+                    touchAction: 'none',
+                    userSelect: 'none'
+                }}
+                onMouseDown={(e) => {
+                    e.preventDefault(); // Prevent text selection
+                    this.startDrag(e);
+                    onMouseDown(e);
+                }}
+                onMouseMove={(e) => {
+                    this.handleDrag(e);
+                }}
+                onMouseUp={() => {
+                    this.endDrag();
+                }}
+                onMouseLeave={() => {
+                    if (this.isDragging) {
+                        this.endDrag();
+                    }
+                }}
+                onClick={(e) => {
+                    if (!this.isDragging) {
                         onClick(e);
-                        this.clampToCanvas();
-                    }}
-                    onContextMenu={(e) => {
-                        onContextMenuClick(e);
-                        this.clampToCanvas();
-                    }}
-                >
+                    }
+                }}
+                onContextMenu={(e) => {
+                    onContextMenuClick(e);
+                }}
+            >
                 <div className="flex flex-col h-full pb-8">
                     <div className="flex justify-between items-center mb-2">
                         <div 

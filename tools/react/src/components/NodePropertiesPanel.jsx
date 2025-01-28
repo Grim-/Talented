@@ -117,7 +117,7 @@ const NodePropertiesPanel = ({
                   title="Node type: Start (beginning node), Normal (standard node), or Branch (splits into multiple paths)"
                 >
                   <div className="flex items-center gap-1">
-                    Type <BadgeHelp className="h-4 w-4 text-gray-400" />
+                    Style <BadgeHelp className="h-4 w-4 text-gray-400" />
                   </div>
                 </label>
                 <select
