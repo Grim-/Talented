@@ -94,6 +94,7 @@
     <Compile Include="DisplayStrategies\VerticalTreeStrategy.cs" />
     <Compile Include="Events\EventManager.cs" />
     <Compile Include="Events\EventPatches.cs" />
+    <Compile Include="Events\GizmoGridPager.cs" />
     <Compile Include="Experience\AbilityExperienceTypeDef.cs" />
     <Compile Include="Experience\DamageDealtExperienceTypeDef.cs" />
     <Compile Include="Experience\DamageTakenExperienceTypeDef.cs" />
