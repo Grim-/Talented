@@ -659,9 +659,10 @@ export const importFromXml = (xmlContents, setTreeName, setTreeSize, setTreeHand
           treeWidth = Number(width);
           treeHeight = Number(height);
 
-          setTreeName(treeDef.treeName || 'NAME IMPORT FAILED');
-          setTreeSize({width: treeWidth || 600, height: treeHeight || 400})
-          setTreeHandler(treeDef.hand)
+          setTreeName(treeDef.getElementsByTagName('treeName')[0]?.textContent || 'NAME IMPORT FAILED');
+          setTreeSize({width: treeWidth || 600, height: treeHeight || 400});
+          setTreeHandler(treeDef.getElementsByTagName('handlerClass')[0]?.textContent || 'Talented.ActiveTreeHandler');
+          setTreeDisplay(treeDef.getElementsByTagName('displayStrategy')[0]?.textContent ||'FixedPosition')
         }
       }
     }

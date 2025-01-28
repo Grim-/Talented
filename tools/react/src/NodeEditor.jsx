@@ -128,7 +128,7 @@ const NodeEditor = ({
 
       const { nodes: newNodes, paths: newPaths } = importFromXml(fileContents, setTreeName, setTreeSize, setTreeHandler, setTreeDisplay);
       clearSession(setNodes, setPaths, true);
-      setNodes([...nodes, ...newNodes]);
+      setNodes(newNodes);
       setPaths([...paths, ...newPaths]);
       setShowImport(false);
     } catch (e) {
