@@ -29,7 +29,7 @@ namespace Talented
         // Combat events
         public static event Func<Thing, Thing, DamageInfo, DamageWorker.DamageResult, DamageWorker.DamageResult> OnDamageDealt;
         public static event Action<Pawn, DamageInfo> OnDamageTaken;
-
+        public static event Action<Pawn, DamageInfo, Hediff> OnThingKilled;
         // Work events
         public static event Action<Pawn, WorkTypeDef, float> OnWorkCompleted;
         public static event Action<Pawn, SkillDef, float> OnSkillGained;
@@ -89,6 +89,19 @@ namespace Talented
             {
                 Instance.eventQueue.Enqueue(new QueuedEvent(
                     () => OnDamageTaken?.Invoke(target, info),
+                    Current.Game.tickManager.TicksGame + 1
+                ));
+            }
+        }
+
+        public static void RaiseOnKilled(Pawn target, DamageInfo info, Hediff culprit = null)
+        {
+            if (OnThingKilled == null) return;
+
+            lock (Instance.queueLock)
+            {
+                Instance.eventQueue.Enqueue(new QueuedEvent(
+                    () => OnThingKilled?.Invoke(target, info, culprit),
                     Current.Game.tickManager.TicksGame + 1
                 ));
             }

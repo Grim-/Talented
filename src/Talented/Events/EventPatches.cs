@@ -92,6 +92,15 @@ namespace Talented
             }
         }
 
+        //[HarmonyPatch(typeof(Pawn), nameof(Pawn.Kill))]
+        //public static class Patch_Pawn_Kill
+        //{
+        //    public static void Prefix(Pawn __instance, DamageInfo dinfo, Hediff exactCulprit)
+        //    {
+        //        EventManager.RaiseOnKilled(__instance, dinfo, exactCulprit);
+        //    }
+        //}
+
         [HarmonyPatch(typeof(Pawn_JobTracker), nameof(Pawn_JobTracker.StartJob))]
         public static class Patch_StartJob
         {
