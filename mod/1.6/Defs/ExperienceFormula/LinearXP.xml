@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.ExperienceFormulaDef>
+    <defName>Basic_LinearXP</defName>
+    <experienceWorkerClass>Talented.LinearExperienceFormula</experienceWorkerClass>
+    <baseExperience>100</baseExperience>
+  </Talented.ExperienceFormulaDef>
+</Defs>

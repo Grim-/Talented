@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Passive: Powder Mastery -->
+    <Talented.TalentDef>
+        <defName>PowderMasteryPassive</defName>
+        <label>Powder Mastery</label>
+        <description>Years of handling black powder weapons increases shooting accuracy and reload speed.</description>
+        <levelRequired>2</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>PowderMasteryBuff</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Active: Pistol Shot -->
+    <Talented.TalentDef>
+        <defName>PistolShotAbility</defName>
+        <label>Pistol Shot</label>
+        <description>Draw your flintlock for a quick, powerful shot.</description>
+        <levelRequired>3</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>PistolShotEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+
+    <!-- Passive: Sea Legs -->
+    <Talented.TalentDef>
+        <defName>SeaLegsPassive</defName>
+        <label>Sea Legs</label>
+        <description>Perfect balance from years at sea improves movement and dodge chance.</description>
+        <levelRequired>4</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>SeaLegsEffect</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Ultimate: Cannon Barrage -->
+    <Talented.TalentDef>
+        <defName>CannonBarrageUltimate</defName>
+        <label>Cannon Barrage</label>
+        <description>Call down devastating cannon fire on an area.</description>
+        <levelRequired>5</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>CannonBarrageEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+</Defs>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.TreeDisplayStrategyDef>
+    <defName>FixedPosition</defName>
+    <strategyClass>Talented.FixedPositionStrategy</strategyClass>
+  </Talented.TreeDisplayStrategyDef>
+
+  <Talented.TreeDisplayStrategyDef>
+    <defName>RadialTreeStrategy</defName>
+    <strategyClass>Talented.RadialTreeStrategy</strategyClass>
+  </Talented.TreeDisplayStrategyDef>
+</Defs>

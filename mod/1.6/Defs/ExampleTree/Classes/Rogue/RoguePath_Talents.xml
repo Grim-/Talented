@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Passive: Quick Strikes -->
+    <Talented.TalentDef>
+        <defName>QuickStrikesPassive</defName>
+        <label>Quick Strikes</label>
+        <description>Master the art of swift attacks, permanently increasing attack speed.</description>
+        <levelRequired>2</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>QuickStrikesBuff</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Active: Vital Strike -->
+    <Talented.TalentDef>
+        <defName>VitalStrikeAbility</defName>
+        <label>Vital Strike</label>
+        <description>A precise strike targeting vital points, dealing critical damage.</description>
+        <levelRequired>3</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>VitalStrikeEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+
+    <!-- Passive: Combat Flow -->
+    <Talented.TalentDef>
+        <defName>CombatFlowPassive</defName>
+        <label>Combat Flow</label>
+        <description>Enhanced battle movements increase dodge chance and melee hit chance.</description>
+        <levelRequired>4</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>CombatFlowEffect</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Ultimate: Lethal Fury -->
+    <Talented.TalentDef>
+        <defName>LethalFuryUltimate</defName>
+        <label>Lethal Fury</label>
+        <description>Enter a state of deadly precision, massively increasing melee damage and attack speed.</description>
+        <levelRequired>5</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>LethalFuryEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+</Defs>

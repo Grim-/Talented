@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.TreeDisplayStrategyDef>
+    <defName>VerticalStrategy</defName>
+    <strategyClass>Talented.VerticalTreeStrategy</strategyClass>
+  </Talented.TreeDisplayStrategyDef>
+
+</Defs>

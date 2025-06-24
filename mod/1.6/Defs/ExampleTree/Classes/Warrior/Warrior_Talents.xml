@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <Talented.TalentDef>
+        <defName>WarriorStrengthUpgrade</defName>
+        <label>Warrior's Might</label>
+        <description>Enhances physical strength through parasitic muscle enhancement.</description>
+        <levelRequired>3</levelRequired>
+        <statEffects>
+            <li>
+                <statDef>MeleeWeapon_DamageMultiplier</statDef>
+                <value>1.15</value>
+                <operation>Multiply</operation>
+            </li>
+            <li>
+                <statDef>CarryingCapacity</statDef>
+                <value>1.2</value>
+                <operation>Multiply</operation>
+            </li>
+        </statEffects>
+    </Talented.TalentDef>
+
+    <Talented.TalentDef>
+        <defName>BattleFuryUpgrade</defName>
+        <label>Battle Fury</label>
+        <description>Grants the ability to enter a fury state, temporarily boosting combat capabilities.</description>
+        <levelRequired>4</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>BattleFuryAbility</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+
+    <Talented.TalentDef>
+        <defName>ArmoredHideUpgrade</defName>
+        <label>Armored Hide</label>
+        <description>Develops hardened skin plates that provide natural armor protection.</description>
+        <levelRequired>4</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>ArmoredHide</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+</Defs>

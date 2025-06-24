@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+<Talented.TalentTreeSkinDef Name="Talented_DefaultSkin">
+  <defName>DefaultTreeSkin</defName>
+  <label>Default Tree Skin</label>
+  <description>Default visual style for upgrade trees</description>
+
+  <!-- Background configuration -->
+  <backgroundTexturePath>UI/Tree/defaultbackground</backgroundTexturePath>
+  <backgroundColor>(1, 1, 1)</backgroundColor>
+  <backgroundScaleMode>StretchToFill</backgroundScaleMode>
+
+  <windowMargin>0</windowMargin>
+  <treeListbackgroundScaleMode>ScaleToFit</treeListbackgroundScaleMode>
+
+  <!-- Scale modes
+      StretchToFill,
+      ScaleAndCrop,
+      ScaleToFit
+    -->
+
+  <!-- Node appearance -->
+  <nodeSpacing>5</nodeSpacing>
+
+  <!-- Connection appearance -->
+  <connectionTexturePath>UI/Tree/connection_lineglow</connectionTexturePath>
+  <connectionThickness>2</connectionThickness>
+  <showConnectionArrows>true</showConnectionArrows>
+  <arrowSize>10</arrowSize>
+
+  <!-- Color scheme -->
+  <unlockedNodeColor>(0.2, 0.8, 0.2)</unlockedNodeColor>
+  <availableNodeColor>(0.5, 0.5, 0.5)</availableNodeColor>
+  <lockedNodeColor>(0.8, 0.2, 0.2)</lockedNodeColor>
+  <pathSelectedColor>(1, 1, 0)</pathSelectedColor>
+  <pathExcludedColor>(1, 0, 0)</pathExcludedColor>
+  <pathAvailableColor>(1, 1, 1)</pathAvailableColor>
+
+  <!-- Connection colors -->
+  <unlockedConnectionColor>(0.2, 0.8, 0.2, 0.8)</unlockedConnectionColor>
+  <activeConnectionColor>(0.8, 0.8, 0.2, 0.6)</activeConnectionColor>
+  <inactiveConnectionColor>(0.5, 0.5, 0.5, 0.3)</inactiveConnectionColor>
+
+  <!-- Text configuration -->
+  <labelOffset>-5</labelOffset>
+  <pathLabelOffset>25</pathLabelOffset>
+  <labelFont>Medium</labelFont>
+  <labelColor>(1, 1, 1)</labelColor>
+</Talented.TalentTreeSkinDef>
+</Defs>

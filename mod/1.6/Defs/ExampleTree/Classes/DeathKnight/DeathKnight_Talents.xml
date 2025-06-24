@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Passive: Unholy Fortitude -->
+    <Talented.TalentDef>
+        <defName>UnholyFortitudePassive</defName>
+        <label>Unholy Fortitude</label>
+        <description>Dark energies course through your body, increasing health and granting life leech on attacks.</description>
+        <levelRequired>2</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>UnholyFortitudeBuff</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Active: Anti-Magic Shell -->
+    <Talented.TalentDef>
+        <defName>AntiMagicShellAbility</defName>
+        <label>Anti-Magic Shell</label>
+        <description>Surround yourself with a protective shell that absorbs magical damage and converts it to healing.</description>
+        <levelRequired>3</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>AntiMagicShellEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+
+    <!-- Passive: Death's Embrace -->
+    <Talented.TalentDef>
+        <defName>DeathsEmbracePassive</defName>
+        <label>Death's Embrace</label>
+        <description>Your connection to death grows stronger, increasing damage against living targets and granting increased healing from all sources.</description>
+        <levelRequired>4</levelRequired>
+        <hediffEffects>
+            <li>
+                <hediffDef>DeathsEmbraceBuff</hediffDef>
+            </li>
+        </hediffEffects>
+    </Talented.TalentDef>
+
+    <!-- Ultimate: Army of the Dead -->
+    <Talented.TalentDef>
+        <defName>ArmyOfTheDeadUltimate</defName>
+        <label>Army of the Dead</label>
+        <description>Raise fallen enemies as temporary undead servants while enhancing your own combat abilities.</description>
+        <levelRequired>5</levelRequired>
+        <abilityEffects>
+            <li>
+                <abilities>
+                    <li>
+                        <abilityDef>ArmyOfTheDeadEffect</abilityDef>
+                    </li>
+                </abilities>
+            </li>
+        </abilityEffects>
+    </Talented.TalentDef>
+</Defs>

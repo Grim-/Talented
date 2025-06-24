@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.TalentTreeDef>
+    <defName>GenericExampleTree</defName>
+    <treeName>A Generic Example Tree</treeName>
+    <!-- treeToolbarName variables
+    //0 Tree name
+    //1 Level
+    //2 Points Available
+    //3 Points Spent
+    //4 Pawn Name -->
+    <treeToolbarName>{0} Level({1}) Points({2})</treeToolbarName>
+    <dimensions>(600,400)</dimensions>
+    <handlerClass>Talented.ActiveTreeHandler</handlerClass>
+    <skin>DefaultTreeSkin</skin>
+    <nodes>
+      <li>Node_1737940031273_1882</li>
+    </nodes>
+    <availablePaths>
+      <li>
+        <name>DeathKnightPath</name>
+        <pathDescription></pathDescription>
+        <pathColor>(0,0,0)</pathColor>
+        <exclusiveWith>
+          <li>GravityMagePath</li>
+          <li>BuccaneerPath</li>
+        </exclusiveWith>
+      </li>
+      <li>
+        <name>BuccaneerPath</name>
+        <pathDescription></pathDescription>
+        <pathColor>(0,0,0)</pathColor>
+        <exclusiveWith>
+          <li>GravityMagePath</li>
+          <li>DeathKnightPath</li>
+        </exclusiveWith>
+      </li>
+      <li>
+        <name>GravityMagePath</name>
+        <pathDescription></pathDescription>
+        <pathColor>(0,0,0)</pathColor>
+        <exclusiveWith>
+          <li>DeathKnightPath</li>
+          <li>BuccaneerPath</li>
+        </exclusiveWith>
+      </li>
+    </availablePaths>
+    <displayStrategy>FixedPosition</displayStrategy>
+    <talentPointFormula>PerLevel</talentPointFormula>
+  </Talented.TalentTreeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_1882</defName>
+    <label>Root</label>
+    <position>(276,293)</position>
+    <type>Start</type>
+    <upgrades>
+      <li>HardyPassive</li>
+      <li>ArmorUpgrade</li>
+    </upgrades>
+    <connections>
+      <li>Node_1737940031273_8757</li>
+      <li>Node_1737940031273_9356</li>
+      <li>Node_1737940031273_2678</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_8757</defName>
+    <label>New Node</label>
+    <position>(276,241)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>UnholyFortitudePassive</li>
+    </upgrades>
+    <path>DeathKnightPath</path>
+    <connections>
+      <li>Node_1737940031273_6932</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_6932</defName>
+    <label>New Node</label>
+    <position>(276,190)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>AntiMagicShellAbility</li>
+    </upgrades>
+    <path>DeathKnightPath</path>
+    <connections>
+      <li>Node_1737940031273_8817</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_8817</defName>
+    <label>New Node</label>
+    <position>(276,138)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>DeathsEmbracePassive</li>
+    </upgrades>
+    <path>DeathKnightPath</path>
+    <connections>
+      <li>Node_1737940031273_9864</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_9356</defName>
+    <label>New Node</label>
+    <position>(169,241)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>SeaLegsPassive</li>
+    </upgrades>
+    <path>BuccaneerPath</path>
+    <connections>
+      <li>Node_1737940031273_6959</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_9864</defName>
+    <label>New Node</label>
+    <position>(276,86)</position>
+    <type>Normal</type>
+        <style>CapstoneNodeStyle</style>
+    <upgrades>
+      <li>ArmyOfTheDeadUltimate</li>
+    </upgrades>
+    <path>DeathKnightPath</path>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_6959</defName>
+    <label>New Node</label>
+    <position>(167,192)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>PistolShotAbility</li>
+    </upgrades>
+    <path>BuccaneerPath</path>
+    <connections>
+      <li>Node_1737940031273_2453</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_2453</defName>
+    <label>New Node</label>
+    <position>(167,141)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>PowderMasteryPassive</li>
+    </upgrades>
+    <path>BuccaneerPath</path>
+    <connections>
+      <li>Node_1737940031273_9098</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_9098</defName>
+    <label>New Node</label>
+    <position>(167,90)</position>
+    <type>Normal</type>
+    <style>CapstoneNodeStyle</style>
+    <upgrades>
+      <li>CannonBarrageUltimate</li>
+    </upgrades>
+    <path>BuccaneerPath</path>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_543</defName>
+    <label>New Node</label>
+    <position>(385,86)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>SingularityBurstUltimate</li>
+    </upgrades>
+    <path>GravityMagePath</path>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_8192</defName>
+    <label>New Node</label>
+    <position>(385,190)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>MassManipulationPassive</li>
+    </upgrades>
+    <path>GravityMagePath</path>
+    <connections>
+      <li>Node_1737940031273_1925</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_2678</defName>
+    <label>New Node</label>
+    <position>(385,241)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>ZeroGravityMasteryPassive</li>
+    </upgrades>
+    <path>GravityMagePath</path>
+    <connections>
+      <li>Node_1737940031273_8192</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+  <Talented.TalentTreeNodeDef>
+    <defName>Node_1737940031273_1925</defName>
+    <label>New Node</label>
+    <position>(385,138)</position>
+    <type>Normal</type>
+    <upgrades>
+      <li>GravityWellAbility</li>
+    </upgrades>
+    <path>GravityMagePath</path>
+    <connections>
+      <li>Node_1737940031273_543</li>
+    </connections>
+  </Talented.TalentTreeNodeDef>
+
+</Defs>

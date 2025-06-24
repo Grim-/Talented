@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Unholy Fortitude Hediff -->
+    <HediffDef>
+        <defName>UnholyFortitudeBuff</defName>
+        <label>unholy fortitude</label>
+        <hediffClass>HediffWithComps</hediffClass>
+        <description>Strengthened by dark energies.</description>
+        <defaultLabelColor>(0.4, 0.2, 0.6)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <IncomingDamageMultiplier>-0.25</IncomingDamageMultiplier>
+                    <MeleeDamageFactor>0.10</MeleeDamageFactor>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Anti-Magic Shell Ability and Effect -->
+    <AbilityDef>
+        <defName>AntiMagicShellEffect</defName>
+        <label>anti-magic shell</label>
+        <description>A protective barrier against magical attacks.</description>
+        <iconPath>Abilities/AntiMagicShell</iconPath>
+        <targetRequired>False</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>0.5</warmupTime>
+        </verbProperties>
+        <comps>
+            <li Class="CompProperties_AbilityGiveHediff">
+                <hediffDef>AntiMagicShellState</hediffDef>
+                <compClass>CompAbilityEffect_GiveHediff</compClass>
+            </li>
+        </comps>
+    </AbilityDef>
+
+    <HediffDef>
+        <defName>AntiMagicShellState</defName>
+        <label>anti-magic shell</label>
+        <hediffClass>HediffWithComps</hediffClass>
+        <description>Protected against magical damage.</description>
+        <defaultLabelColor>(0.2, 0.4, 0.8)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <IncomingDamageMultiplier>-0.50</IncomingDamageMultiplier>
+                    <PsychicSensitivity>-0.50</PsychicSensitivity>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Death's Embrace Hediff -->
+    <HediffDef>
+        <defName>DeathsEmbraceBuff</defName>
+        <label>death's embrace</label>
+        <hediffClass>HediffWithComps</hediffClass>
+        <description>Empowered by the forces of death.</description>
+        <defaultLabelColor>(0.3, 0.1, 0.3)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MeleeDamageFactor>0.30</MeleeDamageFactor>
+                    <MeleeHitChance>0.15</MeleeHitChance>
+                    <StaggerTimeMultiplier>-0.50</StaggerTimeMultiplier>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Army of the Dead Ability -->
+    <AbilityDef>
+        <defName>ArmyOfTheDeadEffect</defName>
+        <label>army of the dead</label>
+        <description>Raise the dead to fight at your command.</description>
+        <iconPath>Abilities/ArmyOfTheDead</iconPath>
+        <targetRequired>False</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>2.0</warmupTime>
+            <range>20.0</range>
+        </verbProperties>
+        <comps>
+        </comps>
+    </AbilityDef>
+</Defs>

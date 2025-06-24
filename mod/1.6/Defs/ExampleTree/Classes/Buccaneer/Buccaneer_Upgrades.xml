@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- Powder Mastery Hediff -->
+    <HediffDef>
+        <defName>PowderMasteryBuff</defName>
+        <label>powder mastery</label>
+        <description>Expert handling of black powder weapons.</description>
+        <defaultLabelColor>(0.7, 0.5, 0.2)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <ShootingAccuracyPawn>2.0</ShootingAccuracyPawn>
+                    <ReloadSpeed>0.15</ReloadSpeed>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Pistol Shot Ability -->
+    <AbilityDef>
+        <defName>PistolShotEffect</defName>
+        <label>pistol shot</label>
+        <description>A powerful flintlock shot.</description>
+        <iconPath>Abilities/PistolShot</iconPath>
+        <targetRequired>True</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>0.5</warmupTime>
+            <range>15.9</range>
+        </verbProperties>
+    </AbilityDef>
+
+    <!-- Sea Legs Hediff -->
+    <HediffDef>
+        <defName>SeaLegsEffect</defName>
+        <label>sea legs</label>
+        <description>Perfect balance from years at sea.</description>
+        <defaultLabelColor>(0.2, 0.5, 0.7)</defaultLabelColor>
+        <stages>
+            <li>
+                <statOffsets>
+                    <MoveSpeed>0.15</MoveSpeed>
+                    <MeleeDodgeChance>0.15</MeleeDodgeChance>
+                </statOffsets>
+            </li>
+        </stages>
+    </HediffDef>
+
+    <!-- Cannon Barrage Ability -->
+    <AbilityDef>
+        <defName>CannonBarrageEffect</defName>
+        <label>cannon barrage</label>
+        <description>Call in devastating cannon fire.</description>
+        <iconPath>Abilities/CannonBarrage</iconPath>
+        <targetRequired>True</targetRequired>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <warmupTime>2.0</warmupTime>
+            <range>40.9</range>
+        </verbProperties>
+    </AbilityDef>
+</Defs>

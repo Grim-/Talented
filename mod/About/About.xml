@@ -4,6 +4,7 @@
   <author>Emo</author>
   <supportedVersions>
     <li>1.5</li>
+    <li>1.6</li>
   </supportedVersions>
 	<packageId>com.emo.talented</packageId>
         <description>Allows mod developers to use this light weight, extendable framework in order to create classes and other specializations.</description>

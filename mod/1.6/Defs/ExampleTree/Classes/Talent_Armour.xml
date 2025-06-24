@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <Talented.TalentDef>
+      <defName>ArmorUpgrade</defName>
+      <label>Enhanced Defense</label>
+      <description>Improves overall armor effectiveness by 5%.</description>
+      <levelRequired>4</levelRequired>
+      <statEffects>
+          <li>
+              <statDef>ArmorRating_Sharp</statDef>
+              <value>1.05</value>
+              <operation>Add</operation>
+          </li>
+      </statEffects>
+  </Talented.TalentDef>
+
+  <Talented.TalentDef>
+      <defName>HardyPassive</defName>
+      <label>Hardy</label>
+      <levelRequired>0</levelRequired>
+      <pointCost>1</pointCost>
+      <stackingStatEffect>
+        <maxRepeats>5</maxRepeats>
+          <effects>
+            <li>
+              <statDef>LifespanFactor</statDef>
+              <value>1.2</value>
+              <operation>Multiply</operation>
+            </li>
+        </effects>
+      </stackingStatEffect>
+  </Talented.TalentDef>
+</Defs>
